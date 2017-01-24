@@ -1,0 +1,30 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="page-header">
+        <h1>{{{beteckning}}}</h1>
+      </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Lagfaren ägare</h3>
+          </div>
+            <table class="table">
+              <tbody>
+                {{#each lagfart}}
+                  <tr>
+                    <td>
+                      <address>
+                        <strong>{{agare.namn}}</strong><br>
+                        {{agare.utdelningsadress}}<br>
+                        {{agare.postadress}}<br>
+                        </address>
+                        Andel: {{andel}}
+                    </td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+</div>

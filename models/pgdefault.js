@@ -1,0 +1,31 @@
+var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
+  var schema = queryOptions.schema;
+  //var database = queryOptions.database;
+  var table = queryOptions.table;
+  var searchField = queryOptions.searchField;
+  var sqlSearchField = searchField ? table + '."' + searchField + '" AS "NAMN",' : "";
+  var fields = queryOptions.fields;
+  var geometryField = queryOptions.geometryName || "SHAPE";
+  var centroid = 'ST_AsText(ST_PointOnSurface(' + table + '."' + geometryField + '")) AS "GEOM" ';
+  var sqlFields = fields ? fields.join(',') + "," : "";
+  var type = " '" + table + "'" + ' AS "TYPE", ';
+  var condition = queryString;
+  var searchString;
+  var limitNumber = queryOptions.limit || defaultLimit || 1000;
+  var limit = ' LIMIT ' + limitNumber.toString() + ' ';
+
+  searchString =
+    'SELECT ' +
+    sqlSearchField +
+    ' adressplats."gid" AS "GID", ' +
+    type +
+    centroid +
+    ' FROM ' + schema + '.' + table +
+    ' WHERE LOWER(' + table + '."' + searchField + '"' + ") ILIKE LOWER('" + condition + "%')" +
+    ' ORDER BY ' + table + '."' + searchField + '"' +
+    limit + ';';
+
+  return searchString;
+}
+
+module.exports = pgDefault;
