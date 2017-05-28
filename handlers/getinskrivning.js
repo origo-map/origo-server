@@ -100,6 +100,7 @@ function formatLagfart(obj) {
     var postnummer = objectifier.get('ns4:Person.ns4:Adress.ns4:postnummer', agare);
     var postort = objectifier.get('ns4:Person.ns4:Adress.ns4:postort', agare);
     person.postadress = postnummer + ' ' + postort;
+    person.coAdress = objectifier.get('ns4:Person.ns4:Adress.ns4:coAdress', agare);
     rObj.agare = person;
   }
   
@@ -111,13 +112,45 @@ function formatLagfart(obj) {
     var postnummer = objectifier.get('ns4:Organisation.ns4:Adress.ns4:postnummer', agare);
     var postort = objectifier.get('ns4:Organisation.ns4:Adress.ns4:postort', agare);
     org.postadress = postnummer + ' ' + postort;
+    org.coAdress = objectifier.get('ns4:Organisation.ns4:Adress.ns4:coAdress', agare);
     rObj.agare = org;
   }
+
+  //Om ägare är utländsk
+  else if (objectifier.get('ns4:UtlandskAgare', agare)) {
+    var utlandsk = {};
+    utlandsk.utdelningsadress = objectifier.get('ns4:UtlandskAgare.ns4:utdelningsadress', agare);
+    var postkod = objectifier.get('ns4:UtlandskAgare.ns4:postkod', agare);
+    var postort = objectifier.get('ns4:UtlandskAgare.ns4:postort', agare);
+    utlandsk.postadress = postkod + ' ' + postort;
+    utlandsk.land = objectifier.get('ns4:UtlandskAgare.ns4:land', agare);
+    rObj.agare = utlandsk;
+  }
+
+  //Om ägare är utländsk eller skyddad identitet
+  else {
+    rObj.efternamn = objectifier.get('ns4:efternamn', agare);
+    rObj.fornamn = objectifier.get('ns4:fornamn', agare);
+    rObj.orgnamn = objectifier.get('ns4:organisationsnamn', agare);
+  }
+
+  //Id-nummer
+  rObj.id = objectifier.get('ns4:IDnummer', agare);
 
   //Andel
   var taljare = objectifier.get('ns4:BeviljadAndel.ns4:taljare', obj);
   var namnare = objectifier.get('ns4:BeviljadAndel.ns4:namnare', obj);
   rObj.andel = taljare + '/' + namnare;
+
+  //Inskrivningsdag
+  var inskrivningsdag = objectifier.get('ns4:inskrivningsdag', obj);
+  rObj.inskrivningsdag = inskrivningsdag.substr(0,10);
+
+  //Dagboksnummer
+  rObj.dagboksnummer = objectifier.get('ns4:dagboksnummer', obj);
+
+  //Beslut
+  rObj.beslut = objectifier.get('ns4:beslut', obj);
 
   return rObj;
 }
