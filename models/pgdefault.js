@@ -17,7 +17,7 @@ var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
   searchString =
     'SELECT ' +
     sqlSearchField +
-    ' adressplats."gid" AS "GID", ' +
+    ' ' + table + '."gid" AS "GID", ' +
     type +
     centroid +
     ' FROM ' + schema + '.' + table +
