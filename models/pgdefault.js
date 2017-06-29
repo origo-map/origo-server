@@ -1,8 +1,8 @@
 var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
   var schema = queryOptions.schema;
-  //var database = queryOptions.database;
   var table = queryOptions.table;
   var searchField = queryOptions.searchField;
+  var gid = queryOptions.gid || 'gid';
   var sqlSearchField = searchField ? table + '."' + searchField + '" AS "NAMN",' : "";
   var fields = queryOptions.fields;
   var geometryField = queryOptions.geometryName || "SHAPE";
@@ -17,7 +17,7 @@ var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
   searchString =
     'SELECT ' +
     sqlSearchField +
-    ' ' + table + '."gid" AS "GID", ' +
+    ' ' + table + '."' + gid + '" AS "GID", ' +
     type +
     centroid +
     ' FROM ' + schema + '.' + table +

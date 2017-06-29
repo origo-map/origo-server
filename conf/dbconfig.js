@@ -62,12 +62,15 @@ module.exports = {
               geometryName: 'geometry field name, for example geom',
               database: 'database name',
               fields: ['field name', 'field name'],
-			  layers: [
-				'layer name',
-				'layer name',
-				'layer name',
-				'layer name'
-			  ]
+      			  tables: [
+                {
+        					table: 'table name',
+        					searchField: 'search field name'
+      				  },
+      				  {
+        					table: 'table name'
+      				  }
+			        ]
           }
       },
       addressEstate: {

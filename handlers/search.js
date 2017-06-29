@@ -10,13 +10,13 @@ var search = function(req, res) {
   var connector = dbConfig.connectors.search;
   var multiSearchModel = searchModel.search;
   var limit = dbConfig.limit || 100;
-  var layers = req.query.layers || multiSearchModel.layers;
+  var tables = req.query.layers || multiSearchModel.tables;
 
   var db = dbType(connector);
   var queries = [];
-  layers.forEach(function(layer) {
-    multiSearchModel.table = layer;
-    var searchString = model[db](query, multiSearchModel, limit);
+  tables.forEach(function(table) {
+	var options = Object.assign({}, multiSearchModel, table);
+    var searchString = model[db](query, options, limit);
     queries.push({
       queryString: searchString
     });
