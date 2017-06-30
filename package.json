@@ -27,6 +27,7 @@
     "mssql": "^3.3.0",
     "oracledb": "^1.9.3",
     "pg": "^6.1.0",
-    "pg-promise": "^5.3.5"
+    "pg-promise": "^5.3.5",
+    "node-windows": "^0.1.14"
   }
 }
