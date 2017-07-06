@@ -14,11 +14,35 @@
                   <tr>
                     <td>
                       <address>
-                        <strong>{{agare.namn}}</strong><br>
-                        {{agare.utdelningsadress}}<br>
-                        {{agare.postadress}}<br>
-                        </address>
-                        Andel: {{andel}}
+                        {{#if efternamn}}
+                          <strong>{{efternamn}} {{fornamn}}</strong><br>
+                        {{/if}}
+                        {{#if orgnamn}}
+                          <strong>{{orgnamn}}</strong><br>
+                        {{/if}}
+                        {{#if agare.namn}}
+                          <strong>{{agare.namn}}</strong><br>
+                        {{/if}}
+                        {{#if agare.utdelningsadress}}
+                          {{agare.utdelningsadress}}<br>
+                        {{/if}}
+                        {{#if agare.coAdress}}
+                          {{agare.coAdress}}<br>
+                        {{/if}}
+                        {{#if agare.postadress}}
+                          {{agare.postadress}}<br>
+                        {{/if}}
+                        {{#if agare.land}}
+                          {{agare.land}}<br>
+                        {{/if}}
+                      </address>
+                      {{#if id}}
+                      Id-nummer: {{id}}<br>
+                      {{/if}}
+                      Andel: {{andel}}<br>
+                      Inskrivningsdag: {{inskrivningsdag}}<br>
+                      Dagboksnummer: {{dagboksnummer}}<br>
+                      Beslut: {{beslut}}
                     </td>
                   </tr>
                 {{/each}}
