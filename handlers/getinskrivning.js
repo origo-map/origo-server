@@ -102,7 +102,7 @@ function formatLagfart(obj) {
     person.postadress = postnummer + ' ' + postort;
     rObj.agare = person;
   }
-  
+
   //Om ägare är organisation
   else if (objectifier.get('ns4:Organisation', agare)) {
     var org = {};
