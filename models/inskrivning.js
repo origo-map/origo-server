@@ -1,17 +1,19 @@
 module.exports = function() {
 
   var inskrivning = {
-    beteckning: undefined,
-    lagfart: [],
-    inskrivningsdag: false,
-    dagboksnummer: false,
-    beslut: false,
-    agare: {
-      idNummer: false,
-      organisation: {
-        juridiskForm: false
-      },
-      andel: true
+    referens: {
+      beteckning: true,
+      fastighetsnyckel: false
+    },
+    lagfart: {
+      agare: {
+        IDnummer: false,
+        inskrivningsdag: true,
+        dagboksnummer: false,
+        beslut: false,
+        BeviljadAndel: true,
+        agare: true
+      }
     },
     tomtrattsinnehav: {
       beslut: false,

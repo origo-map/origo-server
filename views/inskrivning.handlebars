@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-4">
       <div class="page-header">
-        <h1>{{{beteckning}}}</h1>
+        <h1>{{{referens.beteckning}}}</h1>
       </div>
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -10,7 +10,7 @@
           </div>
             <table class="table">
               <tbody>
-                {{#each lagfart}}
+                {{#each lagfart.agare}}
                   <tr>
                     <td>
                       <address>
@@ -18,7 +18,21 @@
                         {{agare.utdelningsadress}}<br>
                         {{agare.postadress}}<br>
                         </address>
-                        Andel: {{andel}}
+                        {{#if IDnummer}}
+                          Idnummer: {{IDnummer}}<br>
+                        {{/if}}
+                        {{#if BeviljadAndel}}
+                          Andel: {{BeviljadAndel}}<br>
+                        {{/if}}
+                        {{#if inskrivningsdag}}
+                          Inskrivningsdag: {{inskrivningsdag}}<br>
+                        {{/if}}
+                        {{#if dagboksnummer}}
+                          Dagboksnummer: {{dagboksnummer}}<br>
+                        {{/if}}
+                        {{#if beslut}}
+                          Beslut: {{beslut}}<br>
+                        {{/if}}
                     </td>
                   </tr>
                 {{/each}}

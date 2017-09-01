@@ -4,6 +4,9 @@ var builder = require('xmlbuilder');
 var request = require('request');
 var parseString = require('xml2js').parseString;
 var inskrivning = require('../models/inskrivning');
+var translate = require('./inskrivning/translate');
+var referensTranslate = require('./inskrivning/referenstranslate');
+var agareTranslate = require('./inskrivning/agaretranslate');
 
 var getInskrivning = function(req, res) {
 
@@ -66,60 +69,17 @@ var getInskrivning = function(req, res) {
 
 function parseResult(result) {
   var data = objectifier.find('ns4:Inskrivningsinformation', result);
-  var inskriv = inskrivning();
+  var model = inskrivning();
+  var inskriv = {};
 
   //Registerenhet
-  inskriv.beteckning = objectifier.get('ns4:Registerenhetsreferens.ns4:beteckning', data);
+  inskriv.referens = translate(model.referens, data, referensTranslate);
 
-  //Lagfarter
-  var lagfarter = objectifier.get('ns4:Agande.ns4:Lagfart', data);
-  if (Array.isArray(lagfarter)) {
-    inskriv.lagfart = lagfarter.map(function(lagfart) {
-      return formatLagfart(lagfart);
-    });
-  } else {
-    inskriv.lagfart = [formatLagfart(lagfarter)];
-  }
+  //Ägare
+  inskriv.lagfart = translate(model.lagfart, data, agareTranslate);
 
   return inskriv;
 }
 
-function formatLagfart(obj) {
-  var rObj = {};
-
-  //Ägare
-  var agare = objectifier.get('ns4:Agare', obj);
-
-  //Om ägare är person
-  if (objectifier.get('ns4:Person', agare)) {
-    var person = {};
-    var efternamn = objectifier.get('ns4:Person.ns4:efternamn', agare);
-    var fornamn = objectifier.get('ns4:Person.ns4:fornamn', agare);
-    person.namn = efternamn + ', ' + fornamn;
-    person.utdelningsadress = objectifier.get('ns4:Person.ns4:Adress.ns4:utdelningsadress2', agare);
-    var postnummer = objectifier.get('ns4:Person.ns4:Adress.ns4:postnummer', agare);
-    var postort = objectifier.get('ns4:Person.ns4:Adress.ns4:postort', agare);
-    person.postadress = postnummer + ' ' + postort;
-    rObj.agare = person;
-  }
-
-  //Om ägare är organisation
-  else if (objectifier.get('ns4:Organisation', agare)) {
-    var org = {};
-    org.namn = objectifier.get('ns4:Organisation.ns4:organisationsnamn', agare);
-    org.utdelningsadress = objectifier.get('ns4:Organisation.ns4:Adress.ns4:utdelningsadress2', agare);
-    var postnummer = objectifier.get('ns4:Organisation.ns4:Adress.ns4:postnummer', agare);
-    var postort = objectifier.get('ns4:Organisation.ns4:Adress.ns4:postort', agare);
-    org.postadress = postnummer + ' ' + postort;
-    rObj.agare = org;
-  }
-
-  //Andel
-  var taljare = objectifier.get('ns4:BeviljadAndel.ns4:taljare', obj);
-  var namnare = objectifier.get('ns4:BeviljadAndel.ns4:namnare', obj);
-  rObj.andel = taljare + '/' + namnare;
-
-  return rObj;
-}
 
 module.exports = getInskrivning;
