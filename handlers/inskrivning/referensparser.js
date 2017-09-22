@@ -1,5 +1,5 @@
 var objectifier = require('../../lib/utils/objectifier');
-var ns = 'ns4';
+var ns = require('./conf').ns;
 var registerNs = ns + ':Registerenhetsreferens.' + ns + ':';
 
 var referensTranslate = {

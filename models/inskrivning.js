@@ -15,11 +15,12 @@ module.exports = function() {
         agare: true
       }
     },
-    tomtrattsinnehav: {
+    tomtratt: {
       beslut: false,
-      indskrivningdag: false,
+      inskrivningsdag: true,
       dagboksnummer: false,
-      andel: true
+      BeviljadAndel: true,
+      agare: true
     }
   }
 

@@ -39,6 +39,43 @@
               </tbody>
             </table>
         </div>
+        {{#if tomtratt}}
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Tomträttshavare</h3>
+            </div>
+              <table class="table">
+                <tbody>
+                    {{#each tomtratt}}
+                      <tr>
+                        <td>
+                          <address>
+                            <strong>{{agare.namn}}</strong><br>
+                            {{agare.utdelningsadress}}<br>
+                            {{agare.postadress}}<br>
+                            </address>
+                            {{#if IDnummer}}
+                              Idnummer: {{IDnummer}}<br>
+                            {{/if}}
+                            {{#if BeviljadAndel}}
+                              Andel: {{BeviljadAndel}}<br>
+                            {{/if}}
+                            {{#if inskrivningsdag}}
+                              Inskrivningsdag: {{inskrivningsdag}}<br>
+                            {{/if}}
+                            {{#if dagboksnummer}}
+                              Dagboksnummer: {{dagboksnummer}}<br>
+                            {{/if}}
+                            {{#if beslut}}
+                              Beslut: {{beslut}}<br>
+                            {{/if}}
+                        </td>
+                      </tr>
+                    {{/each}}
+                </tbody>
+              </table>
+          </div>
+        {{/if}}
     </div>
   </div>
 </div>

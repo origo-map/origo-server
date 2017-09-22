@@ -4,9 +4,10 @@ var builder = require('xmlbuilder');
 var request = require('request');
 var parseString = require('xml2js').parseString;
 var inskrivning = require('../models/inskrivning');
-var translate = require('./inskrivning/translate');
-var referensTranslate = require('./inskrivning/referenstranslate');
-var agareTranslate = require('./inskrivning/agaretranslate');
+var parser = require('./inskrivning/parser');
+var referensParser = require('./inskrivning/referensparser');
+var lagfartParser = require('./inskrivning/lagfartparser');
+var tomtrattParser = require('./inskrivning/tomtrattparser');
 
 var getInskrivning = function(req, res) {
 
@@ -71,12 +72,19 @@ function parseResult(result) {
   var data = objectifier.find('ns4:Inskrivningsinformation', result);
   var model = inskrivning();
   var inskriv = {};
+  var tomtratter;
 
   //Registerenhet
-  inskriv.referens = translate(model.referens, data, referensTranslate);
+  inskriv.referens = parser(model.referens, data, referensParser);
 
   //Ägare
-  inskriv.lagfart = translate(model.lagfart, data, agareTranslate);
+  inskriv.lagfart = parser(model.lagfart, data, lagfartParser);
+
+  //Tomträttshavare
+  tomtratter = tomtrattParser(model.tomtratt, data);
+  if (tomtratter.length) {
+    inskriv.tomtratt = tomtratter;
+  }
 
   return inskriv;
 }

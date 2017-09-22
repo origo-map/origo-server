@@ -1,56 +1,8 @@
 var objectifier = require('../../lib/utils/objectifier');
-var translate = require('./translate');
-var ns = 'ns4';
-var lagfartNs = ns + ':Agande.' + ns + ':Lagfart';
+var ns = require('./conf').ns;
 
-var lagfarenTranslate = {
-  agare: getLagfarter
-};
-
-var agareTranslate = {
-  IDnummer: getIdNummer,
-  inskrivningsdag: getInskrivning,
-  dagboksnummer: get,
-  beslut: get,
-  BeviljadAndel: getAndel,
-  agare: getAgare
-};
-
-function get(prop, data) {
-  return objectifier.get(ns + ':' + prop, data);
-}
-
-function getInskrivning(prop, data) {
-  return get(prop, data).slice(0,10);
-}
-
-function getLagfarter(prop, data, model) {
-  var lagfarter = objectifier.get(lagfartNs, data);
-  var result = [];
-  if (Array.isArray(lagfarter)) {
-    result = lagfarter.map(function(lagfart) {
-      return translate(model.agare, lagfart, agareTranslate);;
-    });
-  } else {
-    result = [translate(model.agare, lagfarter, agareTranslate)];
-  }
-  return result;
-}
-
-function getAndel(prop, data) {
-  var andelNs = ns + ':' + prop + '.' + ns + ':';
-  var taljare = objectifier.get(andelNs + 'taljare', data);
-  var namnare = objectifier.get(andelNs + 'namnare', data);
-  return taljare + '/' + namnare;
-}
-
-function getIdNummer(prop, data) {
-  var idNs = ns + ':Agare.' + ns + ':' + prop;
-  return objectifier.get(idNs, data);
-}
-
-function getAgare(prop, data, model) {
-  var result = {};
+module.exports = function getAgare(prop, data, model) {
+  var result;
   var agarNs = ns + ':Agare.';
   var personNs = agarNs + ns + ':Person.' + ns + ':';
   var adressNs = personNs + 'Adress.' + ns + ':';
@@ -82,5 +34,3 @@ function getAgare(prop, data, model) {
   }
   return result;
 }
-
-module.exports = lagfarenTranslate;
