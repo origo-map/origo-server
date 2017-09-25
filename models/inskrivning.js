@@ -6,23 +6,22 @@ module.exports = function() {
       fastighetsnyckel: false
     },
     lagfart: {
-      agare: {
-        IDnummer: false,
-        inskrivningsdag: true,
-        dagboksnummer: false,
-        beslut: false,
-        BeviljadAndel: true,
-        agare: true
-      }
+      IDnummer: false,
+      inskrivningsdag: true,
+      dagboksnummer: false,
+      beslut: false,
+      BeviljadAndel: true,
+      agare: true
     },
     tomtratt: {
+      IDnummer: false,
       beslut: false,
       inskrivningsdag: true,
       dagboksnummer: false,
       BeviljadAndel: true,
       agare: true
     }
-  }
+  };
 
   return Object.create(inskrivning);
 

@@ -2,35 +2,69 @@ var objectifier = require('../../lib/utils/objectifier');
 var ns = require('./conf').ns;
 
 module.exports = function getAgare(prop, data, model) {
-  var result;
+  var result = {};
   var agarNs = ns + ':Agare.';
-  var personNs = agarNs + ns + ':Person.' + ns + ':';
-  var adressNs = personNs + 'Adress.' + ns + ':';
-  var orgNs = agarNs + ns + ':Organisation.' + ns + ':';
-  var adressOrgNs = orgNs + 'Adress.' + ns + ':';
+  var personData;
+  var orgData;
 
-  //Om ägare är person
-  if (objectifier.get(agarNs + ns + ':Person', data)) {
-    var person = {};
-    var efternamn = objectifier.get(personNs + 'efternamn', data);
-    var fornamn = objectifier.get(personNs + 'fornamn', data);
-    person.namn = efternamn + ', ' + fornamn;
-    person.utdelningsadress = objectifier.get(adressNs + 'utdelningsadress2', data);
-    var postnummer = objectifier.get(adressNs + 'postnummer', data);
-    var postort = objectifier.get(adressNs + 'postort', data);
-    person.postadress = postnummer + ' ' + postort;
-    result = person;
+  personData = objectifier.get(agarNs + ns + ':Person', data);
+  orgData = objectifier.get(agarNs + ns + ':Organisation', data);
+
+  if (personData) {
+    result = getPerson(personData);
+  } else if (orgData) {
+    result = getOrg(orgData);
   }
 
-  //Om ägare är organisation
-  else if (objectifier.get(agarNs + ns + ':Organisation', data)) {
-    var org = {};
-    org.namn = objectifier.get(orgNs + 'organisationsnamn', data);
-    org.utdelningsadress = objectifier.get(adressOrgNs + 'utdelningsadress2', data);
-    var postnummer = objectifier.get(adressOrgNs + 'postnummer', data);
-    var postort = objectifier.get(adressOrgNs + 'postort', data);
-    org.postadress = postnummer + ' ' + postort;
-    result = org;
+  // Uppgift saknas tex om skyddad identitet. Skyddad identitet har efternamn = "SKYDDAD IDENTITET"
+  if (!result.namn) {
+    result.namn = 'Uppgift saknas';
   }
+
   return result;
+
+  function getPerson(personObj) {
+    var person = {};
+    var utlandsk = objectifier.get(ns + ':Utlandsadress', personObj);
+    var efternamn = objectifier.get(ns + ':efternamn', personObj);
+    var fornamn =  objectifier.get(ns + ':fornamn', personObj);
+    var adress = getAdress(personObj[ns + ':Adress']);
+    if (efternamn && fornamn) {
+      person.namn = efternamn + ', ' + fornamn;
+    }
+    if (utlandsk) {
+      adress = getUtlandskAdress(utlandsk);
+    }
+    return Object.assign(person, adress);
+  }
+
+  function getOrg(orgObj) {
+    var org = {};
+    var utlandsk = objectifier.get(ns + ':Utlandsadress', orgObj);
+    var adress = getAdress(orgObj[ns + ':Adress']);
+    org.namn = objectifier.get(ns + ':organisationsnamn', orgObj);
+    if (utlandsk) {
+      adress = getUtlandskAdress(utlandsk);
+    }
+    return Object.assign(org, adress);
+  }
+
+  function getAdress(adressObj) {
+    var adress = {};
+    var postnummer = objectifier.get(ns + ':postnummer', adressObj);
+    var postort = objectifier.get(ns + ':postort', adressObj);
+    var coAdress;
+    adress.utdelningsadress = objectifier.get(ns + ':utdelningsadress2', adressObj);
+    adress.postadress = postnummer + ' ' + postort;
+    adress.coAdress = objectifier.get(ns + ':coAdress', adressObj);
+    return adress;
+  }
+
+  function getUtlandskAdress(adressObj) {
+    var adress = {};
+    adress.utdelningsadress = objectifier.get(ns + ':utdelningsadress1', adressObj);
+    adress.postadress = objectifier.get(ns + ':utdelningsadress3', adressObj);
+    adress.land = objectifier.get(ns + ':land', adressObj);
+    return adress;
+  }
 }

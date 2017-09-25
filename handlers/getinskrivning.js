@@ -78,7 +78,7 @@ function parseResult(result) {
   inskriv.referens = parser(model.referens, data, referensParser);
 
   //Ägare
-  inskriv.lagfart = parser(model.lagfart, data, lagfartParser);
+  inskriv.lagfart = lagfartParser(model.lagfart, data);
 
   //Tomträttshavare
   tomtratter = tomtrattParser(model.tomtratt, data);

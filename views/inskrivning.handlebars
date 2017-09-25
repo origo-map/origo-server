@@ -10,13 +10,23 @@
           </div>
             <table class="table">
               <tbody>
-                {{#each lagfart.agare}}
+                {{#each lagfart}}
                   <tr>
                     <td>
                       <address>
                         <strong>{{agare.namn}}</strong><br>
-                        {{agare.utdelningsadress}}<br>
-                        {{agare.postadress}}<br>
+                        {{#if agare.utdelningsadress}}
+                          {{agare.utdelningsadress}}<br>
+                        {{/if}}
+                        {{#if agare.coAdress}}
+                          c/o: {{agare.coAdress}}<br>
+                        {{/if}}
+                        {{#if agare.postadress}}
+                          {{agare.postadress}}<br>
+                        {{/if}}
+                        {{#if agare.land}}
+                          {{agare.land}}<br>
+                        {{/if}}
                         </address>
                         {{#if IDnummer}}
                           Idnummer: {{IDnummer}}<br>
