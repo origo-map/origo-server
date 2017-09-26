@@ -10,11 +10,12 @@ module.exports = {
           }
       },
       search: {
-          mssql: {
-            user: 'xxxxx',
-            password: 'xxxxx',
-            connectString: "server name",
-            database: "test"
+          pg: {
+            user: 'postgres',
+            password: 'postgres',
+            connectString: "localhost",
+            database: "mdk",
+			port: 5432
           }
       },
       singlesearch: {
@@ -30,10 +31,10 @@ module.exports = {
           //   database: "database name"
           // }
           pg: {
-            user: 'xxxxx',
-            password: 'xxxxx',
-            connectString: "server name",
-            database: "database name",
+            user: 'postgres',
+            password: 'postgres',
+            connectString: "localhost",
+            database: "rtj",
             port: 5432
           }
       }
@@ -47,30 +48,34 @@ module.exports = {
           //     database: 'database name'
           // }
           search: {
-              table: "table name",
-              searchField: "search field name",
-              schema: 'schema name, for example public',
-              geometryName: 'geometry field name, for example geom',
+              table: "fastighetsytor_sammanslagen",
+              searchField: "FASTIGHET",
+              schema: 'public',
+              geometryName: 'geom',
           }
 
       },
       search: {
           search: {
-              table: "table name",
-              searchField: "search field name",
-              schema: 'schema name, for example dbo',
-              geometryName: 'geometry field name, for example geom',
-              database: 'database name',
-              fields: ['field name', 'field name'],
-      			  tables: [
-                {
-        					table: 'table name',
-        					searchField: 'search field name'
-      				  },
-      				  {
-        					table: 'table name'
-      				  }
-			        ]
+              table: "adressplats",
+              searchField: "Namn",
+              schema: 'public',
+              geometryName: 'geom',
+              database: 'mdk',
+			  tables: [
+				  {
+					table: 'adressplats',
+					searchField: 'NAMN'
+				  },
+				  {
+					table: 'intressepkt'
+				  },
+				  {
+					table: 'turismleder',
+					searchField: 'NAMN',
+					gid: 'GID'
+				  }				  
+			  ]
           }
       },
       addressEstate: {
