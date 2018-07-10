@@ -1,7 +1,7 @@
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
-
+var errors = require('./errors');
 var routes = require('./routes/index');
 
 var app = express();
@@ -31,19 +31,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/origoserver/', routes);
 
 // error handlers
-
-// 404 catch-all handler (middleware)
-app.use(function(req, res, next) {
-    res.status(404);
-    res.render('404');
-});
-
-// 500 error handler (middleware)
-app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    res.status(500);
-    res.render('500');
-});
-
+errors(app);
 
 module.exports = app;
