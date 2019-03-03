@@ -20,16 +20,19 @@ const aktkey = config.getAkt.consumer_key;
 const aktsecret = config.getAkt.consumer_secret;
 const aktscope = config.getAkt.scope;
 
+// Token holder
 let token;
 
-proxy = httpProxy.createProxyServer({});
+// Proxy server holder
+let proxy = httpProxy.createProxyServer();
 
-// Token holder
-function tokenHeader(token) { }
+// Get hold of that nested token and use in proxy request header
+function tokenHeader() { };
 
-proxy.on('proxyReq', (proxyReq, req, res, options) => {
+// Proxy request config
+proxy.on('proxyReq', (proxyReq, req) => {
 
-  // Get the request paths
+  // Get the request path
   const parsedUrl = url.parse(req.url);
   const query = parsedUrl.search;
   const path = parsedUrl.pathname;
@@ -44,7 +47,7 @@ proxy.on('proxyReq', (proxyReq, req, res, options) => {
     enc_id: pathPart[5]
   }
 
-  // Set proper proxy request path
+  // Proxy path holder
   let proxyPath;
 
   if (path.includes('healthcheck')) {
@@ -57,15 +60,15 @@ proxy.on('proxyReq', (proxyReq, req, res, options) => {
     const page = `/distribution/produkter/aktdirekt/v3.0${pathObj.page_}_${pathObj.vers}_${pathObj.subdoc}_${pathObj.page}_${pathObj.archive}_${encodeURIComponent(pathObj.enc_id)}`;
     proxyPath = page;
   }
+  // Set proper proxy request path
   proxyReq.path = proxyPath;
   // Set the proxy request headers
   proxyReq.setHeader(`Authorization`, `Bearer ${token}` + ` scope`, `${aktscope}`);
-
 })
 
 // If the http-proxy throws an error, log it
-proxy.on('error', (err, req, res) => {
-  console.log('Error: ', err);
+proxy.on('error', (err) => {
+  console.log('AktDirekt proxy error: ', err);
 })
 
 // Do the request in proper order
