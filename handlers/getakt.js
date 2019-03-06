@@ -27,7 +27,9 @@ let token;
 let proxy = httpProxy.createProxyServer();
 
 // Get hold of that nested token and use in proxy request header
-function tokenHeader() { };
+function tokenHeader() {
+  return;
+}
 
 // Proxy request config
 proxy.on('proxyReq', (proxyReq, req) => {
@@ -47,19 +49,22 @@ proxy.on('proxyReq', (proxyReq, req) => {
     enc_id: pathPart[5]
   }
 
+  // Proxy target option, akturl, exclude path so we define here and use it with proxyPath
+  const targetPath = `/distribution/produkter/aktdirekt/v3.0`;
   // Proxy path holder
   let proxyPath;
 
   if (path.includes('healthcheck')) {
-    const healthcheck = `/distribution/produkter/aktdirekt/v3.0${path}`;
+    const healthcheck = `${targetPath}${path}`;
     proxyPath = healthcheck;
   } else if (path.includes('index.djvu')) {
-    const index = `/distribution/produkter/aktdirekt/v3.0${path}${encodeURI(query)}`;
+    const index = `${targetPath}${path}${encodeURI(query)}`;
     proxyPath = index;
   } else if (path.includes('page_')) {
-    const page = `/distribution/produkter/aktdirekt/v3.0${pathObj.page_}_${pathObj.vers}_${pathObj.subdoc}_${pathObj.page}_${pathObj.archive}_${encodeURIComponent(pathObj.enc_id)}`;
+    const page = `${targetPath}${pathObj.page_}_${pathObj.vers}_${pathObj.subdoc}_${pathObj.page}_${pathObj.archive}_${encodeURIComponent(pathObj.enc_id)}`;
     proxyPath = page;
   }
+
   // Set proper proxy request path
   proxyReq.path = proxyPath;
   // Set the proxy request headers
