@@ -1,16 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var sendResponse = require('../lib/sendresponse');
-var model = require('../models/dbmodels');
-var path = require('path');
-// var test = require('./test');
-
 var excel = require('exceljs');
-
-// router.get('/', function (req, res) {
-//   console.log('get');
-//   res.send('get');
-// });
 
 router.options('/', function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -29,14 +19,6 @@ router.options('/', function (req, res, next) {
 router.post('/', postHandler);
 
 function postHandler(req, res) {
-
-  // res.header("Access-Control-Allow-Origin", "*");
-  // res.header("Access-Control-Allow-Headers", "Content-Type");
-  // res.writeHead(200, {
-  //   'content-type': 'application/json'
-  // });
-  //sendResponse(res, JSON.stringify('result x'));
-
   res.setHeader('Access-Control-Allow-Origin', '*');
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -45,13 +27,11 @@ function postHandler(req, res) {
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
   res.setHeader('Access-Control-Allow-Credentials', true);
-  // console.log('post');
 
   var workbook = new excel.Workbook(); //creating workbook
   var sheet = workbook.addWorksheet('MySheet'); //creating worksheet
 
   var objArray = req.body;
-  // console.log(objArray);  
 
   Object.entries(objArray).forEach(entry => {
     // console.log(entry[0]);
@@ -65,8 +45,6 @@ function postHandler(req, res) {
     sheet.addRow(); // add an empty row between each layer
   });
 
-
-
   var options = {
     // root: __dirname + '/../',
     dotfiles: 'deny',
@@ -76,12 +54,7 @@ function postHandler(req, res) {
     }
   };
 
-  var dirName = path.basename(__dirname);
-
-
-
   var fileName = './public/temp.xlsx';
-
   workbook.xlsx.writeFile(fileName)
     .then(function () {
       console.log("file is written");
@@ -98,7 +71,6 @@ function postHandler(req, res) {
       console.log("Error writing file.");
       console.log(err);
     });
-
 }
 
 module.exports = router;
