@@ -12,7 +12,6 @@ router.options('/', function (req, res, next) {
   // to the API (e.g. in case you use sessions)
   res.setHeader('Access-Control-Allow-Credentials', true);
   // console.log('options');
-  // res.send('post');
   next();
 });
 
