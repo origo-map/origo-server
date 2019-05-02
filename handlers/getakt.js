@@ -1,7 +1,6 @@
 /**
  * Module for requesting documents via AktDirekt, Lantmäteriet
  * Usage: 
- * Check for service health, json response "UP" - /origoserver/healthcheck
  * Get a djvu index page that gets all pages included in akt(document) - /origoserver/document/index.djvu?archive={archive/county-number}&id={akt-number}
  * Get a single djvu page - /origoserver/document/page_{vers}_{subdoc}_{page}_{archive}_{id}.djvu
  * 
@@ -49,10 +48,7 @@ proxy.on('proxyReq', (proxyReq, req) => {
   let proxyPath;
 
   // Set proper proxy request paths
-  if (path.includes('healthcheck')) {
-    const healthcheck = `${targetPath}${path}`;
-    proxyPath = healthcheck;
-  } else if (path.includes('index.djvu')) {
+  if (path.includes('index.djvu')) {
     const index = `${targetPath}${path}${encodeURI(query)}`;
     proxyPath = index;
   } else if (path.includes('page_')) {

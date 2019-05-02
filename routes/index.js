@@ -23,6 +23,6 @@ router.all('/estate/inskrivning', getInskrivning);
 router.all('/proxy', proxy);
 router.all('/lmproxy/*', lmProxy);
 router.all('/lmproxy-ver/*', lmProxyVer);
-router.all('/*', getAkt);
+router.all('/document/*', getAkt);
 
 module.exports = router;

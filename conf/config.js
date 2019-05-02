@@ -5,7 +5,6 @@ module.exports = {
     password: 'xxxxx'
   },
   getAkt: {
-    url: 'https://api.lantmateriet.se',
     consumer_key: '',
     consumer_secret: '',
     scope: ''
