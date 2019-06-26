@@ -14,6 +14,10 @@ The minimum requirements are:
 
   		   npm install
 
+ 	 *install without optional dependencies*
+
+	 	   npm install --no-optional
+
  3. To start Origo server, run:
 
    		  node app.js
