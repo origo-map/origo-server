@@ -46,6 +46,8 @@ Configured services at:
 
 		/origoserver/estate/inskrivning?fnr={fastighetsnyckel}
 
+		/origoserver/estate/inskrivning?objektid={objektidentitet}
+
 - Akt Direkt
 
 		/origoserver/document/index.djvu?archive={archive/county-number}&id={akt-number}
