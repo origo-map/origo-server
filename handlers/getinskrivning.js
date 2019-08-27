@@ -9,9 +9,13 @@ var referensParser = require('./inskrivning/referensparser');
 var lagfartParser = require('./inskrivning/lagfartparser');
 var tomtrattParser = require('./inskrivning/tomtrattparser');
 
-var getInskrivning = function(req, res) {
+var getInskrivning = function (req, res) {
 
+  // Use either fastighetsnyckel or objektidentitet as querystring to get estate information, fastighetsnyckel is deprecated
   var fnr = objectifier.get('query.fnr', req) || '';
+  var objektid = objectifier.get('query.objektid', req) || '';
+  var fid = fnr ? fnr : objektid;
+  var idStr = fnr ? 'fastighetsnyckel' : 'objektidentitet';
 
   var options = {
     'v2:IncludeData': {
@@ -29,8 +33,8 @@ var getInskrivning = function(req, res) {
     .insertAfter('soap:Body')
     .ele('v2:GetInskrivningRequest')
     .ele('v2:InskrivningRegisterenhetFilter')
-    .ele('v2:fastighetsnyckel')
-    .txt(fnr)
+    .ele('v2:' + idStr)
+    .txt(fid)
     .up()
     .up()
     .ele(options)
@@ -39,27 +43,27 @@ var getInskrivning = function(req, res) {
     });
 
   request.post({
-      url: url,
-      body: xml,
-      auth: {
-        user: user,
-        pass: password
-      },
-      headers: {
-        'Content-Type': 'application/soap+xml'
-      }
+    url: url,
+    body: xml,
+    auth: {
+      user: user,
+      pass: password
     },
-    function(error, response, body) {
+    headers: {
+      'Content-Type': 'application/soap+xml'
+    }
+  },
+    function (error, response, body) {
       var json;
       parseString(body, {
         explicitArray: false,
         ignoreAttrs: true
-      }, function(err, result) {
+      }, function (err, result) {
         json = result;
       });
       if (objectifier.find('env:Fault', json) || error) {
         res.render('inskrivningerror', {
-          fnr: fnr
+          fid: fid
         });
       } else {
         var inskrivning = parseResult(json);
