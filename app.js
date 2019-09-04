@@ -3,6 +3,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
+var mapStateRouter = require('./routes/mapstate');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/origoserver/', routes);
+app.use('/mapstate', mapStateRouter);
 
 // error handlers
 
