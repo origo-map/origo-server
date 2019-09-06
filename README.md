@@ -14,6 +14,10 @@ The minimum requirements are:
 
   		   npm install
 
+ 	 *install without optional dependencies*
+
+	 	   npm install --no-optional
+
  3. To start Origo server, run:
 
    		  node app.js
@@ -32,3 +36,37 @@ Make sure the paths specified in create_windowsservice.js are correct.
 To uninstall run the following command:
 
   		   node uninstall_windowsservice.js
+
+### Current services provided
+Basic configuration needed in conf/config.js and/or conf/dbconfig.js.
+
+Configured services at:
+
+- Inskrivning Direkt - configuration of serviceparts at models/inskrivning.js
+
+		/origoserver/estate/inskrivning?fnr={fastighetsnyckel}
+
+		/origoserver/estate/inskrivning?objektid={objektidentitet}
+
+- Akt Direkt
+
+		/origoserver/document/index.djvu?archive={archive/county-number}&id={akt-number}
+
+		/origoserver/document/page_{vers}_{subdoc}_{page}_{archive}_{id}.djvu
+
+- Search
+
+		/origoserver/addressestatesearch?q={defined in dbconfig.js}
+
+		/origoserver/search?q={defined in dbconfig.js}
+
+		/origoserver/singlesearch?q={defined in dbconfig.js}
+
+- Proxys
+
+		/origoserver/proxy
+
+		/origoserver/lmproxy-ver
+
+		/origoserver/lmproxy
+
