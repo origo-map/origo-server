@@ -27,7 +27,7 @@ module.exports = function getAgare(prop, data, model) {
   // Uppgift saknas om skyddad identitet. Skyddad identitet har efternamn = "SKYDDAD IDENTITET"
   if (result.namn === 'SKYDDAD PERSONUPPGIFT') {
     result.namn = 'Uppgift saknas';
-  } 
+  }
 
   return result;
 
@@ -35,7 +35,7 @@ module.exports = function getAgare(prop, data, model) {
     var namn = {};
     var orgNamn = objectifier.get(ns + ':organisationsnamn', namnObj);
     var efternamn = objectifier.get(ns + ':efternamn', namnObj);
-    var fornamn =  objectifier.get(ns + ':fornamn', namnObj);
+    var fornamn = objectifier.get(ns + ':fornamn', namnObj);
     if (efternamn && fornamn) {
       namn.namn = efternamn + ', ' + fornamn;
     } else if (orgNamn) {
@@ -76,7 +76,6 @@ module.exports = function getAgare(prop, data, model) {
     var adress = {};
     var postnummer = objectifier.get(ns + ':postnummer', adressObj);
     var postort = objectifier.get(ns + ':postort', adressObj);
-    var coAdress;
     adress.utdelningsadress = objectifier.get(ns + ':utdelningsadress2', adressObj);
     adress.postadress = postnummer + ' ' + postort;
     adress.coAdress = objectifier.get(ns + ':coAdress', adressObj);
@@ -94,8 +93,8 @@ module.exports = function getAgare(prop, data, model) {
   function getUtlandskAgareAdress(adressObj) {
     var adress = {};
     adress.utdelningsadress = objectifier.get(ns + ':utdelningsadress', adressObj);
-    var postkod =  objectifier.get(ns + ':postkod', adressObj);
-    var postort =  objectifier.get(ns + ':postort', adressObj);
+    var postkod = objectifier.get(ns + ':postkod', adressObj);
+    var postort = objectifier.get(ns + ':postort', adressObj);
     adress.postadress = postkod + ' ' + postort;
     adress.land = objectifier.get(ns + ':land', adressObj);
     return adress;
