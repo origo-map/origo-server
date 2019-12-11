@@ -28,5 +28,12 @@ module.exports = {
       user: 'xxxxx',
       pass: 'xxxxx'
     }
+  },
+  lmelevation: {
+    url: "https://services.lantmateriet.se/distribution/produkter/hojd/v1/rest/api",
+    auth: {
+      user: 'xxxxx',
+      pass: 'xxxxx'
+    }
   }
 }
