@@ -70,3 +70,6 @@ Configured services at:
 
 		/origoserver/lmproxy
 
+- Höjd Direkt - set username and password in conf/config.js
+
+    /origoserver/lmelevation/{EPSG code}/{longitude}/{latitude}
