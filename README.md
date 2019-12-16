@@ -73,3 +73,7 @@ Configured services at:
 - Höjd Direkt - set username and password in conf/config.js
 
     /origoserver/lmelevation/{EPSG code}/{longitude}/{latitude}
+
+- Ortnamn Direkt - set username and password in conf/config.js
+
+    /origoserver/lmsearchplacename/?q={free text search (starts with)}&start={number}&limit={number}&nametype={placename type}&lang={language code}&srid={EPSG code}

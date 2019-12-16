@@ -35,5 +35,12 @@ module.exports = {
       user: 'xxxxx',
       pass: 'xxxxx'
     }
+  },
+  lmsearchplacename: {
+    url: "http://namespace.lantmateriet.se/distribution/products/placename/v1/placename-1.1.wsdl",
+    auth: {
+      user: 'xxxxx',
+      pass: 'xxxxx'
+    }
   }
 }

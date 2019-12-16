@@ -11,6 +11,7 @@ var lmProxy = require('../handlers/lmproxy');
 var lmProxyVer = require('../handlers/lmproxyver');
 var getAkt = require('../handlers/getakt');
 var lmElevation = require('../handlers/lmelevation');
+var lmSearchPlacename = require('../handlers/lmsearchplacename');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -26,5 +27,6 @@ router.all('/lmproxy/*', lmProxy);
 router.all('/lmproxy-ver/*', lmProxyVer);
 router.all('/document/*', getAkt);
 router.all('/lmelevation*', lmElevation);
+router.all('/lmsearchplacename*', lmSearchPlacename);
 
 module.exports = router;
