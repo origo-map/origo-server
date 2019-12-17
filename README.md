@@ -81,3 +81,7 @@ Configured services at:
 - Registerbeteckning Direkt - set consumer_key and consumer_secret in conf/config.js
 
 		/origoserver/lmregisterenheter?&q={free text search}&srid={EPSG code}&maxHits={number}
+
+- Belägenhetsadress Direkt - set consumer_key and consumer_secret in conf/config.js
+
+		/origoserver/lmsearchaddress?&q={free text search}&srid={EPSG code}&maxHits={number}

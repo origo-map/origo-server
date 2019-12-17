@@ -13,6 +13,7 @@ var getAkt = require('../handlers/getakt');
 var lmElevation = require('../handlers/lmelevation');
 var lmSearchPlacename = require('../handlers/lmsearchplacename');
 var lmSearchEstate = require('../handlers/lmSearchEstate');
+var lmSearchAddress = require('../handlers/lmsearchaddress');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -30,5 +31,6 @@ router.all('/document/*', getAkt);
 router.all('/lmelevation*', lmElevation);
 router.all('/lmsearchplacename*', lmSearchPlacename);
 router.all('/lmregisterenheter*', lmSearchEstate);
+router.all('/lmsearchaddress*', lmSearchAddress);
 
 module.exports = router;

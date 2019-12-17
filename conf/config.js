@@ -49,5 +49,12 @@ module.exports = {
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
     scope: 'am_application_scope default'
+  },
+  lmsearchaddress: {
+    url: "https://api.lantmateriet.se/distribution/produkter/belagenhetsadress/v4.1/",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
   }
 }

@@ -4,22 +4,19 @@ var rp = require('request-promise');
 const url = require('url');
 
 var objectIds;
-var username;
-var password;
 var srid;
-var status;
 var maxHits;
 
 // Token holder
 let token;
 let scope;
 
-var proxyUrl = 'lmsearchestate';
+var proxyUrl = 'lmsearchaddress';
 var configOptions;
 objectIds = [];
 
 // Do the request in proper order
-const lmSearchEstate = async (req, res) => {
+const lmSearchAddress = async (req, res) => {
 
   if (conf[proxyUrl]) {
     configOptions = Object.assign({}, conf[proxyUrl]);
@@ -36,11 +33,6 @@ const lmSearchEstate = async (req, res) => {
     } else {
        srid = '3006';
     }
-    if ('status' in parsedUrl.query) {
-      status = parsedUrl.query.status;
-    } else {
-      status = 'Gällande';
-    }
     if ('maxHits' in parsedUrl.query) {
       maxHits = parsedUrl.query.maxHits;
     } else {
@@ -48,20 +40,20 @@ const lmSearchEstate = async (req, res) => {
     }
 
     // Do a free text search to get the IDs of all that matches
-    await doSearchAsyncCall(encodeURI(configOptions.url + '/referens/fritext/' + searchString + '?status=' + status + '&maxHits=' + maxHits));
+    await doSearchAsyncCall(encodeURI(configOptions.url + '/referens/fritext/' + searchString + '?maxHits=' + maxHits));
 
     // Allow a maximum of 250 objects
     objectIds.length = objectIds.length > 250 ? 250 : objectIds.length;
 
     // Do a POST with all the IDs from free search to get the complete objects with geometry
-    await getEstateAsyncCall(req, res);
+    await getAddressAsyncCall(req, res);
     // Reset the array of found objects.
     objectIds = [];
   }
 }
 
 // Export the module
-module.exports = lmSearchEstate;
+module.exports = lmSearchAddress;
 
 function getTokenWait(options) {
   // Return promise to be invoked for authenticating on service requests
@@ -104,8 +96,8 @@ function doSearchWait(options) {
     var parameters = JSON.parse(result);
 
     parameters.forEach(function(parameter) {
-      if (parameter.beteckningsid) {
-        objectIds.push(parameter.beteckningsid);
+      if (parameter.objektidentitet) {
+        objectIds.push(parameter.objektidentitet);
       }
     });
   })
@@ -125,7 +117,7 @@ async function doSearchAsyncCall(searchUrl) {
   await doSearchWait(options);
 }
 
-function getEstateWait(options, res) {
+function getAddressWait(options, res) {
   rp(options)
   .then(function (parsedBody) {
     // Send the resulting object as json and end response
@@ -133,16 +125,16 @@ function getEstateWait(options, res) {
   })
   .catch(function (err) {
     console.log(err);
-    console.log('ERROR getEstateWait!');
-    res.send([{ error: 'getEstateWait' }]);
+    console.log('ERROR getAddressWait!');
+    res.send([{ error: 'getAddressWait' }]);
   });
 }
 
-async function getEstateAsyncCall(req, res) {
+async function getAddressAsyncCall(req, res) {
   // Setup the call for getting the objects found in search and wait for result
   var options = {
     method: 'POST',
-    uri: configOptions.url + '/?srid=' + srid,
+    uri: configOptions.url + '/?includeData=total&srid=' + srid,
     body: objectIds,
     headers: {
       'content-type': 'application/json',
@@ -151,73 +143,25 @@ async function getEstateAsyncCall(req, res) {
     },
     json: true
   };
-  await getEstateWait(options, res);
-}
-
-function makeRequest(req, res, options) {
-  return rp.get(options)
-  .then(function(result) {
-    var parameters = JSON.parse(result);
-
-    parameters.forEach(function(parameter) {
-      if (parameter.beteckningsid) {
-        objectIds.push(parameter.beteckningsid);
-      }
-    });
-  })
+  await getAddressWait(options, res);
 }
 
 function concatResult(features) {
   const result = [];
 
   features.forEach((feature) => {
-    const objektidentitet = feature.properties.registerenhetsreferens.objektidentitet;
-    const registeromrade = feature.properties.registerbeteckning.registeromrade;
-    const beteckningsid = feature.properties.registerbeteckning.beteckningsid;
-    const beteckning = feature.properties.registerbeteckning.trakt;
-    const block = feature.properties.registerbeteckning.block ;
-    const enhet = feature.properties.registerbeteckning.enhet;
-    let coordinates = [];
-    // Check to see if feature has none or multiple coordinates
-    if ('enhetsomrade' in feature.properties.registerenhetsreferens) {
-      feature.properties.registerenhetsreferens.enhetsomrade.forEach((enhetsomrade) => {
-        if ('centralpunkt' in enhetsomrade) {
-          coordinates.push(enhetsomrade.centralpunkt.coordinates);
-        }
-      })
-    }
+    if (!feature.properties.adressomrade) {console.log(feature);}
+    const objektidentitet_1 = feature.properties.objektidentitet;
+    const objektidentitet_2 = feature.properties.registerenhetsreferens[0].objektidentitet;
+    const kommun = feature.properties.adressomrade ? feature.properties.adressomrade.kommundel.faststalltNamn : feature.properties.gardsadressomrade.adressomrade.kommundel.faststalltNamn;
+    const faststalltNamn = feature.properties.adressomrade.faststalltNamn;
+    const adressplatsnummer = feature.properties.adressplatsattribut.adressplatsbeteckning.adressplatsnummer || '';
+    const bokstavstillagg = feature.properties.adressplatsattribut.adressplatsbeteckning.bokstavstillagg || '';
+    const postnummer = feature.properties.adressplatsattribut.postnummer;
+    const postort = feature.properties.adressplatsattribut.postort;
+    const koordinater = feature.properties.adressplatsattribut.adressplatspunkt.coordinates;
 
-    // Build the object to return
-    let object = {};
-    let fastighet = '';
-    switch (block) {
-      case '*':
-        fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
-        break;
-      default:
-        fastighet = registeromrade + ' ' + beteckning + ' ' + block + ':' + enhet;
-    }
-    if (coordinates.length !== 0) {
-      if (coordinates.length === 1) {
-        object['geometry'] = {
-          coordinates: coordinates,
-          type: 'Point'
-        };
-      } else {
-        object['geometry'] = {
-          coordinates: coordinates,
-          type: 'MultiPoint'
-        };
-      }
-    }
-    object['properties'] = {
-        name: fastighet,
-        objid: objektidentitet,
-        fnr: beteckningsid
-    };
-    object['type'] = 'Feature';
-
-    result.push(object);
+    result.push([objektidentitet_1, kommun + ' ' + faststalltNamn + ' ' + adressplatsnummer + bokstavstillagg + ', ' + postort, koordinater[0], koordinater[1], objektidentitet_2]);
   })
 
   return result;
