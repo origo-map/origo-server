@@ -42,5 +42,12 @@ module.exports = {
       user: 'xxxxx',
       pass: 'xxxxx'
     }
+  },
+  lmsearchestate: {
+    url: "https://api.lantmateriet.se/distribution/produkter/registerbeteckning/v4/",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
   }
 }
