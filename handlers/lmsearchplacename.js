@@ -88,12 +88,13 @@ const lmSearchPlacename = async (req, res) => {
     }
     var args = { 'tns:OrtnamnCriteria': searchParams };
     soap.createClient(configOptions.url, function(err, client) {
-      client.setSecurity(new soap.BasicAuthSecurity(configOptions.auth.user, configOptions.auth.pass));
       client.addHttpHeader('Content-Type', `application/soap+xml`);
+      client.addHttpHeader('Authorization',  `Bearer ${configOptions.token}`);
+      client.addHttpHeader('scope',  `am_application_scope default`);
       client.FindOrtnamn(args, function(err, result) {
         if (err) {
-          console.log('Error:' + err.root.Envelope.Body.Fault.Reason.Text.$value);
-          res.send({ error: err.root.Envelope.Body.Fault.Reason.Text.$value });
+          console.log('Error:' + err);
+          res.send({ error: err });
         } else {
           res.send(concatResult(result.Ortnamn, municipality));
         }
