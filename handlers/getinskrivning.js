@@ -8,8 +8,10 @@ var parser = require('./inskrivning/parser');
 var referensParser = require('./inskrivning/referensparser');
 var lagfartParser = require('./inskrivning/lagfartparser');
 var tomtrattParser = require('./inskrivning/tomtrattparser');
+var getToken = require('../lib/tokenrequest');
+var token;
 
-var getInskrivning = function (req, res) {
+var getInskrivning = async (req, res) => {
 
   // Use either fastighetsnyckel or objektidentitet as querystring to get estate information, fastighetsnyckel is deprecated
   var fnr = objectifier.get('query.fnr', req) || '';
@@ -22,9 +24,21 @@ var getInskrivning = function (req, res) {
       'v2:agare': true
     }
   };
-  var url = config.getInskrivning.url,
-    user = config.getInskrivning.user,
-    password = config.getInskrivning.password;
+
+  var inskrivningUrl = config.getInskrivning.url;
+  var inskrivningKey = config.getInskrivning.consumer_key;
+  var inskrivningSecret = config.getInskrivning.consumer_secret;
+  var inskrivningScope = config.getInskrivning.scope;
+
+  await getToken(inskrivningKey, inskrivningSecret, inskrivningScope)
+    .then(JSON.parse)
+    .then((result) => {
+      token = result.access_token;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
 
   var xml = builder.create('soap:Envelope')
     .att('xmlns:soap', 'http://www.w3.org/2003/05/soap-envelope')
@@ -43,33 +57,30 @@ var getInskrivning = function (req, res) {
     });
 
   request.post({
-    url: url,
+    url: inskrivningUrl,
     body: xml,
-    auth: {
-      user: user,
-      pass: password
-    },
     headers: {
-      'Content-Type': 'application/soap+xml'
+      'Content-Type': 'application/soap+xml',
+      'Authorization': `Bearer ${token}`
     }
-  },
-    function (error, response, body) {
-      var json;
-      parseString(body, {
-        explicitArray: false,
-        ignoreAttrs: true
-      }, function (err, result) {
-        json = result;
-      });
-      if (objectifier.find('env:Fault', json) || error) {
-        res.render('inskrivningerror', {
-          fid: fid
-        });
-      } else {
-        var inskrivning = parseResult(json);
-        res.render('inskrivning', inskrivning);
-      }
+  }, function (error, response, body) {
+    var json;
+    parseString(body, {
+      explicitArray: false,
+      ignoreAttrs: true
+    }, function (err, result) {
+      json = result;
     });
+    if (objectifier.find('env:Fault', json) || error) {
+      res.render('inskrivningerror', {
+        fid: fid
+      });
+    }
+    else {
+      var inskrivning = parseResult(json);
+      res.render('inskrivning', inskrivning);
+    }
+  });
 }
 
 function parseResult(result) {
