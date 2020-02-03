@@ -2,7 +2,7 @@ var conf = require('../conf/config');
 var request = require('request');
 var soap = require('soap');
 const url = require('url');
-var transformCoordinates = require('../lib/utils/transformCoordinates');
+var transformCoordinates = require('../lib/utils/transformcoordinates');
 var getMunicipality = require('../lib/utils/municipality');
 
 var objectIds;
@@ -25,84 +25,97 @@ const lmSearchPlacename = async (req, res) => {
     configOptions = Object.assign({}, conf[proxyUrl]);
 
     const parsedUrl = url.parse(decodeURI(req.url), true);
-    var kommunkod = parsedUrl.query.kommunkod;
-    // Get a object with municipality from the 4-digit code
-    var municipality = getMunicipality(kommunkod);
-    var lmuser = parsedUrl.query.lmuser;
-    var q = parsedUrl.query.q;
-    var page = parsedUrl.query.page;
-    var start = parsedUrl.query.start;
-    var limit = parsedUrl.query.limit;
-    var lang = parsedUrl.query.lang;
-    var nametype = parsedUrl.query.nametype;
-    if ('srid' in parsedUrl.query) {
-      srid = parsedUrl.query.srid;
-    } else {
-      srid = '3006';
-    }
-    var searchParams = {};
-    if ( q.length > 0 ) {
-      searchParams['tns:namn'] = {
-        attributes: {
-          match: 'STARTS_WITH'
-        },
-        $value: q
-      };
-    }
-    // Limit the hits to county and municipality
-    if ( kommunkod ) {
-      searchParams['tns:lanskod'] = municipality.countyCode;
-      searchParams['tns:kommunkod'] = municipality.municipalityCode;
-    }
-    // Set language for result
-    if ( lang ) {
-      searchParams['tns:sprak'] = lang;
-    }
-    // Limit the hits to nametypes
-    if ( nametype ) {
-      var tempData = [];
-      const nametypes = nametype.split(/[=;]/);
-      nametypes.forEach(typ => {
-        tempData.push( { 'tns:namntyp': typ } );
-      });
-      searchParams['tns:namntyper'] = tempData;
-    }
-    // Get the result based on pages
-    if ( page && limit ) {
-      searchParams['tns:intervall'] = {
-        attributes: {
-          slutindex: limit * page,
-          startindex: limit * page - limit
-        }
-      };
-    } else {
-      // Get only the first result
-      if ( start && limit ) {
-        searchParams['tns:intervall'] = {
-          attributes: {
-            slutindex: limit,
-            startindex: start
-          }
-        };
-      }
-    }
-    var args = { 'tns:OrtnamnCriteria': searchParams };
-    soap.createClient(configOptions.url, function(err, client) {
-      client.addHttpHeader('Content-Type', `application/soap+xml`);
-      client.addHttpHeader('Authorization',  `Bearer ${configOptions.token}`);
-      client.addHttpHeader('scope',  `am_application_scope default`);
-      client.FindOrtnamn(args, function(err, result) {
-        if (err) {
-          console.log('Error:' + err);
-          res.send({ error: err });
+    var kommunkod = '';
+    if ('kommunkod' in parsedUrl.query) {
+      kommunkod = parsedUrl.query.kommunkod;
+      var kommunkod = parsedUrl.query.kommunkod;
+      var municipalityArray = kommunkod.split(',');
+      if (municipalityArray.length === 1) {
+        // Get a object with municipality from the 4-digit code
+        var municipality = getMunicipality(kommunkod);
+        var lmuser = parsedUrl.query.lmuser;
+        var q = parsedUrl.query.q;
+        var page = parsedUrl.query.page;
+        var start = parsedUrl.query.start;
+        var limit = parsedUrl.query.limit;
+        var lang = parsedUrl.query.lang;
+        var nametype = parsedUrl.query.nametype;
+        if ('srid' in parsedUrl.query) {
+          srid = parsedUrl.query.srid;
         } else {
-          res.send(concatResult(result.Ortnamn, municipality));
+          srid = '3006';
         }
-      }, {postProcess: function(_xml) {
-        // Replace namespace URI, since the API chokes on it
-        return _xml.replace('http://schemas.xmlsoap.org/soap/envelope/', 'http://www.w3.org/2003/05/soap-envelope');
-      }});
-    });
+        var searchParams = {};
+        if ( q.length > 0 ) {
+          searchParams['tns:namn'] = {
+            attributes: {
+              match: 'STARTS_WITH'
+            },
+            $value: q
+          };
+        }
+        // Limit the hits to county and municipality
+        if ( kommunkod ) {
+          searchParams['tns:lanskod'] = municipality.countyCode;
+          searchParams['tns:kommunkod'] = municipality.municipalityCode;
+        }
+        // Set language for result
+        if ( lang ) {
+          searchParams['tns:sprak'] = lang;
+        }
+        // Limit the hits to nametypes
+        if ( nametype ) {
+          var tempData = [];
+          const nametypes = nametype.split(/[=;]/);
+          nametypes.forEach(typ => {
+            tempData.push( { 'tns:namntyp': typ } );
+          });
+          searchParams['tns:namntyper'] = tempData;
+        }
+        // Get the result based on pages
+        if ( page && limit ) {
+          searchParams['tns:intervall'] = {
+            attributes: {
+              slutindex: limit * page,
+              startindex: limit * page - limit
+            }
+          };
+        } else {
+          // Get only the first result
+          if ( start && limit ) {
+            searchParams['tns:intervall'] = {
+              attributes: {
+                slutindex: limit,
+                startindex: start
+              }
+            };
+          }
+        }
+        var args = { 'tns:OrtnamnCriteria': searchParams };
+        soap.createClient(configOptions.url, function(err, client) {
+          client.addHttpHeader('Content-Type', `application/soap+xml`);
+          client.addHttpHeader('Authorization',  `Bearer ${configOptions.token}`);
+          client.addHttpHeader('scope',  `am_application_scope default`);
+          client.FindOrtnamn(args, function(err, result) {
+            if (err) {
+              console.log('Error:' + err);
+              res.send({});
+            } else {
+              res.send(concatResult(result.Ortnamn, municipality));
+            }
+          }, {postProcess: function(_xml) {
+            // Replace namespace URI, since the API chokes on it
+            return _xml.replace('http://schemas.xmlsoap.org/soap/envelope/', 'http://www.w3.org/2003/05/soap-envelope');
+          }});
+        });
+      } else {
+        console.log('Skip');
+        res.send({});
+      }
+    } else {
+      console.log('Skip');
+      res.send({});
+    }
   }
 }
 
@@ -118,7 +131,11 @@ function concatResult(placenames, municipality) {
       result.push(getOrtnamn(placename, municipality));
     })
   } else {
-    result.push(getOrtnamn(placenames, municipality));
+    if (typeof placenames === 'undefined') {
+      // placenames is undefined do nothing
+    } else {
+      result.push(getOrtnamn(placenames, municipality));
+    }
   }
   return result;
 }
@@ -134,11 +151,13 @@ function getOrtnamn(placename, municipality) {
     lanskod = placename.placering.lanskod;
     kommunkod = placename.placering.kommunkod;
     const pos = placename.placering.punkt.pos.split(/[= ]/);
-    coordinates = transformCoordinates('3006', srid, [Number(pos[1]),Number(pos[0])]);
+    const transformedCoord = transformCoordinates('3006', srid, [Number(pos[1]),Number(pos[0])]);
+    coordinates = [transformedCoord[1], transformedCoord[0]];
   } else {
     placename.placering.forEach((placering) => {
       const pos = placering.punkt.pos.split(/[= ]/);
-      coordinates.push(transformCoordinates('3006', srid, [Number(pos[1]),Number(pos[0])]));
+      const transformedCoord = transformCoordinates('3006', srid, [Number(pos[1]),Number(pos[0])]);
+      coordinates.push([transformedCoord[1], transformedCoord[0]]);
       lanskod = placering.lanskod;
       kommunkod = placering.kommunkod;
     })
@@ -150,16 +169,18 @@ function getOrtnamn(placename, municipality) {
 
   // Build the object to return
   let object = {};
-  if (coordinates[0].length !== 2) {
-    object['geometry'] = {
-      coordinates: coordinates,
-      type: 'Point'
-    };
-  } else {
-    object['geometry'] = {
-      coordinates: coordinates,
-      type: 'MultiPoint'
-    };
+  if (coordinates.length !== 0) {
+    if ( Array.isArray(coordinates[0]) ){
+      object['geometry'] = {
+        coordinates: coordinates,
+        type: 'MultiPoint'
+      };
+    } else {
+      object['geometry'] = {
+        coordinates: coordinates,
+        type: 'Point'
+      };
+    }
   }
   object['properties'] = {
       id: id,
