@@ -27,7 +27,19 @@ const lmSearchAddress = async (req, res) => {
 
     // Get the query parameters from the url
     const parsedUrl = url.parse(decodeURI(req.url), true);
-    searchString = parsedUrl.query.q;
+    const searchString = parsedUrl.query.q;
+    var searchArray = searchString.split(' ');
+    var municipality = searchArray[0];
+    var municipalityArray = municipality.split(',');
+    var index;
+    var searchValue = '';
+    for (index = 0; index < searchArray.length; ++index) {
+      if (index == 1) {
+        searchValue = searchArray[index];
+      } else if (index > 1) {
+        searchValue = searchValue + ' ' + searchArray[index];
+      }
+    }
     if ('srid' in parsedUrl.query) {
       srid = parsedUrl.query.srid;
     } else {
@@ -40,7 +52,7 @@ const lmSearchAddress = async (req, res) => {
     }
 
     // Do a free text search to get the IDs of all that matches
-    await doSearchAsyncCall(encodeURI(configOptions.url + '/referens/fritext/' + searchString + '?maxHits=' + maxHits));
+    await doSearchAsyncCall(municipalityArray, searchValue);
 
     // Allow a maximum of 250 objects
     objectIds.length = objectIds.length > 250 ? 250 : objectIds.length;
@@ -103,18 +115,54 @@ function doSearchWait(options) {
   })
 }
 
-async function doSearchAsyncCall(searchUrl) {
-  // Setup the search call and wait for result
-  const options = {
-      url: searchUrl,
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'scope': `${scope}`
-      }
-  }
-  await doSearchWait(options);
+async function doSearchAsyncCall(municipalityArray, searchValue) {
+  var returnValue = [];
+  var promiseArray = [];
+  // Split all the separate municipality given to individual searches
+  municipalityArray.forEach(function(municipality) {
+    var searchUrl = encodeURI(configOptions.url + '/referens/fritext/' + municipality + ' ' + searchValue + '?maxHits=' + maxHits)
+    // Setup the search call and wait for result
+    const options = {
+        url: searchUrl,
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'scope': `${scope}`
+        }
+    }
+    promiseArray.push(rp.get(options)
+      .then(function(result) {
+        var parameters = JSON.parse(result);
+        var objektidentitet = [];
+
+        parameters.forEach(function(parameter) {
+          if (parameter.objektidentitet) {
+            objektidentitet.push(parameter.objektidentitet);
+          }
+        });
+        return objektidentitet;
+      })
+    )
+  });
+
+  await Promise.all(promiseArray)
+    .then(function (resArr) {
+        // Save the response to be handled in finally
+        returnValue = resArr;
+    })
+    .catch(function (err) {
+        // If fail return empty array
+        objectIds = [];
+    })
+    .finally(function () {
+        // When all search has finished concat them to a single array of object Ids
+        var newArray = [];
+        returnValue.forEach(function(search) {
+          newArray = newArray.concat(search);
+        });
+        objectIds = newArray;
+    });
 }
 
 function getAddressWait(options, res) {
@@ -126,7 +174,7 @@ function getAddressWait(options, res) {
   .catch(function (err) {
     console.log(err);
     console.log('ERROR getAddressWait!');
-    res.send([{ error: 'getAddressWait' }]);
+    res.send([]);
   });
 }
 
@@ -143,7 +191,12 @@ async function getAddressAsyncCall(req, res) {
     },
     json: true
   };
-  await getAddressWait(options, res);
+  // Only do the call if somethin was found in the search
+  if (objectIds.length > 0) {
+    await getAddressWait(options, res);
+  } else {
+    res.send([]);
+  }
 }
 
 function concatResult(features) {
