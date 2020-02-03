@@ -23,6 +23,11 @@ const lmGetEstate = async (req, res) => {
     configOptions = Object.assign({}, conf[proxyUrl]);
     scope = configOptions.scope;
     const parsedUrl = url.parse(decodeURI(req.url), true);
+    if ('srid' in parsedUrl.query) {
+      srid = parsedUrl.query.srid;
+    } else {
+       srid = '3006';
+    }
     if ('fnr' in parsedUrl.query) {
       const fnr = parsedUrl.query.fnr;
       // RegExp for UUID
@@ -97,7 +102,7 @@ function doGetWait(req, res, options) {
 async function doGetAsyncCall(req, res, configOptions, fnr) {
   // Setup the search call and wait for result
   const options = {
-      url: encodeURI(configOptions.url + '/' + fnr + '?includeData=basinformation,geometri'),
+      url: encodeURI(configOptions.url + '/' + fnr + '?includeData=basinformation,geometri' + '&srid=' + srid),
       method: 'GET',
       headers: {
         'content-type': 'application/json',
