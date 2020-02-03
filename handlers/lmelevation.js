@@ -1,7 +1,7 @@
 var conf = require('../conf/config');
 var request = require('request');
 var rp = require('request-promise');
-var transformCoordinates = require('../lib/utils/transformCoordinates');
+var transformCoordinates = require('../lib/utils/transformcoordinates');
 //var Promise = require('bluebird');
 
 var objectIds;
@@ -82,21 +82,23 @@ function doGetWait(req, res, options) {
   .catch(function (err) {
     console.log(err);
     console.log('ERROR doGetWait!');
-    res.send([{ error: 'doGetWait' }]);
+    res.send([]);
   });
 }
 
 async function doGetAsyncCall(req, res, configOptions, proxyUrl) {
-  var buckets;
   var xcoord;
   var ycoord;
   var urlArr;
 
-  buckets = decodeURI(req.url.split(proxyUrl));
   urlArr = req.url.split('/');
-  srid = decodeURI(urlArr[2]);
-  xcoord = decodeURI(urlArr[3]);
-  ycoord = decodeURI(urlArr[4]);
+  srid = decodeURI(urlArr[3]);
+  xcoord = decodeURI(urlArr[4]);
+  ycoord = decodeURI(urlArr[5]);
+  // Check so that not request parameters have been added to ycoord which can happen when the end slash is missing.
+  if (ycoord.includes('?')) {
+    ycoord = ycoord.substring(0, ycoord.indexOf('?'));
+  }
 
   // Check that request url has numbers
   if (isNaN(srid) || isNaN(xcoord) || isNaN(ycoord) ) {
