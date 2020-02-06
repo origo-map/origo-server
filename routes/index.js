@@ -9,10 +9,10 @@ var getInskrivning = require('../handlers/getinskrivning');
 var proxy = require('../handlers/proxy');
 var lmProxy = require('../handlers/lmproxy');
 var lmProxyVer = require('../handlers/lmproxyver');
-
+var getAkt = require('../handlers/getakt');
 
 /* GET start page. */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
   res.render('index');
 });
 
@@ -23,5 +23,6 @@ router.all('/estate/inskrivning', getInskrivning);
 router.all('/proxy', proxy);
 router.all('/lmproxy/*', lmProxy);
 router.all('/lmproxy-ver/*', lmProxyVer);
+router.all('/document/*', getAkt);
 
 module.exports = router;

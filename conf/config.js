@@ -1,8 +1,17 @@
 module.exports = {
+  mapState: {
+    'storagePath': 'OrigoMapState' // Path to map state storage. Current path will save map state to a folder named OrigoMapState in the origo-server directory.
+  },
   getInskrivning: {
-      url: 'https://services.lantmateriet.se/distribution/produkter/inskrivning/v2.1',
-      user: 'xxxxx',
-      password: 'xxxxx'
+    url: 'https://api.lantmateriet.se/distribution/produkter/inskrivning/v2.1',
+    consumer_key: '',
+    consumer_secret: '',
+    scope: ''
+  },
+  getAkt: {
+    consumer_key: '',
+    consumer_secret: '',
+    scope: ''
   },
   proxy: {
     proxyUrl: 'proxy?url='

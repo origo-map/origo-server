@@ -4,7 +4,7 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
   var searchField = queryOptions.searchField;
   var sqlSearchField = searchField ? searchField + " AS NAMN," : "";
   var fields = queryOptions.fields;
-  var geometryField = queryOptions.geometryName || "SHAPE";
+  var geometryField = queryOptions.geometryName || "geom";
   var sqlFields = fields ? fields.join(',') + "," : "";
   var condition = queryString;
   var searchString;
