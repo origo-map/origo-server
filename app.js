@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var mapStateRouter = require('./routes/mapstate');
+var errors = require('./routes/errors');
 
 var app = express();
 
@@ -31,21 +32,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/origoserver/', routes);
 app.use('/mapstate', mapStateRouter);
-
-// error handlers
-
-// 404 catch-all handler (middleware)
-app.use(function(req, res, next) {
-    res.status(404);
-    res.render('404');
-});
-
-// 500 error handler (middleware)
-app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    res.status(500);
-    res.render('500');
-});
-
+app.use(errors);
 
 module.exports = app;
