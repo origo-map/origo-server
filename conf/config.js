@@ -38,9 +38,11 @@ module.exports = {
     scope: 'am_application_scope default'
   },
   lmsearchplacename: {
-    // This version of Ortnamn Direkt will be taken down 2020-09-09, so it has to be replaced with v2
-    url: "http://namespace.lantmateriet.se/distribution/products/placename/v1/placename-1.1.wsdl",
-    token: 'xxxxx'
+    url: "https://api.lantmateriet.se/distribution/produkter/ortnamn/v2",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
   },
   lmsearchestate: {
     url: "https://api.lantmateriet.se/distribution/produkter/registerbeteckning/v4/",
