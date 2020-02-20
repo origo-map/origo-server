@@ -29,5 +29,40 @@ module.exports = {
       user: 'xxxxx',
       pass: 'xxxxx'
     }
+  },
+  lmelevation: {
+    url: "https://api.lantmateriet.se/distribution/produkter/hojd/v1/rest/api",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
+  },
+  lmsearchplacename: {
+    url: "https://api.lantmateriet.se/distribution/produkter/ortnamn/v2",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
+  },
+  lmsearchestate: {
+    url: "https://api.lantmateriet.se/distribution/produkter/registerbeteckning/v4/",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
+  },
+  lmsearchaddress: {
+    url: "https://api.lantmateriet.se/distribution/produkter/belagenhetsadress/v4.1/",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
+  },
+  lmgetestate: {
+    url: "https://api.lantmateriet.se/distribution/produkter/fastighet/v2.1/",
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
   }
 }

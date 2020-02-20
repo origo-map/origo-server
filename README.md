@@ -70,3 +70,30 @@ Configured services at:
 
 		/origoserver/lmproxy
 
+- Höjd Direkt - set consumer_key and consumer_secret in conf/config.js
+
+		/origoserver/lm/elevation/{EPSG code}/{longitude}/{latitude}
+
+- Ortnamn Direkt - set consumer_key and consumer_secret in conf/config.js
+
+		/origoserver/lm/placenames/?q={searchstring}&kommunkod={4-digit number for the municipality}&start={number}&limit={number}&nametype={placename type}&lang={language code}&srid={EPSG code}
+
+- Registerbeteckning Direkt - set consumer_key and consumer_secret in conf/config.js
+
+		/origoserver/lm/registerenheter?q={searchstring}&srid={EPSG code}&maxHits={number}
+
+		The {searchstring} should start with one or multiple, seperated by commas, municipalities and then a space followed by the free text search for the address. For example "Sundsvall,Hudiksvall Nyland 99:1"
+
+		/origoserver/lm/registerenheter?&fnr={UUID}
+
+		/origoserver/lm/registerenheter/{UUID}/enhetsomraden
+
+		/origoserver/lm/registerenheter?x={easting}&y={northing}&srid={EPSG code}
+
+		/origoserver/lm/enhetsomraden?x={easting}&y={northing}&srid={EPSG code}
+
+- Belägenhetsadress Direkt - set consumer_key and consumer_secret in conf/config.js
+
+		/origoserver/lm/addresses?q={searchstring}&srid={EPSG code}&maxHits={number}
+
+		The {searchstring} should start with one or multiple, seperated by commas, municipalities and then a space followed by the free text search for the address. For example "Sundsvall,Hudiksvall Storgatan"

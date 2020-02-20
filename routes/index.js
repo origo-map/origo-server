@@ -10,6 +10,11 @@ var proxy = require('../handlers/proxy');
 var lmProxy = require('../handlers/lmproxy');
 var lmProxyVer = require('../handlers/lmproxyver');
 var getAkt = require('../handlers/getakt');
+var lmElevation = require('../handlers/lmelevation');
+var lmSearchPlacename = require('../handlers/lmsearchplacename');
+var lmEstate = require('../handlers/lmsearchestate');
+var lmSearchAddress = require('../handlers/lmsearchaddress');
+var lmGetEstate = require('../handlers/lmgetestate');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -24,5 +29,11 @@ router.all('/proxy', proxy);
 router.all('/lmproxy/*', lmProxy);
 router.all('/lmproxy-ver/*', lmProxyVer);
 router.all('/document/*', getAkt);
+router.all('/lm/elevation*', lmElevation);
+router.all('/lm/placenames*', lmSearchPlacename);
+router.all('/lm/enhetsomraden*', lmEstate['lmGetEstateFromPoint']);
+router.all('/lm/registerenheter*', lmEstate['lmSearchEstate']);
+router.all('/lm/addresses*', lmSearchAddress);
+router.all('/lm/getestate*', lmGetEstate);
 
 module.exports = router;
