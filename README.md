@@ -70,11 +70,11 @@ Configured services at:
 
 		/origoserver/lmproxy
 
-- Höjd Direkt - set username and password in conf/config.js
+- Höjd Direkt - set consumer_key and consumer_secret in conf/config.js
 
-		/origoserver/lmelevation/{EPSG code}/{longitude}/{latitude}
+		/origoserver/lm/elevation/{EPSG code}/{longitude}/{latitude}
 
-- Ortnamn Direkt - set username and password in conf/config.js
+- Ortnamn Direkt - set consumer_key and consumer_secret in conf/config.js
 
 		/origoserver/lm/placenames/?q={searchstring}&kommunkod={4-digit number for the municipality}&start={number}&limit={number}&nametype={placename type}&lang={language code}&srid={EPSG code}
 
