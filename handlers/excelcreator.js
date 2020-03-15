@@ -1,31 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var excel = require('exceljs');
+var cors = require('cors')
 
-router.options('/', function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  // console.log('options');
-  next();
-});
+router.use(cors());
 
 router.post('/', postHandler);
 
 function postHandler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
 
   var workbook = new excel.Workbook(); //creating workbook
   var sheet = workbook.addWorksheet('MySheet'); //creating worksheet
@@ -36,7 +18,7 @@ function postHandler(req, res) {
     // console.log(entry[0]);
     sheet.addRow([entry[0]]);
     sheet.addRow(Object.keys(entry[1][0]));
-  
+
     entry[1].forEach(function (item) {
       sheet.addRow(Object.values(item));
     });
@@ -54,22 +36,29 @@ function postHandler(req, res) {
   };
 
   var fileName = './public/temp.xlsx';
-  workbook.xlsx.writeFile(fileName)
-    .then(function () {
-      console.log("file is written");
-      res.setHeader('content-type', 'application/download');
-      res.download(fileName, 'ExportedFeatures.xlsx', options, function (err) {
-        if (err) {
-          console.log('Error sending file: ', err);
-        } else {
-          console.log('Sent: ', fileName);
-        }
+
+  // Timeout is set for testing delay spinners in the client, should be removed after test is complete.
+  setTimeout(() => {
+    workbook.xlsx.writeFile(fileName)
+      .then(function () {
+        console.log("file is written");
+        res.setHeader('content-type', 'application/vnd.ms-excel');
+        // res.status(400);
+        res.statusMessage = "Custom Status Message";
+        res.customName = "File Name";
+        res.download(fileName, 'ExportedFeatures.xlsx', options, function (err) {
+          if (err) {
+            console.log('Error sending file: ', err);
+          } else {
+            console.log('Sent: ', fileName);
+          }
+        });
+      })
+      .catch(function (err) {
+        console.log("Error writing file.");
+        console.log(err);
       });
-    })
-    .catch(function (err) {
-      console.log("Error writing file.");
-      console.log(err);
-    });
+  }, 3000);
 }
 
 module.exports = router;
