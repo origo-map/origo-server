@@ -15,20 +15,24 @@
     "bluebird": "^3.4.0",
     "body-parser": "~1.8.1",
     "cookie-parser": "~1.3.3",
-    "debug": "~2.0.0",
     "exceljs": "^1.9.0",
-    "express": "^4.16.4",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
     "express-handlebars": "^3.0.0",
-    "request": "^2.74.0",
+    "http-proxy": "^1.17.0",
+    "proj4": "^2.6.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
     "serve-favicon": "^2.5.0",
+    "soap": "^0.30.0",
     "xml2js": "^0.4.17",
     "xmlbuilder": "^8.2.2"
   },
   "optionalDependencies": {
     "mssql": "^3.3.0",
-    "oracledb": "^1.9.3",
+    "node-windows": "^0.1.14",
+    "oracledb": "^3.1.2",
     "pg": "^6.1.0",
-    "pg-promise": "^5.3.5",
-    "node-windows": "^0.1.14"
+    "pg-promise": "^5.3.5"
   }
 }
