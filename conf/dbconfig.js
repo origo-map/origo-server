@@ -45,13 +45,15 @@ module.exports = {
           //     table: "table name",
           //     searchField: "search field name",
           //     schema: 'schema name, for example dbo',
-          //     database: 'database name'
+          //     database: 'database name',
+          //     useCentroid: true
           // }
           search: {
               table: "fastighetsytor_sammanslagen",
               searchField: "FASTIGHET",
               schema: 'public',
               geometryName: 'geom',
+              useCentroid: true
           }
 
       },
@@ -62,7 +64,8 @@ module.exports = {
               schema: 'public',
               geometryName: 'geom',
               database: 'mdk',
-			  tables: [
+              useCentroid: true,
+              tables: [
 				  {
 					table: 'adressplats',
 					searchField: 'NAMN'
@@ -84,6 +87,7 @@ module.exports = {
               searchField: "search field name",
               schema: 'schema name, for example dbo',
               database: 'database name',
+              useCentroid: true,
               fields: ['field name', 'field name']
           },
           estates: {
@@ -91,6 +95,7 @@ module.exports = {
               searchField: "search field name",
               schema: 'schema name, for example dbo',
               database: 'database name',
+              useCentroid: true,
               fields: ['field name', 'field name']
           }
       }
