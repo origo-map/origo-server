@@ -15,7 +15,6 @@ function postHandler(req, res) {
   var objArray = req.body;
 
   Object.entries(objArray).forEach(entry => {
-    // console.log(entry[0]);
     sheet.addRow([entry[0]]);
     sheet.addRow(Object.keys(entry[1][0]));
 
@@ -43,7 +42,6 @@ function postHandler(req, res) {
       .then(function () {
         console.log("file is written");
         res.setHeader('content-type', 'application/vnd.ms-excel');
-        // res.status(400);
         res.statusMessage = "Custom Status Message";
         res.customName = "File Name";
         res.download(fileName, 'ExportedFeatures.xlsx', options, function (err) {
