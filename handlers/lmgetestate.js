@@ -131,28 +131,29 @@ function concatResult(feature) {
           const oneFeature = {};
           const omradesnummer = enhetsomrade.omradesnummer;
           let coordinates = [];
-          const coordinatesType = enhetsomrade.yta[0].type;
+          let coordinatesType = '';
+          // Only add to response if there is a geometry for enhetsomrade
           if ('yta' in enhetsomrade) {
-              coordinates = enhetsomrade.yta[0].coordinates;
+            coordinatesType = enhetsomrade.yta[0].type;
+            coordinates = enhetsomrade.yta[0].coordinates;
+            oneFeature['geometry'] = {
+              coordinates: coordinates,
+              type: coordinatesType
+            };
+            let fastighet = '';
+            switch (block) {
+              case '*':
+                fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetesområde ' + omradesnummer;
+                break;
+              default:
+                fastighet = registeromrade + ' ' + beteckning + ' ' + block + ':' + enhet + ' Enhetesområde ' + omradesnummer;
+            }
+            oneFeature['properties'] = {
+              name: fastighet
+            };
+            oneFeature['type'] = 'Feature';
+            geometryEnhetsomrade.push(oneFeature);
           }
-          oneFeature['geometry'] = {
-            coordinates: coordinates,
-            type: coordinatesType
-          };
-          let fastighet = '';
-          switch (block) {
-            case '*':
-              fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetesområde ' + omradesnummer;
-              break;
-            default:
-              fastighet = registeromrade + ' ' + beteckning + ' ' + block + ':' + enhet + ' Enhetesområde ' + omradesnummer;
-          }
-          oneFeature['properties'] = {
-            name: fastighet
-          };
-          oneFeature['type'] = 'Feature';
-
-          geometryEnhetsomrade.push(oneFeature);
         })
       }
     })
