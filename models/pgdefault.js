@@ -3,7 +3,7 @@ var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
   var table = queryOptions.table;
   var searchField = queryOptions.searchField;
   var gid = queryOptions.gid || 'gid';
-  var sqlSearchField = searchField ? table + '."' + searchField + '" AS "NAMN",' : "";
+  var sqlSearchField = searchField ? 'CAST(' + table + '."' + searchField + '" AS TEXT) AS "NAMN",' : "";
   var fields = queryOptions.fields;
   var geometryField = queryOptions.geometryName || "geom";
   var centroid = 'ST_AsText(ST_PointOnSurface(' + table + '."' + geometryField + '")) AS "GEOM" ';
@@ -21,7 +21,7 @@ var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
     type +
     centroid +
     ' FROM ' + schema + '.' + table +
-    ' WHERE LOWER(' + table + '."' + searchField + '"' + ") ILIKE LOWER('" + condition + "%')" +
+    ' WHERE LOWER(CAST(' + table + '."' + searchField + '"' + " AS TEXT)) ILIKE LOWER('" + condition + "%')" +
     ' ORDER BY ' + table + '."' + searchField + '"' +
     limit + ';';
 
