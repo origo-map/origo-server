@@ -66,5 +66,12 @@ module.exports = {
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
     scope: 'am_application_scope default'
+  },
+  cors: {
+    origin: '*',
+    methods: ['GET', 'PUT', 'POST', 'OPTIONS', 'PATCH', 'DELETE'],
+    headers: 'X-Requested-With,content-type',
+    credentials: true,
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
   }
 }
