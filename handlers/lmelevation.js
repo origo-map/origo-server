@@ -99,14 +99,15 @@ async function doGetAsyncCall(req, res, configOptions, proxyUrl) {
   if (ycoord.includes('?')) {
     ycoord = ycoord.substring(0, ycoord.indexOf('?'));
   }
-
   // Check that request url has numbers
   if (isNaN(srid) || isNaN(xcoord) || isNaN(ycoord) ) {
-    res.send({ error: 'Request parameters not numbers' });
+    console.log('ERROR Request parameters not numbers!');
+    res.send({});
   } else {
     // Check that crs is one of the defined
     if ( !validProjs.includes(srid) ) {
-      res.send({ error: 'Wrong crs input, must be between 3006 and 3018 or 3857, 4326' });
+      console.log('ERROR Wrong crs input, must be between 3006 and 3018 or 3857, 4326!');
+      res.send({});
     } else {
       if (srid !== '3006') {
         var newCoordinates = transformCoordinates(srid, '3006', [Number(xcoord), Number(ycoord)]);

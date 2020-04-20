@@ -76,7 +76,7 @@ Configured services at:
 
 - Ortnamn Direkt - set consumer_key and consumer_secret in conf/config.js
 
-		/origoserver/lm/placenames/?q={searchstring}&kommunkod={4-digit number for the municipality}&start={number}&limit={number}&nametype={placename type}&lang={language code}&srid={EPSG code}
+		/origoserver/lm/placenames/?q={searchstring}&kommunkod={4-digit number for the municipality}&limit={number}&nametype={placename type}&lang={language name}&srid={EPSG code}
 
 - Registerbeteckning Direkt - set consumer_key and consumer_secret in conf/config.js
 
