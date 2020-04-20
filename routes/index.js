@@ -15,6 +15,7 @@ var lmSearchPlacename = require('../handlers/lmsearchplacename');
 var lmEstate = require('../handlers/lmsearchestate');
 var lmSearchAddress = require('../handlers/lmsearchaddress');
 var lmGetEstate = require('../handlers/lmgetestate');
+var iotProxy = require('../handlers/iotproxy');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -35,5 +36,6 @@ router.all('/lm/enhetsomraden*', lmEstate['lmGetEstateFromPoint']);
 router.all('/lm/registerenheter*', lmEstate['lmSearchEstate']);
 router.all('/lm/addresses*', lmSearchAddress);
 router.all('/lm/getestate*', lmGetEstate);
+router.all('/iotproxy/*', iotProxy);
 
 module.exports = router;
