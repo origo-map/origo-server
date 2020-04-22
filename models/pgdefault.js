@@ -20,6 +20,7 @@ var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
     'SELECT ' +
     sqlSearchField +
     ' ' + table + '."' + gid + '" AS "GID", ' +
+    sqlFields +
     type +
     wkt +
     ' FROM ' + schema + '.' + table +
