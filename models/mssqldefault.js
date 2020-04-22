@@ -6,7 +6,9 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions, defaultLimit
   var sqlSearchField = searchField ? searchField + " AS NAMN," : "";
   var fields = queryOptions.fields;
   var geometryField = queryOptions.geometryName || "geom";
-  var centroid = geometryField + ".STPointOnSurface().ToString() AS GEOM " + " ";
+  var useCentroid = queryOptions.hasOwnProperty("useCentroid") ? queryOptions.useCentroid : true;
+  var wkt = useCentroid ? geometryField + ".STPointOnSurface().ToString() AS GEOM " + " " :
+    geometryField + ".ToString() AS GEOM " + " ";
   var sqlFields = fields ? fields.join(',') + "," : "";
   var type = " '" + table + "'" + " AS TYPE, ";
   var condition = queryString;
@@ -16,7 +18,7 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions, defaultLimit
 
   searchString =
     "SELECT " + limit +
-    sqlSearchField + sqlFields + type + centroid +
+    sqlSearchField + sqlFields + type + wkt +
     " FROM " + database + "." + schema + "." + table +
     " WHERE LOWER(" + searchField + ") LIKE LOWER('" + condition + "%')" + " " +
     " ORDER BY " + searchField + "";
