@@ -103,3 +103,9 @@ Configured services at:
 		/origoserver/iotproxy/?q={service name}&srid={EPSG code}
 
 		The {service name} specified in the config. Transforms coordinates to Sweref99 TM (EPSG:3006) if no srid is supplied.
+
+- Overpass - sends Overpass queries for OpenStreetMap and returns GeoJSON
+
+		/origoserver/overpass/?q={query name}
+
+		The {query name} specified in the config.
