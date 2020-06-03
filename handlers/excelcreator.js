@@ -26,7 +26,6 @@ function postHandler(req, res) {
   });
 
   var options = {
-    // root: __dirname + '/../',
     dotfiles: 'deny',
     headers: {
       'x-timestamp': Date.now(),
@@ -36,27 +35,24 @@ function postHandler(req, res) {
 
   var fileName = './public/temp.xlsx';
 
-  // Timeout is set for testing delay spinners in the client, should be removed after test is complete.
-  setTimeout(() => {
-    workbook.xlsx.writeFile(fileName)
-      .then(function () {
-        console.log("file is written");
-        res.setHeader('content-type', 'application/vnd.ms-excel');
-        res.statusMessage = "Custom Status Message";
-        res.customName = "File Name";
-        res.download(fileName, 'ExportedFeatures.xlsx', options, function (err) {
-          if (err) {
-            console.log('Error sending file: ', err);
-          } else {
-            console.log('Sent: ', fileName);
-          }
-        });
-      })
-      .catch(function (err) {
-        console.log("Error writing file.");
-        console.log(err);
+  workbook.xlsx.writeFile(fileName)
+    .then(function () {
+      console.log("file is written");
+      res.setHeader('content-type', 'application/vnd.ms-excel');
+      res.statusMessage = "Custom Status Message";
+      res.customName = "File Name";
+      res.download(fileName, 'ExportedFeatures.xlsx', options, function (err) {
+        if (err) {
+          console.log('Error sending file: ', err);
+        } else {
+          console.log('Sent: ', fileName);
+        }
       });
-  }, 3000);
+    })
+    .catch(function (err) {
+      console.log("Error writing file.");
+      console.log(err);
+    });
 }
 
 module.exports = router;
