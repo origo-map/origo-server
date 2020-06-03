@@ -6,18 +6,26 @@ const mapstateRouter = express.Router();
 
 mapstateRouter.use(function (req, res, next) {
 
-    // Website you wish to allow to connect
+  // Website you wish to allow to connect
+  if (!res.header('Access-Control-Allow-Origin')) {
     res.setHeader('Access-Control-Allow-Origin', '*');
+  }
 
-    // Request methods you wish to allow
+  // Request methods you wish to allow
+  if (!res.header('Access-Control-Allow-Methods')) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  }
 
-    // Request headers you wish to allow
+  // Request headers you wish to allow
+  if (!res.header('Access-Control-Allow-Headers')) {
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  }
 
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  if (!res.header('Access-Control-Allow-Credentials')) {
     res.setHeader('Access-Control-Allow-Credentials', true);
+  }
 
     // Pass to next layer of middleware
     next();

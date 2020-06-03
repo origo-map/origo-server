@@ -25,12 +25,13 @@ var getInskrivning = async (req, res) => {
     }
   };
 
-  var inskrivningUrl = config.getInskrivning.url;
-  var inskrivningKey = config.getInskrivning.consumer_key;
-  var inskrivningSecret = config.getInskrivning.consumer_secret;
-  var inskrivningScope = config.getInskrivning.scope;
+  var url = config.getInskrivning.url;
+  var url_token = config.getInskrivning.url_token;
+  var consumer_key = config.getInskrivning.consumer_key;
+  var consumer_secret = config.getInskrivning.consumer_secret;
+  var scope = config.getInskrivning.scope;
 
-  await getToken(inskrivningKey, inskrivningSecret, inskrivningScope)
+  await getToken(url_token, consumer_key, consumer_secret, scope)
     .then(JSON.parse)
     .then((result) => {
       token = result.access_token;
@@ -57,7 +58,7 @@ var getInskrivning = async (req, res) => {
     });
 
   request.post({
-    url: inskrivningUrl,
+    url: url,
     body: xml,
     headers: {
       'Content-Type': 'application/soap+xml',

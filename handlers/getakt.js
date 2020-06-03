@@ -14,9 +14,10 @@ const config = require('../conf/config');
 const getToken = require('../lib/tokenrequest');
 
 // Use the config for AktDirekt
-const aktkey = config.getAkt.consumer_key;
-const aktsecret = config.getAkt.consumer_secret;
-const aktscope = config.getAkt.scope;
+const url_token = config.getAkt.url_token;
+const consumer_key = config.getAkt.consumer_key;
+const consumer_secret = config.getAkt.consumer_secret;
+const scope = config.getAkt.scope;
 
 // Token holder
 let token;
@@ -58,7 +59,7 @@ proxy.on('proxyReq', (proxyReq, req) => {
   proxyReq.path = proxyPath;
 
   // Set the proxy request headers
-  proxyReq.setHeader('Authorization', `Bearer ${token}`, ' scope', `${aktscope}`);
+  proxyReq.setHeader('Authorization', `Bearer ${token}`, ' scope', `${scope}`);
 });
 
 // If the http-proxy throws an error, log it
@@ -70,7 +71,7 @@ proxy.on('error', (err) => {
 const getAkt = async (req, res) => {
 
   // Call the promised token
-  await getToken(aktkey, aktsecret, aktscope)
+  await getToken(url_token, consumer_key, consumer_secret, scope)
     .then(JSON.parse)
     .then((result) => {
       token = result.access_token;
