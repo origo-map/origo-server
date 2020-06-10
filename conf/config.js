@@ -73,5 +73,15 @@ module.exports = {
     headers: 'X-Requested-With,content-type',
     credentials: true,
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  },
+  'iotproxy': {
+    services: [
+      {
+        name: "temperature",
+        url: "https://example.com/ngsi-ld/v1/entities?type=WeatherObserved&attrs=temperature",
+        title: "Temperature",
+        properties: ['temperature', 'dateObserved']
+      }
+    ]
   }
 }

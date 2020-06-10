@@ -97,3 +97,9 @@ Configured services at:
 		/origoserver/lm/addresses?q={searchstring}&srid={EPSG code}&maxHits={number}
 
 		The {searchstring} should start with one or multiple, seperated by commas, municipalities and then a space followed by the free text search for the address. For example "Sundsvall,Hudiksvall Storgatan"
+
+- IoTProxy - translates the IoT standard NGSI-LD to GeoJSON
+
+		/origoserver/iotproxy/?q={service name}&srid={EPSG code}
+
+		The {service name} specified in the config. Transforms coordinates to Sweref99 TM (EPSG:3006) if no srid is supplied.
