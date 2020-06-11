@@ -9,6 +9,8 @@ var getInskrivning = require('../handlers/getinskrivning');
 var proxy = require('../handlers/proxy');
 var lmProxy = require('../handlers/lmproxy');
 var lmProxyVer = require('../handlers/lmproxyver');
+var excelCreator = require('../handlers/excelcreator');
+
 var getAkt = require('../handlers/getakt');
 var lmElevation = require('../handlers/lmelevation');
 var lmSearchPlacename = require('../handlers/lmsearchplacename');
@@ -30,6 +32,8 @@ router.all('/estate/inskrivning', getInskrivning);
 router.all('/proxy', proxy);
 router.all('/lmproxy/*', lmProxy);
 router.all('/lmproxy-ver/*', lmProxyVer);
+router.use('/excelcreator', excelCreator);
+
 router.all('/document/*', getAkt);
 router.all('/lm/elevation*', lmElevation);
 router.all('/lm/placenames*', lmSearchPlacename);
