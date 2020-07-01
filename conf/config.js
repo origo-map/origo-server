@@ -83,5 +83,15 @@ module.exports = {
         properties: ['temperature', 'dateObserved']
       }
     ]
+  },
+  'overpass': {
+    queries: [
+      {
+        name: "amenityFuelBBox",
+        query: "[out:json];node(62.1,16.2,63.0,17.8)[amenity=fuel];out;",
+        title: "Get all amenity:fuel for bbox around Sundsvall",
+        options: "{}"
+      }
+    ]
   }
 }
