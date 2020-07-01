@@ -26,34 +26,29 @@ let token;
 proxy = httpProxy.createProxyServer();
 
 // Proxy request config
-proxy.on('proxyReq', (proxyReq, req) => {
+proxy.on('proxyReq', (proxyReq, req, res) => {
 
   // Get the request path
   const parsedUrl = url.parse(req.url);
   const query = parsedUrl.search;
   const path = parsedUrl.pathname;
-  const pathPart = path.split("_");
-  const pathObj = {
-    page_: pathPart[0],
-    vers: pathPart[1],
-    subdoc: pathPart[2],
-    page: pathPart[3],
-    archive: pathPart[4],
-    enc_id: pathPart[5]
-  };
-
-  // Proxy target option, akturl, exclude path so we define here and use it with proxyPath
   const targetPath = '/distribution/produkter/aktdirekt/v3.0';
-
-  // Proxy path holder
+  const conditions = ['Å', 'Ä', 'Ö'];
   let proxyPath;
+  let index;
 
   // Set proper proxy request paths
   if (path.includes('index.djvu')) {
-    const index = `${targetPath}${path}${encodeURI(query)}`;
+    // Edge Chromium does not have option to choose encoding as IE so in order to use IE inside Edge for opening DjVu documents,
+    // we exclude encoding part and that due to swedish letters in some document querys.
+    if (conditions.some(el => query.includes(el))) {
+      index = `${targetPath}${path}${encodeURI(query)}`;
+    } else {
+      index = `${targetPath}${path}${query}`;
+    }
     proxyPath = index;
   } else if (path.includes('page_')) {
-    const page = `${targetPath}${pathObj.page_}_${pathObj.vers}_${pathObj.subdoc}_${pathObj.page}_${pathObj.archive}_${encodeURIComponent(pathObj.enc_id)}`;
+    const page = `${targetPath}${path}`;
     proxyPath = page;
   }
   proxyReq.path = proxyPath;
