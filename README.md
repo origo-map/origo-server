@@ -109,9 +109,3 @@ Configured services at:
 		/origoserver/overpass/?q={query name}
 
 		The {query name} specified in the config.
-
-- ConvertToGeojson - translates a none standard json to GeoJSON FeatureCollection
-
-		/origoserver/converttogeojson/?q={query name}
-
-		The {query name} specified in the config.
