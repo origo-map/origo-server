@@ -93,5 +93,16 @@ module.exports = {
         options: "{}"
       }
     ]
+  },
+  'tvapi': {
+    services: [
+      {
+        name: 'situation',
+        url: 'https://api.trafikinfo.trafikverket.se/v2/data.json',
+        title: 'Situationer i Västernorrland',
+        query: '<REQUEST><LOGIN authenticationkey="xxxxx"/><QUERY runtime="true" objecttype="Situation" schemaversion="1.4"><FILTER><IN name="Deviation.CountyNo" value="22" /></FILTER></QUERY></REQUEST>',
+        type: 'Situation'
+      }
+    ]
   }
 }
