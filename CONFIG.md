@@ -20,13 +20,13 @@ Configuration explained for the following services:
 
 		title - the title that is used as name in the GeoJSON FeatureCollection.
 
-		arrayOfObjects - the name of the array object in the JSON that holds the obects that is to be converted.
+		arrayOfObjects - the name of the array object in the JSON that holds the objects that is to be converted.
 
 		geometry - the name of the object in the JSON that holds the obects geometry.
 
 		geometry_type - the type of the geometry, values can be Point, LineString, Polygon, MultiPoint, MultiLineString, and MultiPolygon.
 
-		geometry_format - the format of the geoemtry, values can for now be Array or GeometryCollections.
+		geometry_format - the format of the geometry, values can for now be Array or GeometryCollections.
 
 		properties - an array with the names of the objects which should be transferred into properties of the feature in the GeoJSON.
 
