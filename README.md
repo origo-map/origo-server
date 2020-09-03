@@ -38,7 +38,7 @@ To uninstall run the following command:
   		   node uninstall_windowsservice.js
 
 ### Current services provided
-Basic configuration needed in conf/config.js and/or conf/dbconfig.js.
+Basic configuration needed in conf/config.js and/or conf/dbconfig.js. More information about configuration can be found in the [CONFIG.md](https://github.com/origo-map/origo-server/blob/master/CONFIG.md) file.
 
 Configured services at:
 
