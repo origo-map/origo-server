@@ -19,6 +19,7 @@ var lmSearchAddress = require('../handlers/lmsearchaddress');
 var lmGetEstate = require('../handlers/lmgetestate');
 var iotProxy = require('../handlers/iotproxy');
 var overpass = require('../handlers/overpass');
+var tvApi = require('../handlers/tvapi');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -43,5 +44,6 @@ router.all('/lm/addresses*', lmSearchAddress);
 router.all('/lm/getestate*', lmGetEstate);
 router.all('/iotproxy/*', iotProxy);
 router.all('/overpass/*', overpass);
+router.all('/tvapi/*', tvApi);
 
 module.exports = router;
