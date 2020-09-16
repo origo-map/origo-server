@@ -115,3 +115,9 @@ Configured services at:
 		/origoserver/tvapi/?q={query name}&output={format}
 
 		The {query name} specified in the config. The format of the output if not the standard from Trafikverket API, currently only supported GeoJSON.
+
+- ConvertToGeojson - translates a none standard json to GeoJSON FeatureCollection
+
+		/origoserver/converttogeojson/?q={query name}
+
+		The {query name} specified in the config.

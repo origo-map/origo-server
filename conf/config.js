@@ -104,5 +104,20 @@ module.exports = {
         type: 'Situation'
       }
     ]
+  },
+  'convertToGeojson': {
+    converts: [
+      {
+        name: 'example',
+        url: 'https://example.com/getitems',
+        title: 'Example, points',
+        arrayOfObjects: 'example',
+        geometry: 'point',
+        geometry_type: 'Point',
+        geometry_format: 'Array',
+        properties: ['title', 'description', 'restrictions', 'level', 'start', 'end'],
+        encoding: 'iso-8859-1'
+      }
+    ]
   }
 }
