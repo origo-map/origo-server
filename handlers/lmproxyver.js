@@ -2,7 +2,7 @@ var conf = require('../conf/config');
 var proxyRequest = require('../lib/proxyrequest');
 
 module.exports = function lmProxy(req, res) {
-  var proxyUrl = 'lmproxy';
+  var proxyUrl = 'lmproxy-ver';
   var options;
   if (conf[proxyUrl]) {
     options = Object.assign({}, conf[proxyUrl]);
