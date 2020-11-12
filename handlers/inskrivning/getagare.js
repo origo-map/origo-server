@@ -57,9 +57,7 @@ module.exports = function getAgare(prop, data, model) {
   }
 
   function getOrg(orgObj) {
-    var namn = {};
-    var orgnamn = objectifier.get(ns + ':organisationsnamn', orgObj);
-    namn.namn = orgnamn;
+    var namn = getNamn(orgObj);
     var utlandsk = objectifier.get(ns + ':Utlandsadress', orgObj);
     var adress = getAdress(orgObj[ns + ':Adress']);
     if (utlandsk) {
