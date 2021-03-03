@@ -98,6 +98,10 @@ Configured services at:
 
 		The {searchstring} should start with one or multiple, seperated by commas, municipalities and then a space followed by the free text search for the address. For example "Sundsvall,Hudiksvall Storgatan"
 
+		/origoserver/lm/addresses?northing={northing}&easting={easting}&srid={EPSG code}&format={format}
+
+		Supply coordinates and get the closest address to those coordinates. Default format is GeoJSON, but Origo can also be used.
+
 - IoTProxy - translates the IoT standard NGSI-LD to GeoJSON
 
 		/origoserver/iotproxy/?q={service name}&srid={EPSG code}

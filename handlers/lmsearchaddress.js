@@ -6,6 +6,7 @@ const url = require('url');
 var objectIds;
 var srid;
 var maxHits;
+var format;
 
 // Token holder
 let token;
@@ -27,7 +28,9 @@ const lmSearchAddress = async (req, res) => {
 
     // Get the query parameters from the url
     const parsedUrl = url.parse(decodeURI(req.url), true);
-    const searchString = parsedUrl.query.q;
+    const searchString = parsedUrl.query.q || '';
+    const northing = parsedUrl.query.northing || undefined;
+    const easting = parsedUrl.query.easting || undefined;
     var searchArray = searchString.split(' ');
     var municipality = searchArray[0];
     var municipalityArray = municipality.split(',');
@@ -50,17 +53,25 @@ const lmSearchAddress = async (req, res) => {
     } else {
       maxHits = '30';
     }
+    if ('format' in parsedUrl.query) {
+      format = parsedUrl.query.format;
+    } else {
+      format = '';
+    }
+    if (northing !== undefined && easting !== undefined) {
+      getAddressPointAsyncCall(northing, easting, req, res);
+    } else {
+      // Do a free text search to get the IDs of all that matches
+      await doSearchAsyncCall(municipalityArray, searchValue);
 
-    // Do a free text search to get the IDs of all that matches
-    await doSearchAsyncCall(municipalityArray, searchValue);
+      // Allow a maximum of 250 objects
+      objectIds.length = objectIds.length > 250 ? 250 : objectIds.length;
 
-    // Allow a maximum of 250 objects
-    objectIds.length = objectIds.length > 250 ? 250 : objectIds.length;
-
-    // Do a POST with all the IDs from free search to get the complete objects with geometry
-    await getAddressAsyncCall(req, res);
-    // Reset the array of found objects.
-    objectIds = [];
+      // Do a POST with all the IDs from free search to get the complete objects with geometry
+      await getAddressAsyncCall(req, res);
+      // Reset the array of found objects.
+      objectIds = [];
+    }
   }
 }
 
@@ -178,6 +189,44 @@ function getAddressWait(options, res) {
   });
 }
 
+function getAddressPointWait(options, res) {
+  rp(options)
+  .then(function (result) {
+    var parameters = JSON.parse(result);
+    if (parameters.features[0].id !== undefined) {
+      const options = {
+          url: encodeURI(configOptions.url + '/' + parameters.features[0].id + '?includeData=total&srid=' + srid),
+          method: 'GET',
+          headers: {
+            'content-type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'scope': `${scope}`
+          }
+      };
+      rp(options)
+      .then(function (adress) {
+        var registerenhet = JSON.parse(adress);
+        if (format === 'Origo') {
+          res.send(concatAddress(registerenhet.features[0]));
+        } else {
+          res.send(registerenhet);
+        }
+      })
+      .catch(function (err) {
+        console.log(err);
+        console.log('ERROR getAddressPointWait!');
+        res.send({});
+      });
+    }
+    return parameters;
+  })
+  .catch(function (err) {
+    console.log(err);
+    console.log('ERROR getAddressPointWait!');
+    res.send({});
+  });
+}
+
 async function getAddressAsyncCall(req, res) {
   // Setup the call for getting the objects found in search and wait for result
   var options = {
@@ -199,6 +248,20 @@ async function getAddressAsyncCall(req, res) {
   }
 }
 
+async function getAddressPointAsyncCall(northing, easting, req, res) {
+  // Setup the call for getting the objects found in search and wait for result
+  var options = {
+    method: 'GET',
+    uri: configOptions.url + 'punkt/' + srid + '/' + northing + ',' + easting + '?includeData=total&srid=' + srid,
+    headers: {
+      'content-type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'scope': `${scope}`
+    }
+  };
+  await getAddressPointWait(options, res);
+}
+
 function concatResult(features) {
   const result = [];
 
@@ -218,4 +281,24 @@ function concatResult(features) {
   })
 
   return result;
+}
+
+function concatAddress(feature) {
+  let adress = {};
+
+  if ('id' in feature) {
+    adress['objektidentitet'] = feature.properties.objektidentitet;
+    adress['kommun'] = feature.properties.adressomrade.kommundel.kommun;
+    const faststalltNamn = feature.properties.adressomrade.faststalltNamn;
+    const adressplatsnummer = feature.properties.adressplatsattribut.adressplatsbeteckning.adressplatsnummer || '';
+    const bokstavstillagg = feature.properties.adressplatsattribut.adressplatsbeteckning.bokstavstillagg || '';
+    adress['adress'] = faststalltNamn + ' ' + adressplatsnummer + bokstavstillagg + ', ' + feature.properties.adressplatsattribut.postort;
+    adress['faststalltNamn'] = faststalltNamn;
+    adress['adressplatsnummer'] = adressplatsnummer;
+    adress['bokstavstillagg'] = bokstavstillagg;
+    adress['postnummer'] = feature.properties.adressplatsattribut.postnummer;
+    adress['postort'] = feature.properties.adressplatsattribut.postort;
+    adress['adressplatspunkt'] = feature.properties.adressplatsattribut.adressplatspunkt;
+  }
+  return adress;
 }
