@@ -119,5 +119,11 @@ module.exports = {
         encoding: 'iso-8859-1'
       }
     ]
+  },
+  'auth': {
+    openidIssuer: 'https://openid-provider/.well-known/openid-configuration',
+    redirect_uri: 'http://localhost:9966/auth',
+    client_id: '',
+    client_secret: ''
   }
 }
