@@ -125,3 +125,7 @@ Configured services at:
 		/origoserver/converttogeojson/?q={query name}
 
 		The {query name} specified in the config.
+
+- Auth - openid authorization and token refresh
+		
+		Configure auth in conf/config.js
