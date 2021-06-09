@@ -40,7 +40,7 @@ module.exports = {
     scope: 'am_application_scope default'
   },
   lmsearchplacename: {
-    url: "https://api.lantmateriet.se/distribution/produkter/ortnamn/v2",
+    url: "https://api.lantmateriet.se/distribution/produkter/ortnamn/v2.1",
     url_token: "https://api.lantmateriet.se/token",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
