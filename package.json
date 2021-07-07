@@ -1,5 +1,5 @@
 {
-  "name": "origo-server",
+  "name": "@origo/origo-server",
   "version": "1.0.0",
   "description": "Origo serverside to be used with an Origo map client",
   "keywords": [
