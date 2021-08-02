@@ -30,7 +30,7 @@ module.exports = async function access_token(req, res) {
       refresh_token: token_set.refresh_token,
       id_token: token_set.id_token,
       expires_at: token_set.expires_at,
-      displayname: user_info.displayname
+      displayname: user_info[conf.auth.displayname_property]
     });
   } catch (e) {
     console.error(e.toString());
