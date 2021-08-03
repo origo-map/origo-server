@@ -58,29 +58,25 @@ module.exports = {
 
       },
       search: {
-          search: {
-              table: "adressplats",
-              searchField: "Namn",
-              schema: 'public',
-              geometryName: 'geom',
-              database: 'mdk',
-              useCentroid: true,
-              tables: [
-				  {
-					table: 'adressplats',
-					searchField: 'NAMN'
-				  },
-				  {
-					table: 'intressepkt'
-				  },
-				  {
-					table: 'turismleder',
-					searchField: 'NAMN',
-					gid: 'GID'
-				  }				  
-			  ]
-          }
-      },
+        search: {
+           tables: [
+              {
+                 table: 'fastighetsytor',
+                 searchField: 'fastighetsbeteckning',
+                 schema: 'public',
+                 geometryName: 'geom',
+                 useCentroid: true
+              },
+              {
+                 table: 'Adresser',
+                 searchField: 'NAMN',
+                 schema: 'public',
+                 geometryName: 'geom',
+                 gid: 'OBJECTID'
+              }
+           ]
+        }
+     },
       addressEstate: {
           addresses: {
               table: "table name",
