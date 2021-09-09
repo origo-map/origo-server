@@ -126,6 +126,6 @@ Configured services at:
 
 		The {query name} specified in the config.
 
-- Auth - openid authorization and token refresh
-		
+- Authorization - openid authorization and token refresh
+
 		Configure auth in conf/config.js
