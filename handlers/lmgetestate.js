@@ -17,7 +17,7 @@ let scope;
 var proxyUrl = 'lmgetestate';
 
 // Do the request in proper order
-const lmGetEstate = async (req, res) => {
+const lmGetEstate = async (req, res, type = 'merged') => {
 
   if (conf[proxyUrl]) {
     configOptions = Object.assign({}, conf[proxyUrl]);
@@ -39,7 +39,7 @@ const lmGetEstate = async (req, res) => {
         await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
 
         // Do a POST with all the IDs from free search to get the complete objects with geometry
-        await doGetAsyncCall(req, res, configOptions, fnr);
+        await doGetAsyncCall(req, res, configOptions, fnr, type);
       } else {
         res.send({});
       }
@@ -87,10 +87,14 @@ async function getTokenAsyncCall(consumer_key, consumer_secret, scope) {
   return result;
 }
 
-function doGetWait(req, res, options) {
+function doGetWait(req, res, options, type) {
   rp(options)
   .then(function (parsedBody) {
-    res.send(concatResult(parsedBody, srid));
+    if (type === 'full') {
+      res.send(parsedBody);
+    } else {
+      res.send(concatResult(parsedBody, srid));
+    }
   })
   .catch(function (err) {
     console.log(err);
@@ -99,7 +103,7 @@ function doGetWait(req, res, options) {
   });
 }
 
-async function doGetAsyncCall(req, res, configOptions, fnr) {
+async function doGetAsyncCall(req, res, configOptions, fnr, type) {
   // Setup the search call and wait for result
   const options = {
       url: encodeURI(configOptions.url + '/' + fnr + '?includeData=basinformation,geometri' + '&srid=' + srid),
@@ -112,7 +116,7 @@ async function doGetAsyncCall(req, res, configOptions, fnr) {
       json: true // Automatically parses the JSON string in the response
   }
 
-  await doGetWait(req, res, options);
+  await doGetWait(req, res, options, type);
 }
 
 function concatResult(feature) {
@@ -125,6 +129,8 @@ function concatResult(feature) {
       const beteckning = element.properties.registerbeteckning.traktnamn;
       const block = element.properties.registerbeteckning.block ;
       const enhet = element.properties.registerbeteckning.enhet;
+      const objektidentitet = element.properties.objektidentitet;
+      const fastighetsnyckel = element.properties.fastighetsnyckel;
 
       if ('enhetsomrade' in element.properties) {
         element.properties.enhetsomrade.forEach((enhetsomrade) => {
@@ -149,7 +155,9 @@ function concatResult(feature) {
                 fastighet = registeromrade + ' ' + beteckning + ' ' + block + ':' + enhet + ' Enhetesområde ' + omradesnummer;
             }
             oneFeature['properties'] = {
-              name: fastighet
+              name: fastighet,
+              objektidentitet: objektidentitet,
+              fastighetsnyckel: fastighetsnyckel
             };
             oneFeature['type'] = 'Feature';
             geometryEnhetsomrade.push(oneFeature);
