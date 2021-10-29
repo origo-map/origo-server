@@ -103,7 +103,7 @@ function doGetWait(req, res, options, objektid) {
 async function doGetAsyncCall(req, res, config, objektid) {
   // Setup the search call and wait for result
   const options = {
-      url: encodeURI(config.url + '/beror/' + objektid + '?includeData=total'),
+      url: encodeURI(config.url + '/beror/' + objektid + '?includeData=agareAlla'),
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -119,9 +119,6 @@ async function doGetAsyncCall(req, res, config, objektid) {
 function parseResult(result) {
   var data = objectifier.find('properties', result);
   var dataRegisterenhet = objectifier.find('fastighetsreferens', result);
-  var dataAgande = objectifier.find('agande', result);
-  var dataTidigareAgande = objectifier.find('tidigareAgande', result);
-  var dataTomtratter = objectifier.find('tomtrattsupplatelse', result);
   var model = inskrivning();
   var inskriv = {};
   var tomtratter;
@@ -132,7 +129,7 @@ function parseResult(result) {
   inskriv.lagfart = lagfartParser(model.lagfart, data);
 
   //Tomträttshavare
-  tomtratter = tomtrattParser(model.tomtratt, dataAgande);
+  tomtratter = tomtrattParser(model.tomtratt, data);
   if (tomtratter.length) {
     inskriv.tomtratt = tomtratter;
   }

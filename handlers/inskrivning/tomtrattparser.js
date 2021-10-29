@@ -18,16 +18,16 @@ var agareParser = {
 };
 
 function getTomtratter(model, data) {
-  var agande = objectifier.get('Agande', data);
+  var agande = objectifier.get('agande', data);
   var tomtratter = [];
-  if (Array.isArray(data)) {
-    data.forEach(function(element) {
+  if (Array.isArray(agande)) {
+    agande.forEach(function(element) {
       if (element.typ === 'Tomträttsinnehav') {
         tomtratter.push(element);
       }
     })
   } else {
-    if (data.typ === 'Tomträttsinnehav') {
+    if (agande.typ === 'Tomträttsinnehav') {
       tomtratter.push(data);
     }
   }
