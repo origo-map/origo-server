@@ -1,18 +1,14 @@
-var objectifier = require('../../lib/utils/objectifier');
-var ns = require('./conf').ns;
-
 module.exports = function getAgare(prop, data, model) {
   var result = {};
-  var agarNs = ns + ':Agare.';
   var namnData;
   var personData;
   var orgData;
   var utlandskAgareData;
 
-  namnData = objectifier.get(agarNs, data);
-  personData = objectifier.get(agarNs + ns + ':Person', data);
-  orgData = objectifier.get(agarNs + ns + ':Organisation', data);
-  utlandskAgareData = objectifier.get(agarNs + ns + ':UtlandskAgare', data);
+  namnData = data[prop];
+  personData = namnData['person'];
+  orgData = namnData['organisation'];
+  utlandskAgareData = namnData['utlandskAgare'];
 
   if (personData) {
     result = getPerson(personData);
@@ -33,9 +29,9 @@ module.exports = function getAgare(prop, data, model) {
 
   function getNamn(namnObj) {
     var namn = {};
-    var orgNamn = objectifier.get(ns + ':organisationsnamn', namnObj);
-    var efternamn = objectifier.get(ns + ':efternamn', namnObj);
-    var fornamn = objectifier.get(ns + ':fornamn', namnObj);
+    var orgNamn = namnObj['organisationsnamn'];
+    var efternamn = namnObj['efternamn'];
+    var fornamn = namnObj['fornamn'];
     if (efternamn && fornamn) {
       namn.namn = efternamn + ', ' + fornamn;
     } else if (orgNamn) {
@@ -47,9 +43,9 @@ module.exports = function getAgare(prop, data, model) {
   }
 
   function getPerson(personObj) {
-    var namn = getNamn(personData);
-    var utlandsk = objectifier.get(ns + ':Utlandsadress', personObj);
-    var adress = getAdress(personObj[ns + ':Adress']);
+    var namn = getNamn(namnData);
+    var utlandsk = personObj['utlandsadress'];
+    var adress = getAdress(personObj);
     if (utlandsk) {
       adress = getUtlandsAdress(utlandsk);
     }
@@ -58,8 +54,8 @@ module.exports = function getAgare(prop, data, model) {
 
   function getOrg(orgObj) {
     var namn = getNamn(orgObj);
-    var utlandsk = objectifier.get(ns + ':Utlandsadress', orgObj);
-    var adress = getAdress(orgObj[ns + ':Adress']);
+    var utlandsk = orgObj['utlandsadress'];
+    var adress = getAdress(orgObj);
     if (utlandsk) {
       adress = getUtlandsAdress(utlandsk);
     }
@@ -68,35 +64,55 @@ module.exports = function getAgare(prop, data, model) {
 
   function getUtlandskAgare(utlObj) {
     var namn = getNamn(namnData);
-    var adress = getUtlandskAgareAdress(utlObj);
+    var adress = getUtlandsAdress(utlObj);
     return Object.assign(namn, adress);
   }
 
-  function getAdress(adressObj) {
-    var adress = {};
-    var postnummer = objectifier.get(ns + ':postnummer', adressObj);
-    var postort = objectifier.get(ns + ':postort', adressObj);
-    adress.utdelningsadress = objectifier.get(ns + ':utdelningsadress2', adressObj);
-    adress.postadress = postnummer + ' ' + postort;
-    adress.coAdress = objectifier.get(ns + ':coAdress', adressObj);
-    return adress;
+  function getAdress(personObj) {
+    var adress = [];
+    var adressObj = personObj['adress'];
+    var sarskildAdressObj = personObj['sarskildAdress'];
+    if (typeof adressObj !== 'undefined') {
+      var postnummer = adressObj['postnummer'];
+      var postort = adressObj['postort'];
+      adress.push({
+        utdelningsadress: adressObj['utdelningsadress2'],
+        postadress: postnummer + ' ' + postort,
+        coAdress: adressObj['coAdress']
+      })
+    }
+    if (typeof sarskildAdressObj !== 'undefined') {
+      var postnummer = sarskildAdressObj['postnummer'];
+      var postort = sarskildAdressObj['postort'];
+      adress.push({
+        utdelningsadress: sarskildAdressObj['utdelningsadress2'],
+        postadress: postnummer + ' ' + postort,
+        coAdress: sarskildAdressObj['coAdress']
+      })
+    }
+
+    return { adress: adress };
   }
 
   function getUtlandsAdress(adressObj) {
-    var adress = {};
-    adress.utdelningsadress = objectifier.get(ns + ':utdelningsadress1', adressObj);
-    adress.postadress = objectifier.get(ns + ':utdelningsadress3', adressObj);
-    adress.land = objectifier.get(ns + ':land', adressObj);
-    return adress;
-  }
-
-  function getUtlandskAgareAdress(adressObj) {
-    var adress = {};
-    adress.utdelningsadress = objectifier.get(ns + ':utdelningsadress', adressObj);
-    var postkod = objectifier.get(ns + ':postkod', adressObj);
-    var postort = objectifier.get(ns + ':postort', adressObj);
-    adress.postadress = postkod + ' ' + postort;
-    adress.land = objectifier.get(ns + ':land', adressObj);
-    return adress;
+    var adress = [];
+    var postadress = [];
+    if (typeof adressObj !== 'undefined') {
+      if (typeof adressObj['utdelningsadress2'] !== 'undefined') {
+        postadress.push(adressObj['utdelningsadress2']);
+      }
+      if (typeof adressObj['utdelningsadress3'] !== 'undefined') {
+        postadress.push(adressObj['utdelningsadress3']);
+      }
+      if (typeof adressObj['utdelningsadress4'] !== 'undefined') {
+        postadress.push(adressObj['utdelningsadress4']);
+      }
+      adress.push({
+        utdelningsadress: adressObj['utdelningsadress1'],
+        postadress: postadress.toString(),
+        land: adressObj['land']
+      })
+    }
+    return { adress: adress };
   }
 }

@@ -15,24 +15,26 @@
                     <td>
                       <address>
                         <strong>{{agare.namn}}</strong><br>
-                        {{#if agare.utdelningsadress}}
-                          {{agare.utdelningsadress}}<br>
-                        {{/if}}
-                        {{#if agare.coAdress}}
-                          c/o: {{agare.coAdress}}<br>
-                        {{/if}}
-                        {{#if agare.postadress}}
-                          {{agare.postadress}}<br>
-                        {{/if}}
-                        {{#if agare.land}}
-                          {{agare.land}}<br>
-                        {{/if}}
+                        {{#each agare.adress}}
+                          {{#if utdelningsadress}}
+                            {{utdelningsadress}}<br>
+                          {{/if}}
+                          {{#if coAdress}}
+                            c/o: {{coAdress}}<br>
+                          {{/if}}
+                          {{#if postadress}}
+                            {{postadress}}<br>
+                          {{/if}}
+                          {{#if land}}
+                            {{land}}<br>
+                          {{/if}}
+                        {{/each}}
                         </address>
-                        {{#if IDnummer}}
-                          Idnummer: {{IDnummer}}<br>
+                        {{#if idnummer}}
+                          Idnummer: {{idnummer}}<br>
                         {{/if}}
-                        {{#if BeviljadAndel}}
-                          Andel: {{BeviljadAndel}}<br>
+                        {{#if beviljadAndel}}
+                          Andel: {{beviljadAndel}}<br>
                         {{/if}}
                         {{#if inskrivningsdag}}
                           Inskrivningsdag: {{inskrivningsdag}}<br>
@@ -61,14 +63,26 @@
                         <td>
                           <address>
                             <strong>{{agare.namn}}</strong><br>
-                            {{agare.utdelningsadress}}<br>
-                            {{agare.postadress}}<br>
+                            {{#each agare.adress}}
+                              {{#if utdelningsadress}}
+                                {{utdelningsadress}}<br>
+                              {{/if}}
+                              {{#if coAdress}}
+                                c/o: {{coAdress}}<br>
+                              {{/if}}
+                              {{#if postadress}}
+                                {{postadress}}<br>
+                              {{/if}}
+                              {{#if land}}
+                                {{land}}<br>
+                              {{/if}}
+                            {{/each}}
                             </address>
-                            {{#if IDnummer}}
-                              Idnummer: {{IDnummer}}<br>
+                            {{#if idnummer}}
+                              Idnummer: {{idnummer}}<br>
                             {{/if}}
-                            {{#if BeviljadAndel}}
-                              Andel: {{BeviljadAndel}}<br>
+                            {{#if beviljadAndel}}
+                              Andel: {{beviljadAndel}}<br>
                             {{/if}}
                             {{#if inskrivningsdag}}
                               Inskrivningsdag: {{inskrivningsdag}}<br>
@@ -78,6 +92,58 @@
                             {{/if}}
                             {{#if beslut}}
                               Beslut: {{beslut}}<br>
+                            {{/if}}
+                        </td>
+                      </tr>
+                    {{/each}}
+                </tbody>
+              </table>
+          </div>
+        {{/if}}
+        {{#if tidigareAgande}}
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Tidigare ägande</h3>
+            </div>
+              <table class="table">
+                <tbody>
+                    {{#each tidigareAgande}}
+                      <tr>
+                        <td>
+                          <address>
+                            <strong>{{agare.namn}}</strong><br>
+                            {{#each agare.adress}}
+                              {{#if utdelningsadress}}
+                                {{utdelningsadress}}<br>
+                              {{/if}}
+                              {{#if coAdress}}
+                                c/o: {{coAdress}}<br>
+                              {{/if}}
+                              {{#if postadress}}
+                                {{postadress}}<br>
+                              {{/if}}
+                              {{#if land}}
+                                {{land}}<br>
+                              {{/if}}
+                            {{/each}}
+                            </address>
+                            {{#if idnummer}}
+                              Idnummer: {{idnummer}}<br>
+                            {{/if}}
+                            {{#if beviljadAndel}}
+                              Andel: {{beviljadAndel}}<br>
+                            {{/if}}
+                            {{#if inskrivningsdag}}
+                              Inskrivningsdag: {{inskrivningsdag}}<br>
+                            {{/if}}
+                            {{#if dagboksnummer}}
+                              Dagboksnummer: {{dagboksnummer}}<br>
+                            {{/if}}
+                            {{#if beslut}}
+                              Beslut: {{beslut}}<br>
+                            {{/if}}
+                            {{#if typ}}
+                             Typ: {{typ}}<br>
                             {{/if}}
                         </td>
                       </tr>

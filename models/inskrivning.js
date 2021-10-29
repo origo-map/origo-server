@@ -3,23 +3,32 @@ module.exports = function() {
   var inskrivning = {
     referens: {
       beteckning: true,
-      fastighetsnyckel: false
+      objektidentitet: false
     },
     lagfart: {
-      IDnummer: false,
+      idnummer: false,
       inskrivningsdag: true,
       dagboksnummer: false,
       beslut: false,
-      BeviljadAndel: true,
+      beviljadAndel: true,
       agare: true
     },
     tomtratt: {
-      IDnummer: false,
+      idnummer: false,
       beslut: false,
       inskrivningsdag: true,
       dagboksnummer: false,
-      BeviljadAndel: true,
+      beviljadAndel: true,
       agare: true
+    },
+    tidigareAgande: {
+      idnummer: false,
+      beslut: false,
+      inskrivningsdag: true,
+      dagboksnummer: false,
+      beviljadAndel: false,
+      agare: true,
+      typ: false
     }
   };
 
