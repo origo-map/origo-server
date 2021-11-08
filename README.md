@@ -90,7 +90,9 @@ Configured services at:
 
 		/origoserver/lm/registerenheter?x={easting}&y={northing}&srid={EPSG code}
 
-		/origoserver/lm/enhetsomraden?x={easting}&y={northing}&srid={EPSG code}
+		/origoserver/lm/enhetsomraden?x={easting}&y={northing}&srid={EPSG code}&type={merged/full}
+
+		Type can be merged or full, default is merged. Full will get the full response from Lantmäteriet and merged will give enhetsomraden polygon and only a subset of properties.
 
 - Belägenhetsadress Direkt - set consumer_key and consumer_secret in conf/config.js
 

@@ -28,8 +28,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(bodyParser.json({limit: '5mb'}));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: "5mb"}));
+app.use(bodyParser.urlencoded({limit: "5mb", extended: true, parameterLimit:50000}));
+app.use(express.json({limit: '5mb'}));
+app.use(express.urlencoded({limit: '5mb', extended: true, parameterLimit:50000}));
 app.use(express.static(path.join(__dirname, 'public')));
 if (conf['cors']) {
   var configOptions = Object.assign({}, conf['cors']);

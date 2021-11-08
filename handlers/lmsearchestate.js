@@ -104,6 +104,7 @@ const lmSearchEstate = async (req, res) => {
 
 // Do the request in proper order
 const lmGetEstateFromPoint = async (req, res) => {
+  let type = 'merged';
 
   if (conf[proxyUrl]) {
     configOptions = Object.assign({}, conf[proxyUrl]);
@@ -113,6 +114,11 @@ const lmGetEstateFromPoint = async (req, res) => {
       srid = parsedUrl.query.srid;
     } else {
        srid = '3006';
+    }
+    if ('type' in parsedUrl.query) {
+      type = parsedUrl.query.type;
+    } else {
+      type = 'merged';
     }
     if ('x' in parsedUrl.query) {
       const x = parsedUrl.query.x;
@@ -128,7 +134,7 @@ const lmGetEstateFromPoint = async (req, res) => {
       } else {
         if (typeof fnrObjektidentitet !== '') {
           req.url = req.url + '&fnr=' + fnrObjektidentitet;
-          lmGetEstate(req, res);
+          lmGetEstate(req, res, type);
         }
       }
     } else {
