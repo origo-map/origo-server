@@ -22,6 +22,7 @@ var overpass = require('../handlers/overpass');
 var tvApi = require('../handlers/tvapi');
 var convertToGeojson = require('../handlers/converttogeojson');
 var auth = require('../handlers/auth');
+var clients = require('../handlers/clients');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -49,6 +50,7 @@ router.all('/overpass/*', overpass);
 router.all('/tvapi/*', tvApi);
 router.all('/converttogeojson/*', convertToGeojson);
 router.use('/auth', auth);
+router.use('/clients', clients);
 
 
 module.exports = router;

@@ -8,6 +8,7 @@ module.exports = async function authorize(req, res) {
       redirect_uri: conf.auth.redirect_uri,
       response_type: 'code',
       scope: 'openid',
+      state: req.query.state ?? 'just-in'
     });
     res.redirect(authorizationUrl);
   } catch (e) {
