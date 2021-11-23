@@ -1,97 +1,129 @@
-var config = require('../conf/config');
+var conf = require('../conf/config');
 var objectifier = require('../lib/utils/objectifier');
 var builder = require('xmlbuilder');
 var request = require('request');
-var parseString = require('xml2js').parseString;
+var rp = require('request-promise');
 var inskrivning = require('../models/inskrivning');
 var parser = require('./inskrivning/parser');
 var referensParser = require('./inskrivning/referensparser');
 var lagfartParser = require('./inskrivning/lagfartparser');
 var tomtrattParser = require('./inskrivning/tomtrattparser');
+var tidigareParser = require('./inskrivning/tidigareparser');
 var getToken = require('../lib/tokenrequest');
+const url = require('url');
 var token;
+var handler = 'getInskrivning';
 
 var getInskrivning = async (req, res) => {
+  if (conf[handler]) {
+    configOptions = Object.assign({}, conf[handler]);
+    const parsedUrl = url.parse(decodeURI(req.url), true);
 
-  // Use either fastighetsnyckel or objektidentitet as querystring to get estate information, fastighetsnyckel is deprecated
-  var fnr = objectifier.get('query.fnr', req) || '';
-  var objektid = objectifier.get('query.objektid', req) || '';
-  var fid = fnr ? fnr : objektid;
-  var idStr = fnr ? 'fastighetsnyckel' : 'objektidentitet';
+    if ('objektid' in parsedUrl.query) {
+      const objektid = parsedUrl.query.objektid;
+      // RegExp for UUID
+      const uuidRegEx = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/i;
+      let found = objektid.match(uuidRegEx);
+      // Check to see if the fnr are a valid UUID and only proceed if it is
+      if (found !== null) {
+        // Get a token from LM
+        await getTokenAsyncCall(configOptions.url_token, configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
 
-  var options = {
-    'v2:IncludeData': {
-      'v2:agare': true
-    }
-  };
-
-  var url = config.getInskrivning.url;
-  var url_token = config.getInskrivning.url_token;
-  var consumer_key = config.getInskrivning.consumer_key;
-  var consumer_secret = config.getInskrivning.consumer_secret;
-  var scope = config.getInskrivning.scope;
-
-  await getToken(url_token, consumer_key, consumer_secret, scope)
-    .then(JSON.parse)
-    .then((result) => {
-      token = result.access_token;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-
-  var xml = builder.create('soap:Envelope')
-    .att('xmlns:soap', 'http://www.w3.org/2003/05/soap-envelope')
-    .att('xmlns:v2', 'http://namespace.lantmateriet.se/distribution/produkter/inskrivning/v2.1')
-    .ele('soap:Header')
-    .insertAfter('soap:Body')
-    .ele('v2:GetInskrivningRequest')
-    .ele('v2:InskrivningRegisterenhetFilter')
-    .ele('v2:' + idStr)
-    .txt(fid)
-    .up()
-    .up()
-    .ele(options)
-    .end({
-      pretty: true
-    });
-
-  request.post({
-    url: url,
-    body: xml,
-    headers: {
-      'Content-Type': 'application/soap+xml',
-      'Authorization': `Bearer ${token}`
-    }
-  }, function (error, response, body) {
-    var json;
-    parseString(body, {
-      explicitArray: false,
-      ignoreAttrs: true
-    }, function (err, result) {
-      json = result;
-    });
-    if (objectifier.find('env:Fault', json) || error) {
+        // Do a POST with all the IDs from free search to get the complete objects with geometry
+        await doGetAsyncCall(req, res, configOptions, objektid);
+      } else {
+        res.render('inskrivningerror', {
+          fid: objektid
+        });
+      }
+    } else {
       res.render('inskrivningerror', {
-        fid: fid
+        fid: objektid
       });
     }
-    else {
-      var inskrivning = parseResult(json);
-      res.render('inskrivning', inskrivning);
-    }
+  } else {
+    res.render('inskrivningerror', {
+      error: 'No config!'
+    });
+  }
+}
+
+module.exports = getInskrivning;
+
+function getTokenWait(options) {
+  // Return promise to be invoked for authenticating on service requests
+  return new Promise((resolve, reject) => {
+      // Requesting the token service object
+      request(options, (error, response, body) => {
+          if (error) {
+            console.log('Error token:' + error);
+            reject('An error occured collecting token: ', error);
+          } else {
+            token = body.access_token;
+            // console.log('Got token ' + token);
+            resolve(body.access_token);
+          }
+      })
+  })
+}
+
+async function getTokenAsyncCall(url_token, consumer_key, consumer_secret, scope) {
+  // Request a token from Lantmateriet API
+  const options = {
+      url: url_token,
+      method: 'POST',
+      headers: {
+         'Authorization': 'Basic ' + Buffer.from(consumer_key + ':' + consumer_secret).toString('base64')
+      },
+      form: {
+          'scope': scope,
+          'grant_type': 'client_credentials'
+      },
+      json: true
+  }
+  var result = await getTokenWait(options);
+  return result;
+}
+
+function doGetWait(req, res, options, objektid) {
+  rp(options)
+  .then(function (parsedBody) {
+    var inskrivning = parseResult(parsedBody);
+    res.render('inskrivning', inskrivning);
+  })
+  .catch(function (err) {
+    console.log(err);
+    console.log('ERROR doGetWait!');
+    res.render('inskrivningerror', {
+      fid: objektid
+    });
   });
 }
 
+async function doGetAsyncCall(req, res, config, objektid) {
+  // Setup the search call and wait for result
+  const options = {
+      url: encodeURI(config.url + '/beror/' + objektid + '?includeData=agareAlla'),
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      json: true // Automatically parses the JSON string in the response
+  }
+
+  await doGetWait(req, res, options, objektid);
+}
+
 function parseResult(result) {
-  var data = objectifier.find('ns4:Inskrivningsinformation', result);
+  var data = objectifier.find('properties', result);
+  var dataRegisterenhet = objectifier.find('fastighetsreferens', result);
   var model = inskrivning();
   var inskriv = {};
   var tomtratter;
-
   //Registerenhet
-  inskriv.referens = parser(model.referens, data, referensParser);
+  inskriv.referens = parser(model.referens, dataRegisterenhet, referensParser);
 
   //Ägare
   inskriv.lagfart = lagfartParser(model.lagfart, data);
@@ -102,8 +134,10 @@ function parseResult(result) {
     inskriv.tomtratt = tomtratter;
   }
 
+  //Tidigare Ägande
+  tidigareAgare = tidigareParser(model.tidigareAgande, data);
+  if (tidigareAgare.length) {
+    inskriv.tidigareAgande = tidigareAgare;
+  }
   return inskriv;
 }
-
-
-module.exports = getInskrivning;
