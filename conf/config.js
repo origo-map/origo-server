@@ -32,6 +32,13 @@ module.exports = {
       pass: 'xxxxx'
     }
   },
+  lmbuilding: {
+    url: 'https://api.lantmateriet.se/distribution/produkter/byggnad/v2',
+    url_token: "https://api.lantmateriet.se/token",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
+  },
   lmelevation: {
     url: "https://api.lantmateriet.se/distribution/produkter/hojd/v1/rest/api",
     url_token: "https://api.lantmateriet.se/token",

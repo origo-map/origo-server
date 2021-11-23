@@ -21,7 +21,16 @@ var server = app.listen(3001, function () {
 process.chdir(__dirname);
 
 var handlebars = require('express-handlebars')
-    .create({defaultLayout: 'main'});
+    .create({ defaultLayout: 'main', helpers: {
+      eq: function (v1, v2) { return v1 === v2; },
+      ne: function (v1, v2) { return v1 !== v2; },
+      lt: function (v1, v2) { return v1 < v2; },
+      gt: function (v1, v2) { return v1 > v2; },
+      lte: function (v1, v2) { return v1 <= v2; },
+      gte: function (v1, v2) { return v1 >= v2; },
+      and: function () { return Array.prototype.every.call(arguments, Boolean); },
+      or: function () { return Array.prototype.slice.call(arguments, 0, -1).some(Boolean); }
+    }});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));

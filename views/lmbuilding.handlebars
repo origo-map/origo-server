@@ -1,0 +1,50 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="page-header">
+          <h2>Byggnader på fastighet {{{features.[0].properties.liggerPa.registerenhetsreferens.beteckning}}}</h2>
+      </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Byggnadsinformation</h3>
+          </div>
+            <table class="table">
+              <tbody>
+                {{#each features}}
+                  <tr>
+                    <td>
+                        <strong>Byggnad {{properties.byggnadsattribut.husnummer}}</strong><br>
+                        {{#if properties.byggnadsnamn.[0].namn}}
+                          Byggnadsnamn: {{properties.byggnadsnamn.[0].namn}}<br>
+                        {{/if}}
+                        {{#if (eq properties.byggnadsandamal.[0].typ "Samhallsfunktion") }}
+                          Byggnadsändamål: Samhällsfunktion<br>
+                        {{else if (eq properties.byggnadsandamal.[0].typ "OvrigByggnad") }}
+                          Byggnadsändamål: Övrig byggnad<br>
+                        {{else}}
+                          Byggnadsändamål: {{properties.byggnadsandamal.[0].typ}}<br>
+                        {{/if}}
+                        {{#if properties.byggnadsandamal.[0].andamal}}
+                          Detaljerat ändamål: {{properties.byggnadsandamal.[0].andamal}}<br>
+                        {{/if}}
+                        {{#if properties.byggnadsattribut.nybyggnadsar}}
+                          Nybyggnadsår: {{properties.byggnadsattribut.nybyggnadsar}}<br>
+                        {{/if}}
+                        {{#if properties.byggnadsattribut.husnummer}}
+                          Husnummer: {{properties.byggnadsattribut.husnummer}}<br>
+                        {{/if}}
+                        {{#if properties.byggnadsdel.[0].insamlingslage}}
+                          Insamlingsläge: {{properties.byggnadsdel.[0].insamlingslage}}<br>
+                        {{/if}}
+                        {{#if properties.liggerPa.registerenhetsreferens.objektidentitet}}
+                          Fastighet: {{properties.liggerPa.registerenhetsreferens.beteckning}}<br>
+                        {{/if}}
+                    </td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+</div>
