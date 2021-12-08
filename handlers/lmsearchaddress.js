@@ -271,13 +271,17 @@ function concatResult(features) {
     const objektidentitet_2 = feature.properties.registerenhetsreferens[0].objektidentitet;
     const kommun = feature.properties.adressomrade ? feature.properties.adressomrade.kommundel.faststalltNamn : feature.properties.gardsadressomrade.adressomrade.kommundel.faststalltNamn;
     const faststalltNamn = feature.properties.adressomrade.faststalltNamn;
+    let popularnamn = '';
+    if ('adressplatsnamn' in feature.properties) {
+      popularnamn = feature.properties.adressplatsnamn.popularnamn;
+    }
     const adressplatsnummer = feature.properties.adressplatsattribut.adressplatsbeteckning.adressplatsnummer || '';
     const bokstavstillagg = feature.properties.adressplatsattribut.adressplatsbeteckning.bokstavstillagg || '';
     const postnummer = feature.properties.adressplatsattribut.postnummer;
     const postort = feature.properties.adressplatsattribut.postort;
     const koordinater = feature.properties.adressplatsattribut.adressplatspunkt.coordinates;
 
-    result.push([objektidentitet_1, kommun + ' ' + faststalltNamn + ' ' + adressplatsnummer + bokstavstillagg + ', ' + postort, koordinater[0], koordinater[1], objektidentitet_2]);
+    result.push([objektidentitet_1, popularnamn + ' ' + faststalltNamn + ' ' + adressplatsnummer + bokstavstillagg + ', ' + postort, koordinater[0], koordinater[1], objektidentitet_2]);
   })
 
   return result;
@@ -292,7 +296,12 @@ function concatAddress(feature) {
     const faststalltNamn = feature.properties.adressomrade.faststalltNamn;
     const adressplatsnummer = feature.properties.adressplatsattribut.adressplatsbeteckning.adressplatsnummer || '';
     const bokstavstillagg = feature.properties.adressplatsattribut.adressplatsbeteckning.bokstavstillagg || '';
+    let popularnamn = '';
+    if ('adressplatsnamn' in feature.properties) {
+      popularnamn = feature.properties.adressplatsnamn.popularnamn;
+    }
     adress['adress'] = faststalltNamn + ' ' + adressplatsnummer + bokstavstillagg + ', ' + feature.properties.adressplatsattribut.postort;
+    adress['popularnamn'] = popularnamn;
     adress['faststalltNamn'] = faststalltNamn;
     adress['adressplatsnummer'] = adressplatsnummer;
     adress['bokstavstillagg'] = bokstavstillagg;
