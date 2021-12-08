@@ -48,6 +48,12 @@ Configured services at:
 
 		/origoserver/estate/inskrivning?objektid={objektidentitet}
 
+- Byggnad Direkt - set consumer_key and consumer_secret in conf/config.js
+
+		/origoserver/lm/building?registerenhet={objektidentitet of estate}
+
+		/origoserver/lm/building?uuid={objektidentitet of building}
+
 - Akt Direkt
 
 		/origoserver/document/index.djvu?archive={archive/county-number}&id={akt-number}
