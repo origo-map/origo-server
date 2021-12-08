@@ -273,7 +273,9 @@ function concatResult(features) {
     const faststalltNamn = feature.properties.adressomrade.faststalltNamn;
     let popularnamn = '';
     if ('adressplatsnamn' in feature.properties) {
-      popularnamn = feature.properties.adressplatsnamn.popularnamn;
+      if ('popularnamn' in feature.properties.adressplatsnamn) {
+        popularnamn = feature.properties.adressplatsnamn.popularnamn;
+      }
     }
     const adressplatsnummer = feature.properties.adressplatsattribut.adressplatsbeteckning.adressplatsnummer || '';
     const bokstavstillagg = feature.properties.adressplatsattribut.adressplatsbeteckning.bokstavstillagg || '';
@@ -298,7 +300,9 @@ function concatAddress(feature) {
     const bokstavstillagg = feature.properties.adressplatsattribut.adressplatsbeteckning.bokstavstillagg || '';
     let popularnamn = '';
     if ('adressplatsnamn' in feature.properties) {
-      popularnamn = feature.properties.adressplatsnamn.popularnamn;
+      if ('popularnamn' in feature.properties.adressplatsnamn) {
+        popularnamn = feature.properties.adressplatsnamn.popularnamn;
+      }
     }
     adress['adress'] = faststalltNamn + ' ' + adressplatsnummer + bokstavstillagg + ', ' + feature.properties.adressplatsattribut.postort;
     adress['popularnamn'] = popularnamn;
