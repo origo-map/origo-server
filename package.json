@@ -12,6 +12,7 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "axios": "^0.26.1",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "cookie-parser": "~1.3.3",
@@ -21,6 +22,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "express-handlebars": "^5.3.0",
+    "express-http-proxy": "^1.6.3",
     "express-openapi": "^7.5.0",
     "express-rate-limit": "^6.2.0",
     "http-proxy": "^1.18.1",
@@ -45,7 +47,7 @@
     "mssql": "^3.3.0",
     "mysql": "^2.18.1",
     "node-windows": "^0.1.14",
-    "oracledb": "^3.1.2",
+    "oracledb": "^5.3.0",
     "pg": "^8.7.1",
     "pg-promise": "^10.11.1"
   }
