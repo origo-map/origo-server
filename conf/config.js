@@ -32,6 +32,14 @@ module.exports = {
       pass: 'xxxxx'
     }
   },
+  lmapiproxy: {
+    url: 'https://api.lantmateriet.se/',
+    url_token: "https://api.lantmateriet.se/token",
+    url_revoke: "https://api.lantmateriet.se/revoke",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    scope: 'am_application_scope default'
+  },
   lmbuilding: {
     url: 'https://api.lantmateriet.se/distribution/produkter/byggnad/v2',
     url_token: "https://api.lantmateriet.se/token",
