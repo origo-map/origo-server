@@ -4,7 +4,7 @@ const clientsRouter = express.Router();
 var supportedClients = require('../conf/config').auth.clients;
 
 var clients = function(req, res) {
-  const clientName = req.query.state ?? '';
+  const clientName = (req.query.state !== null && req.query.state !== undefined) ? req.query.state : '';
 
   let leClientUrl = supportedClients[clientName];
   if (leClientUrl) {

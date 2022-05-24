@@ -8,7 +8,7 @@ module.exports = async function authorize(req, res) {
       redirect_uri: conf.auth.redirect_uri,
       response_type: 'code',
       scope: 'openid',
-      state: req.query.state ?? 'just-in'
+      state: (req.query.state !== null && req.query.state !== undefined) ? req.query.state : 'just-in'
     });
     res.redirect(authorizationUrl);
   } catch (e) {
