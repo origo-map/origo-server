@@ -75,3 +75,19 @@ To use the API you must have a authentication key, which can be obtained by regi
 		query - a query that is accepted by the Trafikverket API in XML-format inclusive the authentication key.
 
 		type - the object type of the response, currently only Siuation is implemented.
+		
+- Authorization with openID
+
+An openID connect provider is required for this to work.
+
+		openidIssuer - url to openID well-known configuration
+
+		redirect_uri - url to where the response to the request should be sent, after the user signs in. Must be the same as in the openID provider.
+
+		http_timeout - timeout in milliseconds for communication with openIdIssuer.
+
+		client_id - from openID provider
+
+		client_secret - from openID provider
+
+		display_name - attribute from user-information displayed in the user menu (Origo with oidc-plugin).
