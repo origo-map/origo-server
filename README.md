@@ -133,3 +133,9 @@ Configured services at:
 		/origoserver/converttogeojson/?q={query name}
 
 		The {query name} specified in the config.
+		
+- Authorization - openid authorization and token refresh
+
+		Configure auth in conf/config.js
+
+		The {clients} contains the different clients which this origo server will support (which need authentication). Since the authentication is done externally, the clients need a way to get back to their urls, then the client has to have an defined identifier which is also defined here with a url, used for the redirect.

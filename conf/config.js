@@ -126,5 +126,17 @@ module.exports = {
         encoding: 'iso-8859-1'
       }
     ]
+  },
+  auth: {
+    openidIssuer: 'https://openid-provider/.well-known/openid-configuration',
+    redirect_uri: 'https://karta.xxx.se',
+    http_timeout: 10000,
+    client_id: 'xxxxx',
+    client_secret: 'xxxxx',
+    display_name: 'samaccountname',
+    clients: {
+      my_client: 'https://www.myclient.se',
+      my_other_client: 'https://www.myotherclient.com'
+    }
   }
 }
