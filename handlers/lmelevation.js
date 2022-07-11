@@ -92,7 +92,7 @@ function doGetGeoemtryWait(req, res, options) {
     if (srid === '3006') {
       res.send(parsedBody);
     } else {
-      res.send(concatResult(parsedBody, srid, 'Polygon'));
+      res.send(concatResult(parsedBody, srid, 'LineString'));
     }
   })
   .catch(function (err) {
@@ -121,10 +121,10 @@ async function doGetAsyncCall(req, res, configOptions, proxyUrl) {
     let bodyContent = req.body;
     if (srid !== '3006') {
       const newCoordinates = [];
-      bodyContent.coordinates[0].forEach((coord) => {
+      bodyContent.coordinates.forEach((coord) => {
         newCoordinates.push(transformCoordinates(srid, '3006', coord));
       })
-      bodyContent.coordinates = [newCoordinates];
+      bodyContent.coordinates = newCoordinates;
     }
 
     // Setup the search call and wait for result
@@ -182,7 +182,6 @@ function concatResult(feature, toProjection, type = '') {
   }
   const coordinates = feature.geometry.coordinates;
   const nodatavalue = feature.properties.nodatavalue;
-
   result['type'] = 'Feature';
   result['crs'] = {
     type: 'name',
@@ -197,7 +196,7 @@ function concatResult(feature, toProjection, type = '') {
     };
   } else {
     const newCoordinates = [];
-    feature.geometry.coordinates[0].forEach((coord) => {
+    feature.geometry.coordinates.forEach((coord) => {
       newCoordinates.push(transformCoordinates('3006', toProjection, coord));
     })
     result['geometry'] = {
