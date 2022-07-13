@@ -7,7 +7,7 @@ var transformCoordinates = require('../lib/utils/transformcoordinates');
 var objectIds;
 var username;
 var password;
-var srid;
+var srid = '3006';
 var validProjs = ["3006", "3007", "3008", "3009", "3010", "3011", "3012", "3013", "3014", "3015", "3016", "3017", "3018", "3857", "4326"];
 
 // Token holder
@@ -17,7 +17,6 @@ var proxyUrl = 'lmelevation';
 
 // Do the request in proper order
 const lmElevation = async (req, res) => {
-
   if (conf[proxyUrl]) {
     configOptions = Object.assign({}, conf[proxyUrl]);
     scope = configOptions.scope;
@@ -82,7 +81,24 @@ function doGetWait(req, res, options) {
   .catch(function (err) {
     console.log(err);
     console.log('ERROR doGetWait!');
-    res.send([]);
+    res.send({'error': err.error });
+  });
+}
+
+function doGetGeoemtryWait(req, res, options) {
+  rp(options)
+  .then(function (parsedBody) {
+    // Send the resulting object as json and end response
+    if (srid === '3006') {
+      res.send(parsedBody);
+    } else {
+      res.send(concatResult(parsedBody, srid, 'LineString'));
+    }
+  })
+  .catch(function (err) {
+    console.log(err);
+    console.log('ERROR doGetGeoemtryWait!');
+    res.send({'error': err.error });
   });
 }
 
@@ -92,15 +108,41 @@ async function doGetAsyncCall(req, res, configOptions, proxyUrl) {
   var urlArr;
 
   urlArr = req.url.split('/');
-  srid = decodeURI(urlArr[3]);
+  if (urlArr[3] !== '') {
+    srid = decodeURI(urlArr[3]);
+  }
   xcoord = decodeURI(urlArr[4]);
   ycoord = decodeURI(urlArr[5]);
   // Check so that not request parameters have been added to ycoord which can happen when the end slash is missing.
   if (ycoord.includes('?')) {
     ycoord = ycoord.substring(0, ycoord.indexOf('?'));
   }
-  // Check that request url has numbers
-  if (isNaN(srid) || isNaN(xcoord) || isNaN(ycoord) ) {
+  if (req.method == 'POST') { // A geometry was posted so sed it to API to get its Z values
+    let bodyContent = req.body;
+    if (srid !== '3006') {
+      const newCoordinates = [];
+      bodyContent.coordinates.forEach((coord) => {
+        newCoordinates.push(transformCoordinates(srid, '3006', coord));
+      })
+      bodyContent.coordinates = newCoordinates;
+    }
+
+    // Setup the search call and wait for result
+    const options = {
+        url: encodeURI(configOptions.url + '/hojd'),
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'scope': `${scope}`,
+          'Accept': `application/json`
+        },
+        body: bodyContent,
+        json: true // Automatically parses the JSON string in the response
+    }
+
+    await doGetGeoemtryWait(req, res, options);
+  } else if (isNaN(srid) || isNaN(xcoord) || isNaN(ycoord) ) {  // Check that request url has numbers
     console.log('ERROR Request parameters not numbers!');
     res.send({});
   } else {
@@ -132,12 +174,14 @@ async function doGetAsyncCall(req, res, configOptions, proxyUrl) {
   }
 }
 
-function concatResult(feature, toProjection) {
+function concatResult(feature, toProjection, type = '') {
   const result = {};
-
+  let geometryType = 'Point';
+  if (type !== '') {
+    geometryType = type;
+  }
   const coordinates = feature.geometry.coordinates;
   const nodatavalue = feature.properties.nodatavalue;
-
   result['type'] = 'Feature';
   result['crs'] = {
     type: 'name',
@@ -145,10 +189,21 @@ function concatResult(feature, toProjection) {
       name: 'urn:ogc:def:crs:EPSG::' + toProjection
     }
   };
-  result['geometry'] = {
-    type: 'Point',
-    coordinates: transformCoordinates('3006', toProjection, coordinates)
-  };
+  if (geometryType === 'Point') {
+    result['geometry'] = {
+      type: geometryType,
+      coordinates: transformCoordinates('3006', toProjection, coordinates)
+    };
+  } else {
+    const newCoordinates = [];
+    feature.geometry.coordinates.forEach((coord) => {
+      newCoordinates.push(transformCoordinates('3006', toProjection, coord));
+    })
+    result['geometry'] = {
+      type: geometryType,
+      coordinates: newCoordinates
+    };
+  }
   result['properties'] = {
     nodatavalue: nodatavalue
   };
