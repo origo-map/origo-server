@@ -161,6 +161,19 @@ function concatResult(feature) {
             };
             oneFeature['type'] = 'Feature';
             geometryEnhetsomrade.push(oneFeature);
+          } else {
+            const centerPoint = {};
+            centerPoint['geometry'] = {
+              coordinates: element.properties.enhetsomrade[0].centralpunkt.coordinates,
+              type: element.properties.enhetsomrade[0].centralpunkt.type
+            };
+            centerPoint['properties'] = {
+              name: registeromrade + ' ' + beteckning + ' ' + enhet,
+              objektidentitet: objektidentitet,
+              fastighetsnyckel: fastighetsnyckel
+            };
+            centerPoint['type'] = 'Feature';
+            geometryEnhetsomrade.push(centerPoint);
           }
         })
       }
