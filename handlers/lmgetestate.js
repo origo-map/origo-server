@@ -131,7 +131,15 @@ function concatResult(feature) {
       const enhet = element.properties.registerbeteckning.enhet;
       const objektidentitet = element.properties.objektidentitet;
       const fastighetsnyckel = element.properties.fastighetsnyckel;
-
+      const typ = element.properties.typ;
+      let samfallighetsattribut = {};
+      if ('samfallighetsattribut' in element.properties) {
+        samfallighetsattribut = element.properties.samfallighetsattribut;
+      }
+      let fastighetsattribut = {};
+      if ('fastighetsattribut' in element.properties) {
+        fastighetsattribut = element.properties.fastighetsattribut;
+      }
       if ('enhetsomrade' in element.properties) {
         element.properties.enhetsomrade.forEach((enhetsomrade) => {
           const oneFeature = {};
@@ -157,7 +165,10 @@ function concatResult(feature) {
             oneFeature['properties'] = {
               name: fastighet,
               objektidentitet: objektidentitet,
-              fastighetsnyckel: fastighetsnyckel
+              fastighetsnyckel: fastighetsnyckel,
+              typ,
+              fastighetsattribut,
+              samfallighetsattribut
             };
             oneFeature['type'] = 'Feature';
             geometryEnhetsomrade.push(oneFeature);
@@ -170,7 +181,10 @@ function concatResult(feature) {
             centerPoint['properties'] = {
               name: registeromrade + ' ' + beteckning + ' ' + enhet,
               objektidentitet: objektidentitet,
-              fastighetsnyckel: fastighetsnyckel
+              fastighetsnyckel: fastighetsnyckel,
+              typ,
+              fastighetsattribut,
+              samfallighetsattribut
             };
             centerPoint['type'] = 'Feature';
             geometryEnhetsomrade.push(centerPoint);
