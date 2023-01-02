@@ -32,7 +32,6 @@
     "query-overpass": "^1.5.5",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
-    "saml2-js": "^3.0.1",
     "serve-favicon": "^2.5.0",
     "soap": "^0.36.0",
     "sqlite3": "^5.0.3",
