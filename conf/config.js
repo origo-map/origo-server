@@ -68,11 +68,11 @@ module.exports = {
     scope: 'am_application_scope default'
   },
   lmgetestate: {
-    url: "https://api.lantmateriet.se/distribution/produkter/fastighet/v2.1/",
+    url: "https://api.lantmateriet.se/distribution/produkter/fastighetsamfallighet/v3.1",
     url_token: "https://api.lantmateriet.se/token",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
-    scope: 'am_application_scope default'
+    scope: 'fastighetochsamfallighet_direkt_v31_read'
   },
   cors: {
     origin: '*',

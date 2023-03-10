@@ -106,7 +106,7 @@ function doGetWait(req, res, options, type) {
 async function doGetAsyncCall(req, res, configOptions, fnr, type) {
   // Setup the search call and wait for result
   const options = {
-      url: encodeURI(configOptions.url + '/' + fnr + '?includeData=basinformation,geometri' + '&srid=' + srid),
+      url: encodeURI(configOptions.url + '/' + fnr + '?includeData=total' + '&srid=' + srid),
       method: 'GET',
       headers: {
         'content-type': 'application/json',
@@ -125,12 +125,11 @@ function concatResult(feature) {
 
   if ('features' in feature) {
     feature.features.forEach((element) => {
-      const registeromrade = element.properties.registerbeteckning.registeromrade;
-      const beteckning = element.properties.registerbeteckning.traktnamn;
-      const block = element.properties.registerbeteckning.block ;
-      const enhet = element.properties.registerbeteckning.enhet;
+      const registeromrade = element.properties.registerbeteckning[0].registeromrade;
+      const beteckning = element.properties.registerbeteckning[0].trakt;
+      const block = element.properties.registerbeteckning[0].block ;
+      const enhet = element.properties.registerbeteckning[0].enhet;
       const objektidentitet = element.properties.objektidentitet;
-      const fastighetsnyckel = element.properties.fastighetsnyckel;
       const typ = element.properties.typ;
       let samfallighetsattribut = {};
       if ('samfallighetsattribut' in element.properties) {
@@ -140,8 +139,8 @@ function concatResult(feature) {
       if ('fastighetsattribut' in element.properties) {
         fastighetsattribut = element.properties.fastighetsattribut;
       }
-      if ('enhetsomrade' in element.properties) {
-        element.properties.enhetsomrade.forEach((enhetsomrade) => {
+      if ('registerenhetsomrade' in element.properties) {
+        element.properties.registerenhetsomrade.forEach((enhetsomrade) => {
           const oneFeature = {};
           const omradesnummer = enhetsomrade.omradesnummer;
           let coordinates = [];
@@ -165,8 +164,7 @@ function concatResult(feature) {
             oneFeature['properties'] = {
               name: fastighet,
               objektidentitet: objektidentitet,
-              fastighetsnyckel: fastighetsnyckel,
-              typ,
+               typ,
               fastighetsattribut,
               samfallighetsattribut
             };
@@ -175,13 +173,12 @@ function concatResult(feature) {
           } else {
             const centerPoint = {};
             centerPoint['geometry'] = {
-              coordinates: element.properties.enhetsomrade[0].centralpunkt.coordinates,
-              type: element.properties.enhetsomrade[0].centralpunkt.type
+              coordinates: element.properties.registerenhetsomrade[0].centralpunktskoordinat.coordinates,
+              type: element.properties.registerenhetsomrade[0].centralpunktskoordinat.type
             };
             centerPoint['properties'] = {
               name: registeromrade + ' ' + beteckning + ' ' + enhet,
               objektidentitet: objektidentitet,
-              fastighetsnyckel: fastighetsnyckel,
               typ,
               fastighetsattribut,
               samfallighetsattribut
