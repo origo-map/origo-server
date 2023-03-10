@@ -1,5 +1,5 @@
 const fs = require("fs");
-const uuidV4 = require('uuid/v4');
+const { v4: uuidV4 } = require('uuid');
 const origoConfig = require('../conf/config');
 const express = require('express');
 const mapstateRouter = express.Router();
