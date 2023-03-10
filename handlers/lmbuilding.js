@@ -9,6 +9,7 @@ const url = require('url');
 let token;
 let scope;
 var proxyUrl = 'lmbuilding';
+var linkToOwner = true;
 
 // Do the request in proper order
 const lmBuilding = async (req, res) => {
@@ -16,7 +17,9 @@ const lmBuilding = async (req, res) => {
   if (conf[proxyUrl]) {
     configOptions = Object.assign({}, conf[proxyUrl]);
     scope = configOptions.scope;
-
+    if (typeof conf[proxyUrl].linktoowner !== 'undefined') {
+      linkToOwner = conf[proxyUrl].linktoowner
+    }
     //Get a token from LM
     await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
 
@@ -81,7 +84,7 @@ async function doGetAsyncCall(req, res, configOptions, proxyUrl) {
     //id = decodeURI(searchArray[4]);
     var id = objectifier.get('query.registerenhet', req) || '';
     var options1 = {
-        url: encodeURI(configOptions.url + '/referens/registerenhet/' + id + '?includeData=total'),
+        url: encodeURI(configOptions.url + '/referens/beror/' + id + '?includeData=total'),
         method: 'GET',
         headers: {
           'content-type': 'application/json',
@@ -110,7 +113,7 @@ async function doGetAsyncCall(req, res, configOptions, proxyUrl) {
     } else {
       console.log('No buildings object!');
       res.render('lmbuildingerror', {
-        fid: fid
+        error: 'No buildings object!'
       });
     }
     objektList = [];
@@ -143,11 +146,7 @@ function getObjektArr(options) {
           if (error) {
             console.log('Error get list of buildings: ' + error);
           } else {
-            const objList = [];
-            body.forEach(function(item, index, array) {
-              objList.push(item.objektidentitet)
-            })
-            resolve(objList);
+             resolve(body);
           }
       })
   })
@@ -158,6 +157,9 @@ function getBuildingInformation(req, res, options, objektList, fid) {
   .then(function (parsedBody) {
     let feat = parsedBody.features;
     feat.sortBy('properties.byggnadsattribut.husnummer');
+    if (linkToOwner) {
+      parsedBody.objektidentitet = fid;
+    }
     res.render('lmbuilding', parsedBody);
   })
   .catch(function (err) {
