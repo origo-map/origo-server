@@ -61,11 +61,11 @@ module.exports = {
     scope: 'am_application_scope default'
   },
   lmsearchaddress: {
-    url: "https://api.lantmateriet.se/distribution/produkter/belagenhetsadress/v4.1/",
+    url: "https://api.lantmateriet.se/distribution/produkter/belagenhetsadress/v4.2",
     url_token: "https://api.lantmateriet.se/token",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
-    scope: 'am_application_scope default'
+    scope: 'belagenhetsadress_direkt_v42_read'
   },
   lmgetestate: {
     url: "https://api.lantmateriet.se/distribution/produkter/fastighetsamfallighet/v3.1",
