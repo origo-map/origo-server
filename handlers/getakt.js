@@ -1,9 +1,9 @@
 /**
- * Module for requesting documents via AktDirekt, Lantmäteriet
+ * Module for requesting documents via Akt Direkt, Lantmäteriet
  * Usage: 
  * Get a djvu index page that gets all pages included in akt(document) - /origoserver/document/index.djvu?archive={archive/county-number}&id={akt-number}
- * Get a single djvu page - /origoserver/document/page_{vers}_{subdoc}_{page}_{archive}_{id}.djvu
- * 
+ * Get a PDF with all pages included in akt(document) - /origoserver/document/index.pdf?archive={archive/county-number}&id={akt-number}
+ *
  */
 
 // Dependencies
@@ -32,24 +32,21 @@ proxy.on('proxyReq', (proxyReq, req, res) => {
   const parsedUrl = url.parse(req.url);
   const query = parsedUrl.search;
   const path = parsedUrl.pathname;
-  const targetPath = '/distribution/produkter/aktdirekt/v3.0';
+  const targetPath = '/distribution/produkter/aktdirekt/v5.0';
   const conditions = ['Å', 'Ä', 'Ö'];
   let proxyPath;
   let index;
 
   // Set proper proxy request paths
-  if (path.includes('index.djvu')) {
+  if (path.includes('index.')) {
     // Edge Chromium does not have option to choose encoding as IE so in order to use IE inside Edge for opening DjVu documents,
     // we exclude encoding part and that due to swedish letters in some document querys.
     if (conditions.some(el => query.includes(el))) {
-      index = `${targetPath}${path}${encodeURI(query)}`;
+      index = `${targetPath}${path.replace('/index','')}${encodeURI(query)}`;
     } else {
-      index = `${targetPath}${path}${query}`;
+      index = `${targetPath}${path.replace('/index','')}${query}`;
     }
     proxyPath = index;
-  } else if (path.includes('page_')) {
-    const page = `${targetPath}${path}`;
-    proxyPath = page;
   }
   proxyReq.path = proxyPath;
 
