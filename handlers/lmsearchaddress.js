@@ -131,7 +131,7 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
   var promiseArray = [];
   // Split all the separate municipality given to individual searches
   municipalityArray.forEach(function(municipality) {
-    var searchUrl = encodeURI(configOptions.url + '/referens/fritext/' + municipality + ' ' + searchValue + '?maxHits=' + maxHits)
+    var searchUrl = encodeURI(configOptions.url + '/referens/fritext?adress=' + searchValue.replaceAll(',','') + ' ' + municipality + '&maxHits=' + maxHits)
     // Setup the search call and wait for result
     const options = {
         url: searchUrl,
@@ -252,7 +252,7 @@ async function getAddressPointAsyncCall(northing, easting, req, res) {
   // Setup the call for getting the objects found in search and wait for result
   var options = {
     method: 'GET',
-    uri: configOptions.url + 'punkt/' + srid + '/' + northing + ',' + easting + '?includeData=total&srid=' + srid,
+    uri: configOptions.url + '/punkt?punktSrid=' + srid + '&koordinater=' + northing + ',' + easting + '&includeData=total&srid=' + srid,
     headers: {
       'content-type': 'application/json',
       'Authorization': `Bearer ${token}`,
@@ -267,7 +267,7 @@ function concatResult(features) {
 
   features.forEach((feature) => {
     const objektidentitet_1 = feature.properties.objektidentitet;
-    const objektidentitet_2 = feature.properties.registerenhetsreferens[0].objektidentitet;
+    const objektidentitet_2 = feature.properties.registerenhetsreferens.objektidentitet;
     const kommun = feature.properties.adressomrade ? feature.properties.adressomrade.kommundel.faststalltNamn : feature.properties.gardsadressomrade.adressomrade.kommundel.faststalltNamn;
     let faststalltNamn = '';
     if ('gardsadressomrade' in feature.properties) {
@@ -286,7 +286,7 @@ function concatResult(features) {
     const bokstavstillagg = feature.properties.adressplatsattribut.adressplatsbeteckning.bokstavstillagg || '';
     const postnummer = feature.properties.adressplatsattribut.postnummer;
     const postort = feature.properties.adressplatsattribut.postort;
-    const koordinater = feature.properties.adressplatsattribut.adressplatspunkt.coordinates;
+    const koordinater = feature.geometry.coordinates;
 
     result.push([objektidentitet_1, popularnamn + ' ' + faststalltNamn + ' ' + adressplatsnummer + bokstavstillagg + ', ' + postort, koordinater[0], koordinater[1], objektidentitet_2]);
   })
