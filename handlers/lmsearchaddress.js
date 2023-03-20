@@ -131,7 +131,7 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
   var promiseArray = [];
   // Split all the separate municipality given to individual searches
   municipalityArray.forEach(function(municipality) {
-    var searchUrl = encodeURI(configOptions.url + '/referens/fritext?adress=' + searchValue + ' ' + municipality + '&maxHits=' + maxHits)
+    var searchUrl = encodeURI(configOptions.url + '/referens/fritext?adress=' + searchValue.replaceAll(',','') + ' ' + municipality + '&maxHits=' + maxHits)
     // Setup the search call and wait for result
     const options = {
         url: searchUrl,
