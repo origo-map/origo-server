@@ -54,11 +54,11 @@ module.exports = {
     scope: 'am_application_scope default'
   },
   lmsearchestate: {
-    url: "https://api.lantmateriet.se/distribution/produkter/registerbeteckning/v4/",
+    url: "https://api.lantmateriet.se/distribution/produkter/registerbeteckning/v5/",
     url_token: "https://api.lantmateriet.se/token",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
-    scope: 'am_application_scope default'
+    scope: 'registerbeteckning_direkt_v5_read'
   },
   lmsearchaddress: {
     url: "https://api.lantmateriet.se/distribution/produkter/belagenhetsadress/v4.2",
