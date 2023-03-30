@@ -125,10 +125,10 @@ function concatResult(feature) {
 
   if ('features' in feature) {
     feature.features.forEach((element) => {
-      const registeromrade = element.properties.registerbeteckning[0].registeromrade;
-      const beteckning = element.properties.registerbeteckning[0].trakt;
-      const block = element.properties.registerbeteckning[0].block ;
-      const enhet = element.properties.registerbeteckning[0].enhet;
+      const registeromrade = element.properties.registerbeteckning[0].registeromrade ? element.properties.registerbeteckning[0].registeromrade : '';
+      const beteckning = element.properties.registerbeteckning[0].trakt ? element.properties.registerbeteckning[0].trakt : '';
+      const block = element.properties.registerbeteckning[0].block ? element.properties.registerbeteckning[0].block : '';
+      const enhet = element.properties.registerbeteckning[0].enhet ? element.properties.registerbeteckning[0].enhet : '';
       const objektidentitet = element.properties.objektidentitet;
       const typ = element.properties.typ;
       let samfallighetsattribut = {};
@@ -156,6 +156,9 @@ function concatResult(feature) {
             let fastighet = '';
             switch (block) {
               case '*':
+                fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetesområde ' + omradesnummer;
+                break;
+              case '':
                 fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetesområde ' + omradesnummer;
                 break;
               default:
