@@ -289,11 +289,11 @@ function concatResult(features) {
 
   features.forEach((feature) => {
     let objektidentitet = '';
-    const registeromrade = feature.properties.registerbeteckning[0].registeromrade;
+    const registeromrade = feature.properties.registerbeteckning[0].registeromrade ? feature.properties.registerbeteckning[0].registeromrade : '';
     const beteckningsid = feature.properties.registerbeteckning[0].objektidentitet;
-    const beteckning = feature.properties.registerbeteckning[0].trakt;
-    const block = feature.properties.registerbeteckning[0].block ;
-    const enhet = feature.properties.registerbeteckning[0].enhet;
+    const beteckning = feature.properties.registerbeteckning[0].trakt ? feature.properties.registerbeteckning[0].trakt : '';
+    const block = feature.properties.registerbeteckning[0].block ? feature.properties.registerbeteckning[0].block : '';
+    const enhet = feature.properties.registerbeteckning[0].enhet ? feature.properties.registerbeteckning[0].enhet : '';
     let coordinates = [];
     // Check to see if feature has none or multiple coordinates
     if ('registerenhetsreferens' in feature.properties) {
@@ -322,6 +322,9 @@ function concatResult(features) {
     let fastighet = '';
     switch (block) {
       case '*':
+        fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
+        break;
+      case '':
         fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
         break;
       default:
@@ -390,14 +393,17 @@ function concatEstateNameResult(feature) {
 
   if ('features' in feature) {
     feature.features.forEach((element) => {
-      const registeromrade = element.properties.registerbeteckning[0].registeromrade;
-      const beteckning = element.properties.registerbeteckning[0].trakt;
-      const block = element.properties.registerbeteckning[0].block ;
-      const enhet = element.properties.registerbeteckning[0].enhet;
+      const registeromrade = element.properties.registerbeteckning[0].registeromrade ? element.properties.registerbeteckning[0].registeromrade : '';
+      const beteckning = element.properties.registerbeteckning[0].trakt ? element.properties.registerbeteckning[0].trakt : '';
+      const block = element.properties.registerbeteckning[0].block ? element.properties.registerbeteckning[0].block : '';
+      const enhet = element.properties.registerbeteckning[0].enhet ? element.properties.registerbeteckning[0].enhet : '';
       //const objektidentitet = element.properties.registerenhetsreferens.objektidentitet;
 
       switch (block) {
         case '*':
+          fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
+          break;
+        case '':
           fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
           break;
         default:
