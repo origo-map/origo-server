@@ -156,13 +156,13 @@ function concatResult(feature) {
             let fastighet = '';
             switch (block) {
               case '*':
-                fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetesområde ' + omradesnummer;
+                fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetsområde ' + omradesnummer;
                 break;
               case '':
-                fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetesområde ' + omradesnummer;
+                fastighet = registeromrade + ' ' + beteckning + ' ' + enhet + ' Enhetsområde ' + omradesnummer;
                 break;
               default:
-                fastighet = registeromrade + ' ' + beteckning + ' ' + block + ':' + enhet + ' Enhetesområde ' + omradesnummer;
+                fastighet = registeromrade + ' ' + beteckning + ' ' + block + ':' + enhet + ' Enhetsområde ' + omradesnummer;
             }
             oneFeature['properties'] = {
               name: fastighet,
