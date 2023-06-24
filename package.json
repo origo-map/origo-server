@@ -41,7 +41,7 @@
     "xmlbuilder": "^15.1.1"
   },
   "optionalDependencies": {
-    "mssql": "^3.3.0",
+    "mssql": "^9.1.1",
     "mysql": "^2.18.1",
     "node-windows": "^0.1.14",
     "oracledb": "^3.1.2",
