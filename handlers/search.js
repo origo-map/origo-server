@@ -7,19 +7,17 @@ var model = require('../models/dbmodels');
 
 var search = function(req, res) {
   var query = req.query.q;
-  var queryType = req.query.queryType;
+  var queryType = req.query.t;
   switch (queryType) {
-    case 'beginwith':
-      query = `%${query}`;
-      break;
     case 'contain':
       query = `%${query}%`;
       break;
     case 'equal':
       query = `${query}`;
       break;
+    case 'beginwith':
     default:
-      query = `%${query}`;
+      query = `${query}%`;
       break;
   }
   var connector = dbConfig.connectors.search;
