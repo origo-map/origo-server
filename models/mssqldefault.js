@@ -20,7 +20,7 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions, defaultLimit
     "SELECT " + limit +
     sqlSearchField + sqlFields + type + wkt +
     " FROM " + database + "." + schema + "." + table +
-    " WHERE LOWER(" + searchField + ") LIKE LOWER('" + condition + "%')" + " " +
+    " WHERE LOWER(" + searchField + ") LIKE LOWER('" + condition + "')" + " " +
     " ORDER BY " + searchField + "";
 
   return searchString;

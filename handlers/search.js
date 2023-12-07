@@ -7,6 +7,21 @@ var model = require('../models/dbmodels');
 
 var search = function(req, res) {
   var query = req.query.q;
+  var queryType = req.query.queryType;
+  switch (queryType) {
+    case 'beginwith':
+      query = `%${query}`;
+      break;
+    case 'contain':
+      query = `%${query}%`;
+      break;
+    case 'equal':
+      query = `${query}`;
+      break;
+    default:
+      query = `%${query}`;
+      break;
+  }
   var connector = dbConfig.connectors.search;
   var multiSearchModel = searchModel.search;
   var limit = dbConfig.limit || 100;

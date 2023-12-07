@@ -24,7 +24,7 @@ var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
     type +
     wkt +
     ' FROM ' + schema + '."' + table + '"' +
-    ' WHERE LOWER(CAST("' + table + '"."' + searchField + '"' + " AS TEXT)) ILIKE LOWER('" + condition + "%')" +
+    ' WHERE LOWER(CAST("' + table + '"."' + searchField + '"' + " AS TEXT)) ILIKE LOWER('" + condition + "')" +
     ' ORDER BY "' + table + '"."' + searchField + '"' +
     limit + ';';
 

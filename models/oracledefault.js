@@ -23,7 +23,7 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
     "SELECT " + sqlSearchField + sqlFields + "'" + table + "'" + " AS type," +
     wkt + " " +
     "FROM " + schema + "." + table + ", user_sdo_geom_metadata m " +
-    "WHERE " + sdo_geom_metadata + "' AND lower(" + searchField + ") LIKE lower('" + condition + "%')" + " " +
+    "WHERE " + sdo_geom_metadata + "' AND lower(" + searchField + ") LIKE lower('" + condition + "')" + " " +
     "ORDER BY " + searchField + "";
 
   return searchString;
