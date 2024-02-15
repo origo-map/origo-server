@@ -10,11 +10,20 @@ var searchAddressEstate = function(req, res) {
   var connector = dbConfig.connectors.addressEstate;
   var addressModel = searchModel.addresses;
   var estatesModel = searchModel.estates;
-  var limit = dbConfig.limit || 100;
+
+  addressModel.limit = addressModel.limit || dbConfig.limit;
+  estatesModel.limit = estatesModel.limit || dbConfig.limit;
+  if (req.query.limit) {
+    addressModel.limit = addressModel.limit ? Math.min(addressModel.limit, req.query.limit) : req.query.limit;
+    estatesModel.limit = estatesModel.limit ? Math.min(estatesModel.limit, req.query.limit) : req.query.limit;
+  } else {
+    addressModel.limit = addressModel.limit || 100;
+    estatesModel.limit = estatesModel.limit || 100;
+  }
 
   var db = dbType(connector);
-  var addressString = model[db](query, addressModel, limit);
-  var estatesString = model[db](query, estatesModel, limit);
+  var addressString = model[db](query, addressModel);
+  var estatesString = model[db](query, estatesModel);
 
   var queries = [];
 
@@ -31,7 +40,7 @@ var searchAddressEstate = function(req, res) {
     .then(function(result) {
       sendResponse(res, JSON.stringify(result));
     });
-}
+};
 
 function estateCb(result) {
   return result.map(function(row) {

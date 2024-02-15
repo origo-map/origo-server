@@ -6,13 +6,19 @@ var model = require('../models/dbmodels');
 
 var singleSearch = function(req, res) {
   var query = req.query.q;
-  var connector = dbConfig['connectors']['singlesearch'];
-  var searchModel = dbConfig['models']['singlesearch']['search'];
-  var limit = dbConfig.limit || 100;
+  var connector = dbConfig.connectors.singlesearch;
+  var searchModel = dbConfig.models.singlesearch.search;
+
+  searchModel.limit = searchModel.limit || dbConfig.limit;
+  if (req.query.limit) {
+    searchModel.limit = searchModel.limit ? Math.min(searchModel.limit, req.query.limit) : req.query.limit;
+  } else {
+    searchModel.limit = searchModel.limit || 100;
+  }
 
   var db = dbType(connector);
   var dbModel = model[db];
-  var searchString = dbModel(query, searchModel, limit);
+  var searchString = dbModel(query, searchModel);
 
   var queries = [];
 
@@ -25,6 +31,6 @@ var singleSearch = function(req, res) {
       sendResponse(res, JSON.stringify(result));
     });
 
-}
+};
 
 module.exports = singleSearch;
