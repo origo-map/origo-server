@@ -16,6 +16,9 @@ const limiter = rateLimit({
 	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+	keyGenerator: (req, res) => {
+        return req.ip.match(/\[?((\d+\.?){4}|((:?[a-z0-9]{0,8}){2,8}))\]?/i, "$1")[1]; // Client ip without port
+    }
 })
 
 // apply rate limiter to all requests
