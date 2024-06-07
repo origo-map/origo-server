@@ -136,6 +136,14 @@ Configured services at:
 		
 - Authorization - openid authorization and token refresh
 
-		Configure auth in conf/config.js
+      Configure auth in conf/config.js
 
-		The {clients} contains the different clients which this origo server will support (which need authentication). Since the authentication is done externally, the clients need a way to get back to their urls, then the client has to have an defined identifier which is also defined here with a url, used for the redirect.
+      The {clients} contains the different clients which this origo server will support (which need authentication). Since the authentication is done externally, the clients need a way to get back to their urls, then the client has to have an defined identifier which is also defined here with a url, used for the redirect.
+
+- NGP Detaljplan - get documents from detailed plans
+
+      Configure ngpDetaljplan in conf/config.js
+
+      /origoserver/attachments/detaljplan/2281K-DP-xxx/attachments
+
+      /origoserver/attachments/detaljplan/2281K-DP-xxx/attachments/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
