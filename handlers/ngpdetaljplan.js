@@ -11,7 +11,7 @@ let configOptions = {};
  */
 let token;
 /**
- * Timestamp när tokenet expirar (minus lite marginal)
+ * Timestamp when the token expires (minus a little margin)
  */
 let tokenExpires;
 
@@ -20,7 +20,7 @@ if (conf['ngpDetaljplan']) {
  }
 
 /**
- * Loggar in mot LM och fyller i globala variabeln "token" med ett nytt token
+ * Logs in against LM and fills the global variable "token" with a new token
  */
 async function createToken() {
     const url = new URL('token', configOptions.url_base);
@@ -36,13 +36,13 @@ async function createToken() {
     const responsebody = await response.json();
 
     token = responsebody.access_token;
-    // Vi får hur många sekunder den gäller. Inte ett exakt klockslag. Räkna ut när den expirar och dra av lite marginal
-    // för processing. Man borde kunna kika i själva tokenet också, men detta är enklare
+    // We get how many seconds it lasts. Not an exact time. Calculate when it expires and deduct a little margin
+    // for processing. You should be able to look in the token itself as well, but this is easier
     tokenExpires = Date.now() + responsebody.expires_in *1000 - 10000;
   }
 
   /**
-   * Återkallar aktuellt token och nollar globala variabeln "token"
+   * Revokes current token and resets global variable "token"
    */
   async function revokeToken() {
     const url = new URL('revoke', configOptions.url_base);
@@ -59,11 +59,11 @@ async function createToken() {
   }
  
 /**
- * Säkerställer att det finns ett giltigt token. Anropas innan man gör ett apianrop
+ * Ensures there is a valid token. Called before making an API call
  */
   async function ensureToken() {
     if(token && Date.now()  > tokenExpires) {
-        // Återkalla det gamla bara utifall att det skulle vara tid kvar på det
+        // Recall the old one just in case there would be time left for it
         await revokeToken();
     }
     if(!token) {
@@ -73,9 +73,9 @@ async function createToken() {
   }
   
   /**
-   * Listar alla assets som attachments
-   * @param {*} planid detaljplansbeteckning att lista assets för. På formen 2281K-DP199
-   * @returns Lista av fileinfo
+   * Lists all assets as attachments
+   * @param {*} planid detailed plan designation to list assets for. On form 2281K-DP199 or xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx
+   * @returns List of file info
    */
 async function listAssets(planid, res) {
     await ensureToken();
@@ -96,24 +96,24 @@ async function listAssets(planid, res) {
         throw new Error(`Error: ${response.status}`);
     } else {
         const responsebody = await response.json();
-        // Det skall finnas exakt en feature eftersom vi sökte på id
+        // There must be exactly one feature because we searched by id
         if(responsebody.features.length === 0) {
-            console.log('Det skall finnas exakt en feature eftersom vi sökte på id');
-            throw new Error('Planen saknas');
+            console.log('There must be exactly one feature because we searched by id');
+            throw new Error('The plan is missing');
         }
         for (const key in responsebody.features[0].assets) {
             if (Object.hasOwnProperty.call(responsebody.features[0].assets, key)) {
                 const asset = responsebody.features[0].assets[key];
     
-                // Själva planfilen kommer också med, med den torde vara ointressant, så ta allt annat
+                // The plan file itself is also included, with that it should be uninteresting, so take everything else
                 if (!asset.roles.includes('detaljplan')) {
                     // Create a response according to origo attachment spec (AGS + group)
-                    // ID skulle kunna vara assetlöpnumret, så får man slå upp href igen när man skall hämta, men 
-                    // jag vet inte om ordningen är garanterad, och det blir ett extra anrop.
+                    // ID could be the asset serial number, so you have to look up href again when you want to retrieve, but
+                    // I don't know if the order is guaranteed, and there will be an extra call.
                     const id = asset.href.split('/').pop();
                     const fileInfo = {
                         "id": id,
-                        // TODO: det är inte säkert att det är pdf, men vi vet inte och ingen bryr sig förrän vi faktiskt laddar ner
+                        // TODO: not sure it's pdf but we don't know and no one cares until we actually download
                         "contentType": 'application/pdf',
                         "name": asset.title,
                         // Group is not part of AGS-spec
@@ -131,13 +131,13 @@ async function listAssets(planid, res) {
 
 
 /**
- * Hämtar en asset och streamar tillbaka den direkt till klienten så slipper vi buffra.
- * @param {*} uuid uiid för aktuell asset
- * @param {*} res response-objektet att streama resultatet till
+ * If we download an asset and stream it back directly to the client, we avoid buffering.
+ * @param {*} uuid uuid for current asset
+ * @param {*} res the response object to stream the result to
  */
 async function getDocument(uuid, res) {
     await ensureToken();
-    // Förhoppningsvis är det alltid på denna url, annars måste vi göra en ny sökning och kolla assets href.
+    // Hopefully it's always at this url, otherwise we'll have to do another search and check the assets href.
     const url = new URL(`distribution/geodatakatalog/nedladdning/v1/asset/${uuid}`, configOptions.url_base);
     const myHeaders = new Headers();
     myHeaders.append('Authorization', `Bearer ${token}`);
@@ -152,7 +152,7 @@ async function getDocument(uuid, res) {
 
   
 /**
- * Express handler som hanterar lista attachments. Skickar tillbaka attachments enligt origos spec
+ * Express handler that handles list attachments. Sends back attachments according to origo's spec
  * @param {*} req 
  * @param {*} res 
  */
@@ -167,7 +167,7 @@ const listAll = async (req, res) => {
 }
 
 /**
- * Express handler som streamar en fil till klienten
+ * Express handler that streams a file to the client
  * @param {*} req 
  * @param {*} res 
  */
