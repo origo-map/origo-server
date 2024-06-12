@@ -14,6 +14,10 @@ let token;
  * Timestamp when the token expires (minus a little margin)
  */
 let tokenExpires;
+/**
+ * Keeps track of how many times request has been runned in case token gets invalid
+ */
+let runCounter = 0;
 
 if (conf['ngpDetaljplan']) {
     configOptions = Object.assign({}, conf['ngpDetaljplan']);
@@ -69,8 +73,7 @@ async function createToken() {
     if(!token) {
         await createToken();
     }
-
-  }
+}
   
   /**
    * Lists all assets as attachments
@@ -93,8 +96,17 @@ async function listAssets(planid, res) {
     const response = await fetch(url, { method: 'POST', body: JSON.stringify(postdata), headers: myHeaders });
     const fileinfos = [];
     if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
+        if (response.status === 401 && runCounter === 0) {
+            runCounter += 1;
+            await createToken();
+            await listAssets(planid, res);
+        } else {
+            runCounter = 0;
+            throw new Error(`Error: ${response.status}`);
+        }
     } else {
+        runCounter = 0;
         const responsebody = await response.json();
         // There must be exactly one feature because we searched by id
         if(responsebody.features.length === 0) {
@@ -126,7 +138,9 @@ async function listAssets(planid, res) {
         }
     }
 
-    return fileinfos;
+    if (fileinfos.length > 0) {
+        res.json({ "attachmentInfos": fileinfos });        
+    }
 }
 
 
@@ -143,8 +157,17 @@ async function getDocument(uuid, res) {
     myHeaders.append('Authorization', `Bearer ${token}`);
     const response = await fetch(url, { headers: myHeaders });
     if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
+        if (response.status === 401 && runCounter === 0) {
+            runCounter += 1;
+            await createToken();
+            await getDocument(uuid, res);
+        } else {
+            runCounter = 0;
+            throw new Error(`Error: ${response.status}`);
+        }
     } else {
+        runCounter = 0;
         response.body.pipe(res);
     }
 }
@@ -158,12 +181,7 @@ async function getDocument(uuid, res) {
  */
 const listAll = async (req, res) => {
     const id = req.params.filenumber;
-    const list = await listAssets(id, res);
-    if (list.length > 0) {
-        res.json({ "attachmentInfos": list });        
-    } else {
-        res.json({});
-    }
+    await listAssets(id, res);
 }
 
 /**
