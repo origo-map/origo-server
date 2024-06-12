@@ -11,6 +11,7 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions, defaultLimit
     geometryField + ".ToString() AS GEOM " + " ";
   var sqlFields = fields ? fields.join(',') + "," : "";
   var type = " '" + table + "'" + " AS TYPE, ";
+  var title = queryOptions.title ? " '" + queryOptions.title + "'" + ' AS "TITLE", ' : '';
   var condition = queryString;
   var searchString;
   var limitNumber = queryOptions.limit || defaultLimit || 1000;
@@ -18,7 +19,11 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions, defaultLimit
 
   searchString =
     "SELECT " + limit +
-    sqlSearchField + sqlFields + type + wkt +
+    sqlSearchField +
+    sqlFields +
+    type +
+    title +
+    wkt +
     " FROM " + database + "." + schema + "." + table +
     " WHERE LOWER(" + searchField + ") LIKE LOWER('" + condition + "%')" + " " +
     " ORDER BY " + searchField + "";
