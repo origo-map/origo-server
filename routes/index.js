@@ -54,8 +54,8 @@ router.all('/tvapi/*', tvApi);
 router.all('/converttogeojson/*', convertToGeojson);
 router.use('/auth', auth);
 router.use('/clients', clients);
-router.get('/attachments/:table/:filenumber/attachments/', ngpDetaljplan['listAll']);
-router.get('/attachments/:table/:filenumber/attachments/:uuid', ngpDetaljplan['fetchDoc']);
+router.get('/dpdocuments/:table/:filenumber/attachments/', ngpDetaljplan['listAll']);
+router.get('/dpdocuments/:table/:filenumber/attachments/:uuid', ngpDetaljplan['fetchDoc']);
 
 
 module.exports = router;
