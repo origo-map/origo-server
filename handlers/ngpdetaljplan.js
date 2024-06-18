@@ -14,10 +14,6 @@ let token;
  * Timestamp when the token expires (minus a little margin)
  */
 let tokenExpires;
-/**
- * Keeps track of how many times request has been runned in case token gets invalid
- */
-let runCounter = 0;
 
 if (conf['ngpDetaljplan']) {
     configOptions = Object.assign({}, conf['ngpDetaljplan']);
@@ -81,6 +77,9 @@ async function createToken(next) {
    * @returns List of file info
    */
 async function listAssets(planid, res, next) {
+    if ( typeof listAssets.counter == 'undefined' ) {
+        listAssets.counter = 0;
+    }
     await ensureToken(next);
     const url = new URL('distribution/geodatakatalog/sokning/v1/detaljplan/v2/search', configOptions.url_base);
     
@@ -97,16 +96,16 @@ async function listAssets(planid, res, next) {
     const fileinfos = [];
     if (!response.ok) {
         // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
-        if (response.status === 401 && runCounter === 0) {
-            runCounter += 1;
+        if (response.status === 401 && listAssets.counter < 1) {
+            listAssets.counter += 1;
             await createToken(next);
             await listAssets(planid, res);
         } else {
-            runCounter = 0;
+            listAssets.counter = 0;
             next(new Error(`Error: ${response.status}`));
         }
     } else {
-        runCounter = 0;
+        listAssets.counter = 0;
         const responsebody = await response.json();
         // There must be exactly one feature because we searched by id
         if(responsebody.features.length === 0) {
@@ -150,6 +149,9 @@ async function listAssets(planid, res, next) {
  * @param {*} res the response object to stream the result to
  */
 async function getDocument(uuid, res, next) {
+    if ( typeof getDocument.counter == 'undefined' ) {
+        getDocument.counter = 0;
+    }
     await ensureToken(next);
     // Hopefully it's always at this url, otherwise we'll have to do another search and check the assets href.
     const url = new URL(`distribution/geodatakatalog/nedladdning/v1/asset/${uuid}`, configOptions.url_base);
@@ -158,16 +160,16 @@ async function getDocument(uuid, res, next) {
     const response = await fetch(url, { headers: myHeaders });
     if (!response.ok) {
         // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
-        if (response.status === 401 && runCounter === 0) {
-            runCounter += 1;
+        if (response.status === 401 && getDocument.counter < 1) {
+            getDocument.counter += 1;
             await createToken(next);
             await getDocument(uuid, res);
         } else {
-            runCounter = 0;
+            getDocument.counter = 0;
             next(new Error(`Error: ${response.status}`));
         }
     } else {
-        runCounter = 0;
+        getDocument.counter = 0;
         response.body.pipe(res);
     }
 }
