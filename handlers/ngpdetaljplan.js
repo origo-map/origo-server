@@ -26,7 +26,7 @@ if (conf['ngpDetaljplan']) {
 /**
  * Logs in against LM and fills the global variable "token" with a new token
  */
-async function createToken() {
+async function createToken(next) {
     const url = new URL('token', configOptions.url_base);
     const myHeaders = new Headers();
     
@@ -35,7 +35,7 @@ async function createToken() {
     myHeaders.append('Authorization', 'Basic ' + Buffer.from(configOptions.client_key + ':' + configOptions.client_secret).toString('base64'));
     const response = await fetch(url, { method:'POST', headers: myHeaders });
     if(!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+      next(new Error(`Error: ${response.status}`));
     }
     const responsebody = await response.json();
 
@@ -48,7 +48,7 @@ async function createToken() {
   /**
    * Revokes current token and resets global variable "token"
    */
-  async function revokeToken() {
+  async function revokeToken(next) {
     const url = new URL('revoke', configOptions.url_base);
     const myHeaders = new Headers();
     
@@ -57,7 +57,7 @@ async function createToken() {
     myHeaders.append('Authorization', 'Basic ' + Buffer.from(configOptions.client_key + ':' + configOptions.client_secret).toString('base64'));
     const response = await fetch(url, { method:'POST', headers: myHeaders });
     if(!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+        next(new Error(`Error: ${response.status}`));
     }
     token = null;   
   }
@@ -65,13 +65,13 @@ async function createToken() {
 /**
  * Ensures there is a valid token. Called before making an API call
  */
-  async function ensureToken() {
+  async function ensureToken(next) {
     if(token && Date.now()  > tokenExpires) {
         // Recall the old one just in case there would be time left for it
-        await revokeToken();
+        await revokeToken(next);
     }
     if(!token) {
-        await createToken();
+        await createToken(next);
     }
 }
   
@@ -80,8 +80,8 @@ async function createToken() {
    * @param {*} planid detailed plan designation to list assets for. On form 2281K-DP199 or xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx
    * @returns List of file info
    */
-async function listAssets(planid, res) {
-    await ensureToken();
+async function listAssets(planid, res, next) {
+    await ensureToken(next);
     const url = new URL('distribution/geodatakatalog/sokning/v1/detaljplan/v2/search', configOptions.url_base);
     
     const regex = /\$(.+?)\$/g;
@@ -99,11 +99,11 @@ async function listAssets(planid, res) {
         // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
         if (response.status === 401 && runCounter === 0) {
             runCounter += 1;
-            await createToken();
+            await createToken(next);
             await listAssets(planid, res);
         } else {
             runCounter = 0;
-            throw new Error(`Error: ${response.status}`);
+            next(new Error(`Error: ${response.status}`));
         }
     } else {
         runCounter = 0;
@@ -111,7 +111,7 @@ async function listAssets(planid, res) {
         // There must be exactly one feature because we searched by id
         if(responsebody.features.length === 0) {
             console.log('There must be exactly one feature because we searched by id');
-            throw new Error('The plan is missing');
+            next(new Error('The plan is missing'));
         }
         for (const key in responsebody.features[0].assets) {
             if (Object.hasOwnProperty.call(responsebody.features[0].assets, key)) {
@@ -149,8 +149,8 @@ async function listAssets(planid, res) {
  * @param {*} uuid uuid for current asset
  * @param {*} res the response object to stream the result to
  */
-async function getDocument(uuid, res) {
-    await ensureToken();
+async function getDocument(uuid, res, next) {
+    await ensureToken(next);
     // Hopefully it's always at this url, otherwise we'll have to do another search and check the assets href.
     const url = new URL(`distribution/geodatakatalog/nedladdning/v1/asset/${uuid}`, configOptions.url_base);
     const myHeaders = new Headers();
@@ -160,11 +160,11 @@ async function getDocument(uuid, res) {
         // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
         if (response.status === 401 && runCounter === 0) {
             runCounter += 1;
-            await createToken();
+            await createToken(next);
             await getDocument(uuid, res);
         } else {
             runCounter = 0;
-            throw new Error(`Error: ${response.status}`);
+            next(new Error(`Error: ${response.status}`));
         }
     } else {
         runCounter = 0;
@@ -179,9 +179,9 @@ async function getDocument(uuid, res) {
  * @param {*} req 
  * @param {*} res 
  */
-const listAll = async (req, res) => {
+const listAll = async (req, res, next) => {
     const id = req.params.filenumber;
-    await listAssets(id, res);
+    await listAssets(id, res, next);
 }
 
 /**
@@ -189,19 +189,19 @@ const listAll = async (req, res) => {
  * @param {*} req 
  * @param {*} res 
  */
-const fetchDoc = async (req, res) => {
+const fetchDoc = async (req, res, next) => {
     const documentid = req.params.uuid;
  
     if (typeof documentid !== 'undefined') {
         const checkUuidRegEx = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/i;
         let found = documentid.match(checkUuidRegEx);
         if (found !== null) {  
-            const doc = await getDocument(documentid, res);
+            const doc = await getDocument(documentid, res, next);
         } else {
-            throw new Error(`Not valid documentid: ${documentid}`);
+            next(new Error(`Not valid documentid: ${documentid}`));
         }
     } else {
-        throw new Error('No documentid found!');
+        next(new Error('No documentid found!'));
     }
 }
 
