@@ -24,6 +24,7 @@ var convertToGeojson = require('../handlers/converttogeojson');
 var lmBuilding = require('../handlers/lmbuilding');
 var auth = require('../handlers/auth');
 var clients = require('../handlers/clients');
+var ngp = require('../handlers/ngp');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -53,6 +54,6 @@ router.all('/tvapi/*', tvApi);
 router.all('/converttogeojson/*', convertToGeojson);
 router.use('/auth', auth);
 router.use('/clients', clients);
-
+router.use('/ngp', ngp);
 
 module.exports = router;
