@@ -105,34 +105,39 @@ async function listAssets(planid, res, next) {
             next(new Error(`Error: ${response.status}`));
         }
     }
-    const responsebody = await response.json();
-    // There must be exactly one feature because we searched by id
-    if(responsebody.features.length === 0) {
-        console.log('There must be exactly one feature because we searched by id');
-        next(new Error('The plan is missing'));
-    }
-    for (const key in responsebody.features[0].assets) {
-        if (Object.hasOwnProperty.call(responsebody.features[0].assets, key)) {
-            const asset = responsebody.features[0].assets[key];
-
-            // The plan file itself is also included, with that it should be uninteresting, so take everything else
-            if (!asset.roles.includes('detaljplan')) {
-                // Create a response according to origo attachment spec (AGS + group)
-                // ID could be the asset serial number, so you have to look up href again when you want to retrieve, but
-                // I don't know if the order is guaranteed, and there will be an extra call.
-                const id = asset.href.split('/').pop();
-                const fileInfo = {
-                    "id": id,
-                    // TODO: not sure it's pdf but we don't know and no one cares until we actually download
-                    "contentType": 'application/pdf',
-                    "name": asset.title,
-                    // Group is not part of AGS-spec
-                    "group": 'planer'
-                };
-
-                fileinfos.push(fileInfo);
+    if (response.ok) {
+        const responsebody = await response.json();
+        // There must be exactly one feature because we searched by id
+        if(responsebody.features.length === 0) {
+            console.log('There must be exactly one feature because we searched by id');
+            next(new Error('The plan is missing'));
+        } else {
+            for (const key in responsebody.features[0].assets) {
+                if (Object.hasOwnProperty.call(responsebody.features[0].assets, key)) {
+                    const asset = responsebody.features[0].assets[key];
+        
+                    // The plan file itself is also included, with that it should be uninteresting, so take everything else
+                    if (!asset.roles.includes('detaljplan')) {
+                        // Create a response according to origo attachment spec (AGS + group)
+                        // ID could be the asset serial number, so you have to look up href again when you want to retrieve, but
+                        // I don't know if the order is guaranteed, and there will be an extra call.
+                        const id = asset.href.split('/').pop();
+                        const fileInfo = {
+                            "id": id,
+                            // TODO: not sure it's pdf but we don't know and no one cares until we actually download
+                            "contentType": 'application/pdf',
+                            "name": asset.title,
+                            // Group is not part of AGS-spec
+                            "group": 'planer'
+                        };
+        
+                        fileinfos.push(fileInfo);
+                    }
+                }
             }
         }
+    } else {
+        next(new Error(`Error: ${response.status}`));
     }
 
     if (fileinfos.length > 0) {
