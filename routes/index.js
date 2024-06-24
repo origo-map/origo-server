@@ -24,7 +24,7 @@ var convertToGeojson = require('../handlers/converttogeojson');
 var lmBuilding = require('../handlers/lmbuilding');
 var auth = require('../handlers/auth');
 var clients = require('../handlers/clients');
-var ngpDetaljplan = require('../handlers/ngpdetaljplan');
+var ngp = require('../handlers/ngp');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -54,8 +54,6 @@ router.all('/tvapi/*', tvApi);
 router.all('/converttogeojson/*', convertToGeojson);
 router.use('/auth', auth);
 router.use('/clients', clients);
-router.get('/dpdocuments/:table/:filenumber/attachments/', ngpDetaljplan['listAll']);
-router.get('/dpdocuments/:table/:filenumber/attachments/:uuid', ngpDetaljplan['fetchDoc']);
-
+router.use('/ngp', ngp);
 
 module.exports = router;

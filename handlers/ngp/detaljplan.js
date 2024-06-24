@@ -1,4 +1,4 @@
-var conf = require('../conf/config');
+var conf = require('../../conf/config');
 var ex = require('express');
 const fetch = (...args) =>
 	import('node-fetch').then(({default: fetch}) => fetch(...args));
