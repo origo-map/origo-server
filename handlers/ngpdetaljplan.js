@@ -77,9 +77,6 @@ async function createToken(next) {
    * @returns List of file info
    */
 async function listAssets(planid, res, next) {
-    if ( typeof listAssets.counter == 'undefined' ) {
-        listAssets.counter = 0;
-    }
     await ensureToken(next);
     const url = new URL('distribution/geodatakatalog/sokning/v1/detaljplan/v2/search', configOptions.url_base);
     
@@ -92,47 +89,48 @@ async function listAssets(planid, res, next) {
     myHeaders.append('Content-Type', 'application/json');
     myHeaders.append('Authorization', `Bearer ${token}`);
   
-    const response = await fetch(url, { method: 'POST', body: JSON.stringify(postdata), headers: myHeaders });
+    let response = await fetch(url, { method: 'POST', body: JSON.stringify(postdata), headers: myHeaders });
     const fileinfos = [];
     if (!response.ok) {
-        // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
-        if (response.status === 401 && listAssets.counter < 1) {
-            listAssets.counter += 1;
+        if (response.status === 401) {
+            // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
             await createToken(next);
-            await listAssets(planid, res);
+            myHeaders.set('Authorization', `Bearer ${token}`);
+            response = await fetch(url, { method: 'POST', body: JSON.stringify(postdata), headers: myHeaders });
+            // Check if still some error and throw otherwise continue with response
+            if (!response.ok) {
+                next(new Error(`Error: ${response.status}`));
+            }
         } else {
-            listAssets.counter = 0;
             next(new Error(`Error: ${response.status}`));
         }
-    } else {
-        listAssets.counter = 0;
-        const responsebody = await response.json();
-        // There must be exactly one feature because we searched by id
-        if(responsebody.features.length === 0) {
-            console.log('There must be exactly one feature because we searched by id');
-            next(new Error('The plan is missing'));
-        }
-        for (const key in responsebody.features[0].assets) {
-            if (Object.hasOwnProperty.call(responsebody.features[0].assets, key)) {
-                const asset = responsebody.features[0].assets[key];
-    
-                // The plan file itself is also included, with that it should be uninteresting, so take everything else
-                if (!asset.roles.includes('detaljplan')) {
-                    // Create a response according to origo attachment spec (AGS + group)
-                    // ID could be the asset serial number, so you have to look up href again when you want to retrieve, but
-                    // I don't know if the order is guaranteed, and there will be an extra call.
-                    const id = asset.href.split('/').pop();
-                    const fileInfo = {
-                        "id": id,
-                        // TODO: not sure it's pdf but we don't know and no one cares until we actually download
-                        "contentType": 'application/pdf',
-                        "name": asset.title,
-                        // Group is not part of AGS-spec
-                        "group": 'planer'
-                    };
-    
-                    fileinfos.push(fileInfo);
-                }
+    }
+    const responsebody = await response.json();
+    // There must be exactly one feature because we searched by id
+    if(responsebody.features.length === 0) {
+        console.log('There must be exactly one feature because we searched by id');
+        next(new Error('The plan is missing'));
+    }
+    for (const key in responsebody.features[0].assets) {
+        if (Object.hasOwnProperty.call(responsebody.features[0].assets, key)) {
+            const asset = responsebody.features[0].assets[key];
+
+            // The plan file itself is also included, with that it should be uninteresting, so take everything else
+            if (!asset.roles.includes('detaljplan')) {
+                // Create a response according to origo attachment spec (AGS + group)
+                // ID could be the asset serial number, so you have to look up href again when you want to retrieve, but
+                // I don't know if the order is guaranteed, and there will be an extra call.
+                const id = asset.href.split('/').pop();
+                const fileInfo = {
+                    "id": id,
+                    // TODO: not sure it's pdf but we don't know and no one cares until we actually download
+                    "contentType": 'application/pdf',
+                    "name": asset.title,
+                    // Group is not part of AGS-spec
+                    "group": 'planer'
+                };
+
+                fileinfos.push(fileInfo);
             }
         }
     }
@@ -149,27 +147,28 @@ async function listAssets(planid, res, next) {
  * @param {*} res the response object to stream the result to
  */
 async function getDocument(uuid, res, next) {
-    if ( typeof getDocument.counter == 'undefined' ) {
-        getDocument.counter = 0;
-    }
     await ensureToken(next);
     // Hopefully it's always at this url, otherwise we'll have to do another search and check the assets href.
     const url = new URL(`distribution/geodatakatalog/nedladdning/v1/asset/${uuid}`, configOptions.url_base);
     const myHeaders = new Headers();
     myHeaders.append('Authorization', `Bearer ${token}`);
-    const response = await fetch(url, { headers: myHeaders });
+    let response = await fetch(url, { headers: myHeaders });
     if (!response.ok) {
         // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
-        if (response.status === 401 && getDocument.counter < 1) {
-            getDocument.counter += 1;
+        if (response.status === 401) {
             await createToken(next);
-            await getDocument(uuid, res);
+            myHeaders.set('Authorization', `Bearer ${token}`);
+            response = await fetch(url, { headers: myHeaders });
+            // Check if OK and then send document otherwise throw error
+            if (response.ok) {
+                response.body.pipe(res);
+            } else {
+                next(new Error(`Error: ${response.status}`));
+            }
         } else {
-            getDocument.counter = 0;
             next(new Error(`Error: ${response.status}`));
         }
     } else {
-        getDocument.counter = 0;
         response.body.pipe(res);
     }
 }
