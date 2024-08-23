@@ -137,6 +137,7 @@ module.exports = {
     clients: {
       my_client: 'https://www.myclient.se',
       my_other_client: 'https://www.myotherclient.com'
-    }
+    },
+    scope: 'openid'
   }
 }
