@@ -105,9 +105,9 @@ Configured services at:
 
 - Belägenhetsadress Direkt - set consumer_key and consumer_secret in conf/config.js
 
-      /origoserver/lm/addresses?q={searchstring}&srid={EPSG code}&maxHits={number}
+      /origoserver/lm/addresses?q={searchstring}&srid={EPSG code}&maxHits={number}&municipalityCodes={codes}&statusAddress={status}
 
-      The {searchstring} should start with one or multiple, seperated by commas, municipalities and then a space followed by the free text search for the address. For example "Sundsvall,Hudiksvall Storgatan"
+      The {searchstring} can start with one or multiple, seperated by commas, municipalities and then a space followed by the free text search for the address. For example "Sundsvall,Hudiksvall Storgatan". The {number} specifies total number of hits that should be returned, default is 30. If the search is done on multiple municipalities the total is multiplied as well. The {codes} should be one or more 'kommunkod' separated by comma. If  'municipalityCodes' is set there is no need to have municipalities in the {searchstring}. With {statusAddress} it's possible to limit the search to a specific status, default is 'Gällande'.
 
       /origoserver/lm/addresses?northing={northing}&easting={easting}&srid={EPSG code}&format={format}
 
