@@ -27,8 +27,10 @@ function getLagfarter(model, data) {
       }
     })
   } else {
-    if (agande.typ === 'Lagfart') {
-      lagfarter.push(agande);
+    if (typeof agande !== 'undefined') {
+      if (agande.typ === 'Lagfart') {
+        lagfarter.push(agande);
+      }
     }
   }
   var result = [];
