@@ -5,6 +5,7 @@ var cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 var routes = require('./routes/index');
+const lmApiProxy = require('./routes/lmapiproxy');
 var mapStateRouter = require('./routes/mapstate');
 var errors = require('./routes/errors');
 var conf = require('./conf/config');
@@ -81,6 +82,9 @@ if (conf['cors']) {
 
 app.use('/origoserver/', routes);
 app.use('/mapstate', mapStateRouter);
+if (conf['lmapiproxy']) {
+  conf['lmapiproxy'].forEach(proxyAppConfig => app.use(`/lmap/${proxyAppConfig.id}`, lmApiProxy(proxyAppConfig)));
+}
 app.use(errors);
 
 module.exports = app;
