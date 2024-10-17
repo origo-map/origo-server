@@ -2,6 +2,7 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions, defaultLimit
   var schema = queryOptions.schema;
   var database = queryOptions.database;
   var table = queryOptions.table;
+  var customType = queryOptions.customType;
   var searchField = queryOptions.searchField;
   var sqlSearchField = searchField ? searchField + " AS NAMN," : "";
   var fields = queryOptions.fields;
@@ -10,7 +11,7 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions, defaultLimit
   var wkt = useCentroid ? geometryField + ".STPointOnSurface().ToString() AS GEOM " + " " :
     geometryField + ".ToString() AS GEOM " + " ";
   var sqlFields = fields ? fields.join(',') + "," : "";
-  var type = " '" + table + "'" + " AS TYPE, ";
+  var type = " '" + customType ?? table + "'" + " AS TYPE, ";
   var condition = queryString;
   var searchString;
   var limitNumber = queryOptions.limit || defaultLimit || 1000;
