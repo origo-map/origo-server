@@ -20,16 +20,21 @@ var agareParser = {
 function getTomtratter(model, data) {
   var agande = objectifier.get('agande', data);
   var tomtratter = [];
-  if (Array.isArray(agande)) {
-    agande.forEach(function(element) {
+  if (typeof agande !== 'undefined') {
+    if (Array.isArray(agande)) {
+      agande.forEach(function(element) {
       if (element.typ === 'Tomträttsinnehav') {
         tomtratter.push(element);
       }
     })
-  } else {
-    if (agande.typ === 'Tomträttsinnehav') {
-      tomtratter.push(data);
+    } else {
+      if (agande.typ === 'Tomträttsinnehav') {
+        tomtratter.push(data);
+      }
     }
+  } else {
+    // No owners registered
+    return [];
   }
   var result = [];
   if (tomtratter) {

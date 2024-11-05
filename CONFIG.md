@@ -80,14 +80,30 @@ To use the API you must have a authentication key, which can be obtained by regi
 
 An openID connect provider is required for this to work.
 
-		openidIssuer - url to openID well-known configuration
+    	openidIssuer - url to openID well-known configuration
 
-		redirect_uri - url to where the response to the request should be sent, after the user signs in. Must be the same as in the openID provider.
+    	redirect_uri - url to where the response to the request should be sent, after the user signs in. Must be the same as in the openID provider.
 
-		http_timeout - timeout in milliseconds for communication with openIdIssuer.
+    	http_timeout - timeout in milliseconds for communication with openIdIssuer.
 
-		client_id - from openID provider
+    	client_id - from openID provider
 
-		client_secret - from openID provider
+    	client_secret - from openID provider
 
-		display_name - attribute from user-information displayed in the user menu (Origo with oidc-plugin).
+    	display_name - attribute from user-information displayed in the user menu (Origo with oidc-plugin).
+
+- NGP Detaljplan - get documents from detailed plans
+
+Acts as a attachment server for files from Nationella geodataplattformen (NGP). First setup the Oauth2 keys in [Lantmäteriet APImanager](https://apimanager.lantmateriet.se/devportal/apis) and add GeodatakatalogSökning and GeodatakatalogNedladdning as subscribtions.
+
+    	url_base - the base url to Lantmäteriet API, f.e. 'https://api.lantmateriet.se/' or 'https://api-ver.lantmateriet.se/'.
+
+    	client_key - the client key used to get the token from Lantmäteriet API
+
+    	client_secret - the client secret used to get the token from Lantmäteriet API
+
+    	grant_type - the grant type used to get the token from Lantmäteriet API, f.e. 'client_credentials'.
+
+    	scope - the scope used to get the token from Lantmäteriet API, f.e. 'am_application_scope default'.
+
+    	query - A string with JSON to specify the query on which a detailed plan is searched for and specify where to inject identifier in the query between two $ characters, f.e. '{"feature.typ": {"eq": "detaljplan"}, "detaljplan.beteckning": {"eq": "$planid$"}, "detaljplan.status": {"in": ["laga kraft"]}}'.
