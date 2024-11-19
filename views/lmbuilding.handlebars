@@ -27,6 +27,9 @@
                         {{#if properties.byggnadsandamal.[0].andamal}}
                           Detaljerat ändamål: {{properties.byggnadsandamal.[0].andamal}}<br>
                         {{/if}}
+                        {{#if properties.byggnadsandamal.[0].totalBoarea}}
+                          Total boarea: {{properties.byggnadsandamal.[0].totalBoarea}}<br>
+                        {{/if}}
                         {{#if properties.byggnadsattribut.nybyggnadsar}}
                           Nybyggnadsår: {{properties.byggnadsattribut.nybyggnadsar}}<br>
                         {{/if}}
@@ -45,6 +48,11 @@
               </tbody>
             </table>
         </div>
+        {{#if objektidentitet }}
+          <div class="page-footer">
+            <a href="/origoserver/estate/inskrivning?objektid={{{objektidentitet}}}">Visa ägare</a>
+          </div>
+        {{/if}}
     </div>
   </div>
 </div>

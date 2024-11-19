@@ -78,14 +78,14 @@ const lmSearchEstate = async (req, res) => {
       if ('status' in parsedUrl.query) {
         status = parsedUrl.query.status;
       } else {
-        status = 'Gällande';
+        status = 'gällande';
       }
       if ('maxHits' in parsedUrl.query) {
         maxHits = parsedUrl.query.maxHits;
       } else {
         maxHits = '30';
       }
-
+      
       // Do a free text search to get the IDs of all that matches
       await doSearchAsyncCall(municipalityArray, searchValue);
 
@@ -192,7 +192,7 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
   var promiseArray = [];
   // Split all the separate municipality given to individual searches
   municipalityArray.forEach(function(municipality) {
-    var searchUrl = encodeURI(configOptions.url + '/referens/fritext/' + municipality + ' ' + searchValue + '?status=' + status + '&maxHits=' + maxHits)
+    var searchUrl = encodeURI(configOptions.url + 'referens/fritext?beteckning=' + municipality + ' ' + searchValue + '&status=' + status + '&maxHits=' + maxHits)
     // Setup the search call and wait for result
     const options = {
         url: searchUrl,
@@ -203,14 +203,14 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
           'scope': `${scope}`
         }
     }
+
     promiseArray.push(rp.get(options)
       .then(function(result) {
         var parameters = JSON.parse(result);
         var beteckningsid = [];
-
         parameters.forEach(function(parameter) {
-          if (parameter.beteckningsid) {
-            beteckningsid.push(parameter.beteckningsid);
+          if (parameter.objektidentitet) {
+            beteckningsid.push(parameter.objektidentitet);
           }
         });
         return beteckningsid;
@@ -255,7 +255,7 @@ async function getEstateAsyncCall(req, res) {
     // Setup the call for getting the objects found in search and wait for result
     var options = {
       method: 'POST',
-      uri: configOptions.url + '/?srid=' + srid,
+      uri: configOptions.url + '?srid=' + srid,
       body: objectIds,
       headers: {
         'content-type': 'application/json',
@@ -288,20 +288,33 @@ function concatResult(features) {
   const result = [];
 
   features.forEach((feature) => {
-    const objektidentitet = feature.properties.registerenhetsreferens.objektidentitet;
-    const registeromrade = feature.properties.registerbeteckning.registeromrade;
-    const beteckningsid = feature.properties.registerbeteckning.beteckningsid;
-    const beteckning = feature.properties.registerbeteckning.trakt;
-    const block = feature.properties.registerbeteckning.block ;
-    const enhet = feature.properties.registerbeteckning.enhet;
+    let objektidentitet = '';
+    const registeromrade = feature.properties.registerbeteckning[0].registeromrade ? feature.properties.registerbeteckning[0].registeromrade : '';
+    const beteckningsid = feature.properties.registerbeteckning[0].objektidentitet;
+    const beteckning = feature.properties.registerbeteckning[0].trakt ? feature.properties.registerbeteckning[0].trakt : '';
+    const block = feature.properties.registerbeteckning[0].block ? feature.properties.registerbeteckning[0].block : '';
+    const enhet = feature.properties.registerbeteckning[0].enhet ? feature.properties.registerbeteckning[0].enhet : '';
     let coordinates = [];
     // Check to see if feature has none or multiple coordinates
-    if ('enhetsomrade' in feature.properties.registerenhetsreferens) {
-      feature.properties.registerenhetsreferens.enhetsomrade.forEach((enhetsomrade) => {
-        if ('centralpunkt' in enhetsomrade) {
-          coordinates.push(enhetsomrade.centralpunkt.coordinates);
-        }
-      })
+    if ('registerenhetsreferens' in feature.properties) {
+      objektidentitet = feature.properties.registerenhetsreferens.objektidentitet;
+      if ('registerenhetsomrade' in feature.properties.registerenhetsreferens) {
+        feature.properties.registerenhetsreferens.registerenhetsomrade.forEach((enhetsomrade) => {
+          if ('centralpunktskoordinat' in enhetsomrade) {
+            coordinates.push(enhetsomrade.centralpunktskoordinat.coordinates);
+          }
+        })
+      }
+    }
+    if ('gemensamhetsanlaggningsreferens' in feature.properties) {
+      objektidentitet = feature.properties.gemensamhetsanlaggningsreferens.objektidentitet;
+      if ('registerenhetsomrade' in feature.properties.gemensamhetsanlaggningsreferens) {
+        feature.properties.gemensamhetsanlaggningsreferens.registerenhetsomrade.forEach((enhetsomrade) => {
+          if ('centralpunktskoordinat' in enhetsomrade) {
+            coordinates.push(enhetsomrade.centralpunktskoordinat.coordinates);
+          }
+        })
+      }
     }
 
     // Build the object to return
@@ -309,6 +322,9 @@ function concatResult(features) {
     let fastighet = '';
     switch (block) {
       case '*':
+        fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
+        break;
+      case '':
         fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
         break;
       default:
@@ -358,7 +374,7 @@ function doGetFromPointWait(req, res, options) {
 async function doGetFromPointAsyncCall(req, res, configOptions, easting, northing) {
   // Setup the search call and wait for result
   const options = {
-      url: encodeURI(configOptions.url + '/punkt/' + srid + '/' + northing + ',' + easting + '?srid=' + srid),
+      url: encodeURI(configOptions.url + 'punkt?punktSrid=' + srid + '&koordinater=' + northing + ',' + easting + '&srid=' + srid),
       method: 'GET',
       headers: {
         'content-type': 'application/json',
@@ -377,14 +393,17 @@ function concatEstateNameResult(feature) {
 
   if ('features' in feature) {
     feature.features.forEach((element) => {
-      const registeromrade = element.properties.registerbeteckning.registeromrade;
-      const beteckning = element.properties.registerbeteckning.trakt;
-      const block = element.properties.registerbeteckning.block ;
-      const enhet = element.properties.registerbeteckning.enhet;
+      const registeromrade = element.properties.registerbeteckning[0].registeromrade ? element.properties.registerbeteckning[0].registeromrade : '';
+      const beteckning = element.properties.registerbeteckning[0].trakt ? element.properties.registerbeteckning[0].trakt : '';
+      const block = element.properties.registerbeteckning[0].block ? element.properties.registerbeteckning[0].block : '';
+      const enhet = element.properties.registerbeteckning[0].enhet ? element.properties.registerbeteckning[0].enhet : '';
       //const objektidentitet = element.properties.registerenhetsreferens.objektidentitet;
 
       switch (block) {
         case '*':
+          fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
+          break;
+        case '':
           fastighet = registeromrade + ' ' + beteckning + ' ' + enhet;
           break;
         default:
@@ -404,7 +423,7 @@ async function doGetEstateNumberAsyncCall(configOptions, easting, northing) {
 
   // Setup the search call and wait for result
   const options = {
-      url: encodeURI(configOptions.url + '/punkt/' + srid + '/' + northing + ',' + easting + '?srid=' + srid),
+      url: encodeURI(configOptions.url + 'punkt?punktSrid=' + srid + '&koordinater=' + northing + ',' + easting + '&srid=' + srid),
       method: 'GET',
       headers: {
         'content-type': 'application/json',
@@ -442,7 +461,11 @@ function concatEstateNumberResult(feature) {
 
   if ('features' in feature) {
     feature.features.forEach((element) => {
-      fnrObjektidentitet = element.properties.registerenhetsreferens.objektidentitet;
+      if ('registerenhetsreferens' in element.properties) {
+        fnrObjektidentitet = element.properties.registerenhetsreferens.objektidentitet;
+      } else if ('gemensamhetsanlaggningsreferens' in element.properties) {
+        fnrObjektidentitet = element.properties.gemensamhetsanlaggningsreferens.objektidentitet;
+      }
     })
   }
 }
