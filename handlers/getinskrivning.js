@@ -1,6 +1,5 @@
 var conf = require('../conf/config');
 var objectifier = require('../lib/utils/objectifier');
-var builder = require('xmlbuilder');
 var request = require('request');
 var rp = require('request-promise');
 var inskrivning = require('../models/inskrivning');
@@ -13,11 +12,15 @@ var getToken = require('../lib/tokenrequest');
 const url = require('url');
 var token;
 var handler = 'getInskrivning';
+var linkToBuilding = true;
 
 var getInskrivning = async (req, res) => {
   if (conf[handler]) {
     configOptions = Object.assign({}, conf[handler]);
     const parsedUrl = url.parse(decodeURI(req.url), true);
+    if (typeof conf[handler].linktobuilding !== 'undefined') {
+      linkToBuilding = conf[handler].linktobuilding
+    }
 
     if ('objektid' in parsedUrl.query) {
       const objektid = parsedUrl.query.objektid;
@@ -38,7 +41,7 @@ var getInskrivning = async (req, res) => {
       }
     } else {
       res.render('inskrivningerror', {
-        fid: objektid
+        fid: 'No objektid!'
       });
     }
   } else {
@@ -117,27 +120,32 @@ async function doGetAsyncCall(req, res, config, objektid) {
 }
 
 function parseResult(result) {
-  var data = objectifier.find('properties', result);
-  var dataRegisterenhet = objectifier.find('fastighetsreferens', result);
-  var model = inskrivning();
   var inskriv = {};
-  var tomtratter;
-  //Registerenhet
-  inskriv.referens = parser(model.referens, dataRegisterenhet, referensParser);
+  if ('properties' in result.features[0]) {
+    var data = objectifier.find('properties', result);
+    var dataRegisterenhet = objectifier.find('fastighetsreferens', result);
+    var model = inskrivning();
+    var tomtratter;
+    //Registerenhet
+    inskriv.referens = parser(model.referens, dataRegisterenhet, referensParser);
+    if (linkToBuilding) {
+      inskriv.objektidentitet = dataRegisterenhet.objektidentitet;
+    }
 
-  //Ägare
-  inskriv.lagfart = lagfartParser(model.lagfart, data);
+    //Ägare
+    inskriv.lagfart = lagfartParser(model.lagfart, data);
 
-  //Tomträttshavare
-  tomtratter = tomtrattParser(model.tomtratt, data);
-  if (tomtratter.length) {
-    inskriv.tomtratt = tomtratter;
-  }
+    //Tomträttshavare
+    tomtratter = tomtrattParser(model.tomtratt, data);
+    if (tomtratter.length) {
+      inskriv.tomtratt = tomtratter;
+    }
 
-  //Tidigare Ägande
-  tidigareAgare = tidigareParser(model.tidigareAgande, data);
-  if (tidigareAgare.length) {
-    inskriv.tidigareAgande = tidigareAgare;
+    //Tidigare Ägande
+    tidigareAgare = tidigareParser(model.tidigareAgande, data);
+    if (tidigareAgare.length) {
+      inskriv.tidigareAgande = tidigareAgare;
+    }
   }
   return inskriv;
 }
