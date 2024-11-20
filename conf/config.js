@@ -139,5 +139,13 @@ module.exports = {
       my_other_client: 'https://www.myotherclient.com'
     }
   },
+  ngpDetaljplan: {
+    url_base: "https://api.lantmateriet.se/",
+    client_key: 'xxxxx',
+    client_secret: 'xxxxx',
+    grant_type: 'client_credentials',
+    scope: 'am_application_scope default',
+    query: '{"feature.typ": {"eq": "detaljplan"}, "detaljplan.objektidentitet": {"eq": "$planid$"}, "detaljplan.status": {"in": ["laga kraft"]}}'
+  },
   trustProxy: false
 }
