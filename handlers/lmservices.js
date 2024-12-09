@@ -110,7 +110,7 @@ const lmservices = async function lmservices(params = {}) {
             if (response.features?.length > 0) {
               for (const ga of response.features) {
                 const response2 = await lmservices({ typ: 'rattighet', fastighet: ga.id });
-                if (response2.rattighet.features?.length > 0) {
+                if (response2.rattighet?.features?.length > 0) {
                   ga.rattighet = response2.rattighet;
                 }
               }
