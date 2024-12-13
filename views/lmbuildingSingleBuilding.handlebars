@@ -1,0 +1,71 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="page-header">
+          <h2>Byggnad som ligger på fastighet <a href="/origoserver/lm/building?registerenhet={{{features.[0].properties.liggerPa.registerenhetsreferens.objektidentitet}}}">{{{features.[0].properties.liggerPa.registerenhetsreferens.beteckning}}}</a></h2>
+      </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Byggnadsinformation</h3>
+          </div>
+            <table class="table">
+              <tbody>
+                {{#each features}}
+                  <tr>
+                    <td>
+                        <strong>Byggnad {{properties.byggnadsattribut.husnummer}}</strong><br>
+                        {{#each properties.byggnadsnamn}}
+                          {{#if namn}}
+                            Byggnadsnamn: {{namn}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#each properties.byggnadsandamal}}
+                          {{#if (eq typ "Samhallsfunktion") }}
+                            Byggnadsändamål: Samhällsfunktion<br>
+                          {{else if (eq typ "OvrigByggnad") }}
+                            Byggnadsändamål: Övrig byggnad<br>
+                          {{else}}
+                            Byggnadsändamål: {{typ}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#each properties.byggnadsandamal}}
+                          {{#if andamal}}
+                            Detaljerat ändamål: {{andamal}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#each properties.byggnadsandamal}}
+                          {{#if totalBoarea}}
+                            Total boarea: {{totalBoarea}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#if properties.byggnadsattribut.nybyggnadsar}}
+                          Nybyggnadsår: {{properties.byggnadsattribut.nybyggnadsar}}<br>
+                        {{/if}}
+                        {{#if properties.byggnadsattribut.husnummer}}
+                          Husnummer: {{properties.byggnadsattribut.husnummer}}<br>
+                        {{/if}}
+                        {{#each properties.byggnadsdel}}
+                          {{#if insamlingslage}}
+                            Insamlingsläge: {{insamlingslage}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#if properties.liggerPa.registerenhetsreferens.objektidentitet}}
+                          Fastighet: {{properties.liggerPa.registerenhetsreferens.beteckning}}<br>
+                        {{/if}}
+                        {{#if properties.objektidentitet}}
+                          Objektidentitet:  {{properties.objektidentitet}}<br>
+                        {{/if}}
+                    </td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+        </div>
+        {{#if objektidentitet }}
+          <div class="page-footer">
+            <a href="/origoserver/estate/inskrivning?objektid={{{objektidentitet}}}">Visa ägare</a>
+          </div>
+        {{/if}}
+    </div>
+  </div>
+</div>
