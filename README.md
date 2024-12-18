@@ -156,3 +156,15 @@ Configured services at:
       /origoserver/attachments/ngp/dpdocuments/something-like-the-layername/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/attachments
 
       /origoserver/attachments/ngp/dpdocuments/something-like-the-layername/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/attachments/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+- Attachment - list, get, add and delete files to features
+
+      Configure attachment in conf/config.js
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/attachments
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/attachments/{uuid}
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/addAttachment
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments
