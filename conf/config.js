@@ -57,7 +57,7 @@ module.exports = {
     scope: process.env.ORIGOSERVER_LMSEARCHPLACENAME_SCOPE ?? 'am_application_scope default'
   },
   lmsearchestate: {
-    url: process.env.ORIGOSERVER_LMSEARCHESTATE_URL ?? "https://api.lantmateriet.se/distribution/produkter/registerOOObeteckning/v5/",
+    url: process.env.ORIGOSERVER_LMSEARCHESTATE_URL ?? "https://api.lantmateriet.se/distribution/produkter/registerbeteckning/v5/",
     url_token: process.env.ORIGOSERVER_LMSEARCHESTATE_URL_TOKEN ??  "https://api.lantmateriet.se/token",
     consumer_key: process.env.ORIGOSERVER_LMSEARCHESTATE_CONSUMER_KEY ??  'xxxxx',
     consumer_secret: process.env.ORIGOSERVER_LMSEARCHESTATE_CONSUMER_SECRET ?? 'xxxxx',
