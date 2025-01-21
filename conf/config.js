@@ -44,7 +44,8 @@ module.exports = {
   },
   lmelevation: {
     url: process.env.ORIGOSERVER_LMELEVATION_URL ?? "https://api.lantmateriet.se/distribution/produkter/hojd/v1/rest/api",
-    url_token: process.env.ORIGOSERVER_LMELEVATION_URL_TOKEN ?? "https://api.lantmateriet.se/token",
+    url_token: process.env.ORIGOSERVER_LMELEVATION_URL_TOKEN ?? "https://apimanager.lantmateriet.se/oauth2/token",
+    url_revoke: process.env.ORIGOSERVER_LMELEVATION_URL_REVOKE ?? "https://apimanager.lantmateriet.se/oauth2/revoke",
     consumer_key: process.env.ORIGOSERVER_LMELEVATION_CONSUMER_KEY ?? 'xxxxx',
     consumer_secret: process.env.ORIGOSERVER_LMELEVATION_CONSUMER_SECRET ?? 'xxxxx',
     scope: process.env.ORIGOSERVER_LMELEVATION_SCOPE ?? 'am_application_scope default'
