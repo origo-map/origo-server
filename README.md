@@ -83,6 +83,12 @@ Configured services at:
 
       /origoserver/lm/elevation/{EPSG code}/{longitude}/{latitude}
 
+      Get ground height for coordinate
+
+      /origoserver/lm/elevation/{EPSG code}
+
+      POST a GeoJSON to get all coordinates set to elevation in response
+
 - Ortnamn Direkt - set consumer_key and consumer_secret in conf/config.js
 
       /origoserver/lm/placenames/?q={searchstring}&kommunkod={4-digit number for the municipality}&limit={number}&nametype={placename type}&lang={language name}&srid={EPSG code}
