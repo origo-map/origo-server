@@ -34,14 +34,16 @@ module.exports = {
   },
   lmbuilding: {
     url: 'https://api.lantmateriet.se/distribution/produkter/byggnad/v3',
-    url_token: "https://api.lantmateriet.se/token",
+    url_token: "https://apimanager.lantmateriet.se/oauth2/token",
+    url_revoke: "https://apimanager.lantmateriet.se/oauth2/revoke",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
     scope: 'byggnad_direkt_v3_read'
   },
   lmelevation: {
     url: "https://api.lantmateriet.se/distribution/produkter/hojd/v1/rest/api",
-    url_token: "https://api.lantmateriet.se/token",
+    url_token: "https://apimanager.lantmateriet.se/oauth2/token",
+    url_revoke: "https://apimanager.lantmateriet.se/oauth2/revoke",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
     scope: 'am_application_scope default'
@@ -139,5 +141,13 @@ module.exports = {
       my_other_client: 'https://www.myotherclient.com'
     },
     scope: 'openid'
+  },
+  ngpDetaljplan: {
+    url_base: "https://api.lantmateriet.se/",
+    client_key: 'xxxxx',
+    client_secret: 'xxxxx',
+    grant_type: 'client_credentials',
+    scope: 'am_application_scope default',
+    query: '{"feature.typ": {"eq": "detaljplan"}, "detaljplan.objektidentitet": {"eq": "$planid$"}, "detaljplan.status": {"in": ["laga kraft"]}}'
   }
 }
