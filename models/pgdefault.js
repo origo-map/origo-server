@@ -11,6 +11,7 @@ var pgDefault = function pgDefault(queryString, queryOptions) {
     'ST_AsText("' + table + '"."' + geometryField + '") AS "GEOM" ';
   var sqlFields = fields ? fields.join(',') + "," : "";
   var type = " '" + table + "'" + ' AS "TYPE", ';
+  var title = queryOptions.title ? " '" + queryOptions.title + "'" + ' AS "TITLE", ' : '';
   var condition = queryString;
   var searchString;
   var limit = queryOptions.limit ? ' LIMIT ' + queryOptions.limit.toString() + ' ' : '';
@@ -21,6 +22,7 @@ var pgDefault = function pgDefault(queryString, queryOptions) {
     ' "' + table + '"."' + gid + '" AS "GID", ' +
     sqlFields +
     type +
+    title +
     wkt +
     ' FROM ' + schema + '."' + table + '"' +
     ' WHERE LOWER(CAST("' + table + '"."' + searchField + '"' + " AS TEXT)) ILIKE LOWER('" + condition + "%')" +
