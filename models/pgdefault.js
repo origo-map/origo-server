@@ -1,4 +1,4 @@
-var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
+var pgDefault = function pgDefault(queryString, queryOptions) {
   var schema = queryOptions.schema;
   var table = queryOptions.table;
   var searchField = queryOptions.searchField;
@@ -14,8 +14,7 @@ var pgDefault = function pgDefault(queryString, queryOptions, defaultLimit) {
   var title = queryOptions.title ? " '" + queryOptions.title + "'" + ' AS "TITLE", ' : '';
   var condition = queryString;
   var searchString;
-  var limitNumber = queryOptions.limit || defaultLimit || 1000;
-  var limit = ' LIMIT ' + limitNumber.toString() + ' ';
+  var limit = queryOptions.limit ? ' LIMIT ' + queryOptions.limit.toString() + ' ' : '';
 
   searchString =
     'SELECT ' +

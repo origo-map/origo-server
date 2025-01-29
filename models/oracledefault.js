@@ -19,6 +19,7 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
   } else {
     sdo_geom_metadata = "m.table_name = '" + table + "' AND m.column_name = '" + geometryField;
   }
+  var limit = queryOptions.limit ? " FETCH FIRST " + queryOptions.limit.toString() + " ROWS ONLY" : "";
 
   searchString =
     "SELECT " +
@@ -29,7 +30,8 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
     wkt + " " +
     "FROM " + schema + "." + table + ", user_sdo_geom_metadata m " +
     "WHERE " + sdo_geom_metadata + "' AND lower(" + searchField + ") LIKE lower('" + condition + "%')" + " " +
-    "ORDER BY " + searchField + "";
+    "ORDER BY " + searchField +
+    limit;
 
   return searchString;
 }
