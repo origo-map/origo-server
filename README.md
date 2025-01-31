@@ -167,4 +167,6 @@ Configured services at:
 
       /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/addAttachment
 
+      POST a file to store it in the configured folder under the sub-folder {something-like-the-layername}/{a unique identifier}/{group}. Requires "Content-Type: multipart/form-data" with the multipart fields "attachment" and "group".
+
       /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments
