@@ -9,8 +9,6 @@ var search = function(req, res) {
   var query = req.query.q;
   var connectors = dbConfig.connectors.search;
   var multiSearchModels = Object.values(searchModel);
-  var limit = dbConfig.limit || 100;
- 
   
   var finishedModels = 0;
   var mergedResult = [];
@@ -20,7 +18,13 @@ var search = function(req, res) {
     var tables = req.query.layers || multiSearchModel.tables;
     tables.forEach((table) => {
       var options = Object.assign({}, connectors[db], multiSearchModel, table);
-      var searchString = model[db](query, options, limit);
+      options.limit = options.limit || dbConfig.limit;
+      if (req.query.limit) {
+        options.limit = options.limit ? Math.min(options.limit, req.query.limit) : req.query.limit;
+      } else {
+        options.limit = options.limit || 100;
+      }
+      var searchString = model[db](query, options);
       queries.push({
         queryString: searchString
       });

@@ -14,33 +14,46 @@
                   <tr>
                     <td>
                         <strong>Byggnad {{properties.byggnadsattribut.husnummer}}</strong><br>
-                        {{#if properties.byggnadsnamn.[0].namn}}
-                          Byggnadsnamn: {{properties.byggnadsnamn.[0].namn}}<br>
-                        {{/if}}
-                        {{#if (eq properties.byggnadsandamal.[0].typ "Samhallsfunktion") }}
-                          Byggnadsändamål: Samhällsfunktion<br>
-                        {{else if (eq properties.byggnadsandamal.[0].typ "OvrigByggnad") }}
-                          Byggnadsändamål: Övrig byggnad<br>
-                        {{else}}
-                          Byggnadsändamål: {{properties.byggnadsandamal.[0].typ}}<br>
-                        {{/if}}
-                        {{#if properties.byggnadsandamal.[0].andamal}}
-                          Detaljerat ändamål: {{properties.byggnadsandamal.[0].andamal}}<br>
-                        {{/if}}
-                        {{#if properties.byggnadsandamal.[0].totalBoarea}}
-                          Total boarea: {{properties.byggnadsandamal.[0].totalBoarea}}<br>
-                        {{/if}}
+                        {{#each properties.byggnadsnamn}}
+                          {{#if namn}}
+                            Byggnadsnamn: {{namn}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#each properties.byggnadsandamal}}
+                          {{#if (eq typ "Samhallsfunktion") }}
+                            Byggnadsändamål: Samhällsfunktion<br>
+                          {{else if (eq typ "OvrigByggnad") }}
+                            Byggnadsändamål: Övrig byggnad<br>
+                          {{else}}
+                            Byggnadsändamål: {{typ}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#each properties.byggnadsandamal}}
+                          {{#if andamal}}
+                            Detaljerat ändamål: {{andamal}}<br>
+                          {{/if}}
+                        {{/each}}
+                        {{#each properties.byggnadsandamal}}
+                          {{#if totalBoarea}}
+                            Total boarea: {{totalBoarea}}<br>
+                          {{/if}}
+                        {{/each}}
                         {{#if properties.byggnadsattribut.nybyggnadsar}}
                           Nybyggnadsår: {{properties.byggnadsattribut.nybyggnadsar}}<br>
                         {{/if}}
                         {{#if properties.byggnadsattribut.husnummer}}
                           Husnummer: {{properties.byggnadsattribut.husnummer}}<br>
                         {{/if}}
-                        {{#if properties.byggnadsdel.[0].insamlingslage}}
-                          Insamlingsläge: {{properties.byggnadsdel.[0].insamlingslage}}<br>
-                        {{/if}}
+                        {{#each properties.byggnadsdel}}
+                          {{#if insamlingslage}}
+                            Insamlingsläge: {{insamlingslage}}<br>
+                          {{/if}}
+                        {{/each}}
                         {{#if properties.liggerPa.registerenhetsreferens.objektidentitet}}
                           Fastighet: {{properties.liggerPa.registerenhetsreferens.beteckning}}<br>
+                        {{/if}}
+                        {{#if properties.objektidentitet}}
+                          Objektidentitet:  {{properties.objektidentitet}}<br>
                         {{/if}}
                     </td>
                   </tr>
