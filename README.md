@@ -156,3 +156,17 @@ Configured services at:
       /origoserver/attachments/ngp/dpdocuments/something-like-the-layername/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/attachments
 
       /origoserver/attachments/ngp/dpdocuments/something-like-the-layername/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/attachments/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+- Attachment - list, get, add and delete files to features
+
+      Configure attachment in conf/config.js
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/attachments
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/attachments/{uuid}
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/addAttachment
+
+      POST a file to store it in the configured folder under the sub-folder {something-like-the-layername}/{a unique identifier}/{group}. Requires "Content-Type: multipart/form-data" with the multipart fields "attachment" and "group".
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments
