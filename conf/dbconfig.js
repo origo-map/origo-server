@@ -9,6 +9,7 @@ module.exports = {
             database: "database name"
           }
       },
+      // Defines a default connector. If more than one connector is specified (only works for the search endpoint), then each search model must specify which connector to use.
       search: {
           pg: {
             user: 'postgres',
@@ -17,6 +18,13 @@ module.exports = {
             database: "mdk",
 			port: 5432
           }
+          // ,
+          // mssql: {
+          //   user: 'xxxxx',
+          //   password: 'xxxxx',
+          //   connectString: "server name",
+          //   database: "database name"
+          // }
       },
       singlesearch: {
           // oracle: {
@@ -59,23 +67,36 @@ module.exports = {
       },
       search: {
         search: {
-           tables: [
-              {
-                 table: 'fastighetsytor',
-                 searchField: 'fastighetsbeteckning',
-                 schema: 'public',
-                 geometryName: 'geom',
-                 useCentroid: true
-              },
-              {
-                 table: 'Adresser',
-                 searchField: 'NAMN',
-                 schema: 'public',
-                 geometryName: 'geom',
-                 gid: 'OBJECTID'
-              }
-           ]
+          tables: [
+            {
+              table: 'fastighetsytor',
+              searchField: 'fastighetsbeteckning',
+              schema: 'public',
+              geometryName: 'geom',
+              useCentroid: true
+            },
+            {
+              table: 'Adresser',
+              searchField: 'NAMN',
+              schema: 'public',
+              geometryName: 'geom',
+              gid: 'OBJECTID'
+            }
+          ]
         }
+        // ,
+        // search2: {
+        //   connector: "mssql",
+        //   tables: [
+        //     {
+        //       table: 'gatunamn',
+        //       searchField: 'namn',
+        //       schema: 'dbo',
+        //       geometryName: 'geom',
+        //       useCentroid: false
+        //     }
+        //   ]
+        // }
      },
       addressEstate: {
           addresses: {
