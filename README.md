@@ -170,3 +170,5 @@ Configured services at:
       POST a file to store it in the configured folder under the sub-folder {something-like-the-layername}/{a unique identifier}/{group}. Requires "Content-Type: multipart/form-data" with the multipart fields "attachment" and "group".
 
       /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments
+      
+      POST a string of comma-separated attachment IDs as a JSON body, e g { attachmentIds: "id1,id2,etc" } to delete the specified attachments.
