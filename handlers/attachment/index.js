@@ -2,7 +2,7 @@ var conf = require('../../conf/config');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const { listAttachments, fetchDoc, deleteAttachment } = require('./attachments');
+const { listAttachments, fetchDoc, deleteAttachments, deleteAllAttachments, listAllAttachments } = require('./attachments');
 const multer = require('multer');
 const getUuid = require('uuid-by-string');
 const attachmentRouter = express.Router();
@@ -18,8 +18,10 @@ if (conf['attachment']) {
 }
 
 attachmentRouter.get('/:layer/:object/attachments/', listAttachments);
+attachmentRouter.get('/:layer/attachments/', listAllAttachments);
 attachmentRouter.get('/:layer/:object/attachments/:id', fetchDoc);
-attachmentRouter.post('/:layer/:object/deleteAttachments/', deleteAttachment);
+attachmentRouter.get('/:layer/:object/deleteAttachments/', deleteAllAttachments);
+attachmentRouter.post('/:layer/:object/deleteAttachments/', deleteAttachments);
 attachmentRouter.post('/:layer/:object/addAttachment', upload.single('attachment'), function (req, res, next) {
     const dir = path.join(configOptions.filepath, req.params.layer, req.params.object, req.body.group);
     // Create directory if doesn't already exists
