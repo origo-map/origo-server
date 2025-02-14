@@ -67,6 +67,8 @@ module.exports = {
       },
       search: {
         search: {
+          // Add a reference to the connector if using more than one.
+          // connector: 'mssql',
           tables: [
             {
               table: 'fastighetsytor',
