@@ -69,7 +69,12 @@ const lmSearchPlacename = async (req, res) => {
           searchUrl = searchUrl + '&maxHits=' + limit;
         }
         searchUrl = searchUrl + '&srid=' + srid;
-        doSearchAsyncCall(req, res, municipalityArray, searchUrl);
+        if ( q.length > 0 ) {
+          doSearchAsyncCall(req, res, municipalityArray, searchUrl);
+        } else {
+          console.log('No searchstring, skip!');
+          res.send({});
+        }
       } else {
         console.log('Skip');
         res.send({});
