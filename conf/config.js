@@ -76,6 +76,17 @@ module.exports = {
     consumer_secret: 'xxxxx',
     scope: 'fastighetochsamfallighet_direkt_v31_read'
   },
+  lmcommunityassociation: {
+    url: "https://api-ver.lantmateriet.se/distribution/produkter/samfallighetsforening/v2.2",
+    url_ga: "https://api-ver.lantmateriet.se/distribution/produkter/gemensamhetsanlaggning/v2.1",
+    url_fs: "https://api-ver.lantmateriet.se/distribution/produkter/fastighetsamfallighet/v3.1",
+    url_token: "https://apimanager-ver.lantmateriet.se/oauth2/token",
+    url_revoke: "https://apimanager-ver.lantmateriet.se/oauth2/revoke",
+    consumer_key: 'xxxxx',
+    consumer_secret: 'xxxxx',
+    grant_type: 'client_credentials',
+    scope: 'samfallighetsforening_direkt_v22_read gemensamhetsanlaggning_direkt_v21_read fastighetochsamfallighet_direkt_v31_read',
+  },
   cors: {
     origin: '*',
     methods: ['GET', 'PUT', 'POST', 'OPTIONS', 'PATCH', 'DELETE'],

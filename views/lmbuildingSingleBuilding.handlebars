@@ -1,13 +1,15 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-4">
-      <div class="page-header">
-          <h2>Byggnad som ligger på fastighet <a href="/origoserver/lm/building?registerenhet={{{features.[0].properties.liggerPa.registerenhetsreferens.objektidentitet}}}">{{{features.[0].properties.liggerPa.registerenhetsreferens.beteckning}}}</a></h2>
+      <div class="card">
+        <div class="card-header">
+         <h2>Byggnad som ligger på fastighet<br/> <a href="/origoserver/lm/building?registerenhet={{{features.[0].properties.liggerPa.registerenhetsreferens.objektidentitet}}}">{{{features.[0].properties.liggerPa.registerenhetsreferens.beteckning}}}</a></h2>
+        </div>
       </div>
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Byggnadsinformation</h3>
-          </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Byggnadsinformation</h3>
+        </div>
             <table class="table">
               <tbody>
                 {{#each features}}
@@ -60,12 +62,12 @@
                 {{/each}}
               </tbody>
             </table>
-        </div>
         {{#if objektidentitet }}
-          <div class="page-footer">
+          <div class="card-footer text-body-secondary">
             <a href="/origoserver/estate/inskrivning?objektid={{{objektidentitet}}}">Visa ägare</a>
           </div>
         {{/if}}
+      </div>
     </div>
   </div>
 </div>
