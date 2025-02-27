@@ -1,60 +1,61 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-4">
-      <div class="page-header">
-        <h1>{{{referens.beteckning}}}</h1>
-      </div>
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Lagfaren ägare</h3>
+      <div class="card">
+        <div class="card-header">
+          <h1>{{{referens.beteckning}}}</h1>
+        </div>
+        <div class="card">
+          <div class="card-header">
+              <h3 class="panel-title">Lagfaren ägare</h3>
           </div>
-            <table class="table">
-              <tbody>
-                {{#each lagfart}}
-                  <tr>
-                    <td>
-                      <address>
-                        <strong>{{agare.namn}}</strong><br>
-                        {{#each agare.adress}}
-                          {{#if utdelningsadress}}
-                            {{utdelningsadress}}<br>
+              <table class="table">
+                <tbody>
+                  {{#each lagfart}}
+                    <tr>
+                      <td>
+                        <address>
+                          <strong>{{agare.namn}}</strong><br>
+                          {{#each agare.adress}}
+                            {{#if utdelningsadress}}
+                              {{utdelningsadress}}<br>
+                            {{/if}}
+                            {{#if coAdress}}
+                              c/o: {{coAdress}}<br>
+                            {{/if}}
+                            {{#if postadress}}
+                              {{postadress}}<br>
+                            {{/if}}
+                            {{#if land}}
+                              {{land}}<br>
+                            {{/if}}
+                          {{/each}}
+                          </address>
+                          {{#if idnummer}}
+                            Idnummer: {{idnummer}}<br>
                           {{/if}}
-                          {{#if coAdress}}
-                            c/o: {{coAdress}}<br>
+                          {{#if beviljadAndel}}
+                            Andel: {{beviljadAndel}}<br>
                           {{/if}}
-                          {{#if postadress}}
-                            {{postadress}}<br>
+                          {{#if inskrivningsdag}}
+                            Inskrivningsdag: {{inskrivningsdag}}<br>
                           {{/if}}
-                          {{#if land}}
-                            {{land}}<br>
+                          {{#if dagboksnummer}}
+                            Dagboksnummer: {{dagboksnummer}}<br>
                           {{/if}}
-                        {{/each}}
-                        </address>
-                        {{#if idnummer}}
-                          Idnummer: {{idnummer}}<br>
-                        {{/if}}
-                        {{#if beviljadAndel}}
-                          Andel: {{beviljadAndel}}<br>
-                        {{/if}}
-                        {{#if inskrivningsdag}}
-                          Inskrivningsdag: {{inskrivningsdag}}<br>
-                        {{/if}}
-                        {{#if dagboksnummer}}
-                          Dagboksnummer: {{dagboksnummer}}<br>
-                        {{/if}}
-                        {{#if beslut}}
-                          Beslut: {{beslut}}<br>
-                        {{/if}}
-                    </td>
-                  </tr>
-                {{/each}}
-              </tbody>
-            </table>
+                          {{#if beslut}}
+                            Beslut: {{beslut}}<br>
+                          {{/if}}
+                      </td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
         </div>
         {{#if tomtratt}}
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Tomträttshavare</h3>
+          <div class="card">
+            <div class="card-header">
+                <h3 class="panel-title">Tomträttshavare</h3>
             </div>
               <table class="table">
                 <tbody>
@@ -101,9 +102,9 @@
           </div>
         {{/if}}
         {{#if tidigareAgande}}
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Tidigare ägande</h3>
+          <div class="card">
+            <div class="card-header">
+                <h3 class="panel-title">Tidigare ägande</h3>
             </div>
               <table class="table">
                 <tbody>
@@ -153,10 +154,11 @@
           </div>
         {{/if}}
         {{#if objektidentitet }}
-          <div class="page-footer">
+          <div class="card-footer text-body-secondary">
             <a href="/origoserver/lm/building?registerenhet={{{objektidentitet}}}">Visa byggnader</a>
           </div>
         {{/if}}
+      </div>
     </div>
   </div>
 </div>

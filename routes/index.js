@@ -26,6 +26,7 @@ var auth = require('../handlers/auth');
 var clients = require('../handlers/clients');
 var ngp = require('../handlers/ngp');
 var attachment = require('../handlers/attachment');
+var lmCommunityAssociation = require('../handlers/lmcommunityassociation');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -49,6 +50,7 @@ router.all('/lm/registerenheter*', lmEstate['lmSearchEstate']);
 router.all('/lm/addresses*', lmSearchAddress);
 router.all('/lm/getestate*', lmGetEstate);
 router.all('/lm/building', lmBuilding);
+router.all('/lm/communityassociation*', lmCommunityAssociation);
 router.all('/iotproxy/*', iotProxy);
 router.all('/overpass/*', overpass);
 router.all('/tvapi/*', tvApi);

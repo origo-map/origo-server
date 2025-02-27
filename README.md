@@ -184,3 +184,41 @@ Configured services at:
       /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments/
 
       A GET request to delete all attachments for a specific object.
+
+- Samfällighetsförening Direkt - Show information from Samfällighetsförening Direkt API from Lantmäteriet.
+
+      Configure attachment in conf/config.js
+
+      /origoserver/lm/communityassociation/{objektidentitet of the community association}
+
+      A GET request to show the information on the community association.
+
+      /origoserver/lm/communityassociation/beror/{objektidentitet of the object the association maintains}
+
+      A GET request to show the information on the community association associated with this object.
+
+      /origoserver/lm/communityassociation/filter?lanskod={two digit code}&sate={municipality name}&sateMatch={search method}&kommunkodForvaltningsobjekt={four digit code}&namn={association name}&namnMatch={search method}&foreningstyp={type of association}&andamal={purpose of maintaince object}&maxHits={number}&srid={EPSG code}
+
+       A GET request to list community association based on search parameters. To get the response as a GeoJSON add header "Accept: application/geo+json" in the request, can be used to integrate as Origo layer although the response may take several seconds so shouldn't be used directly. Download the GeoJSON beforehand and publish on webserver or use a geospatial data server to serve the data.
+
+       Filters parameters:
+
+      - lanskod - the code of the county (two digit code)
+
+      - sate - the name of the seat of municipalty the the association resides.
+
+      - sateMatch - the way the search for seat is to be done. Valid values "equals", "startsWith", "contains", "endsWith".
+
+      - kommunkodForvaltningsobjekt - the code of the municipality (four digit code)
+
+      - namn - the name of the association.
+
+      - namnMatch - the way the search for name is to be done. Valid values "equals", "startsWith", "contains", "endsWith".
+
+      - foreningstyp - the type of the association. Valid values "LGA-samfällighet", "Vägsamfällighet", "Vägförening", "Samfällighetsförening".
+
+      - andamal - the purpose of maintaince object. Valid values "Anläggning enligt vattenlagen", "Avloppsanläggning", "Bad och/eller båtanläggning", "Elledning och/eller belysning", "Garage och/eller parkering", "Grönområden", "Kvartersanläggning", "Radio- TV och/eller tele", "Skiftessamfälligheter", "Vattenförsörjning", "Vägar", "Värmeanläggning", "Övrigt".
+
+      - maxHits - the maximum numbeers of hits returned. Default 100. Set a value of 0 or less to get unlimited hits.
+
+      - srid - the EPSG code of the coordinate referens system. Limited to Sweref 99 codes.
