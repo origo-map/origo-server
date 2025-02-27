@@ -25,6 +25,7 @@ var lmBuilding = require('../handlers/lmbuilding');
 var auth = require('../handlers/auth');
 var clients = require('../handlers/clients');
 var ngp = require('../handlers/ngp');
+var attachment = require('../handlers/attachment');
 
 /* GET start page. */
 router.get('/', function (req, res) {
@@ -55,5 +56,6 @@ router.all('/converttogeojson/*', convertToGeojson);
 router.use('/auth', auth);
 router.use('/clients', clients);
 router.use('/ngp', ngp);
+router.use('/attachment', attachment);
 
 module.exports = router;
