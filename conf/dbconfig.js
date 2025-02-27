@@ -62,6 +62,7 @@ module.exports = {
            tables: [
               {
                  table: 'fastighetsytor',
+                 customType: 'fastighetsindelning',
                  searchField: 'fastighetsbeteckning',
                  schema: 'public',
                  geometryName: 'geom',
