@@ -66,6 +66,7 @@ module.exports = {
                  searchField: 'fastighetsbeteckning',
                  schema: 'public',
                  geometryName: 'geom',
+                 title: 'Fastigheter',
                  useCentroid: true
               },
               {

@@ -11,6 +11,7 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
     "TO_CHAR(SDO_UTIL.TO_WKTGEOMETRY(" + geometryField + ")) AS GEOM";
   var sqlFields = fields ? fields.join(',') + "," : "";
   var type = "'" + (customType ?? table) + "' AS type,";
+  var title = queryOptions.title ? " '" + queryOptions.title + "'" + ' AS TITLE, ' : '';
   var condition = queryString;
   var searchString;
   var sdo_geom_metadata;
@@ -20,13 +21,19 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
   } else {
     sdo_geom_metadata = "m.table_name = '" + table + "' AND m.column_name = '" + geometryField;
   }
+  var limit = queryOptions.limit ? " FETCH FIRST " + queryOptions.limit.toString() + " ROWS ONLY" : "";
 
   searchString =
-    "SELECT " + sqlSearchField + sqlFields + type +
+    "SELECT " +
+    sqlSearchField +
+    sqlFields +
+    type +
+    title +
     wkt + " " +
     "FROM " + schema + "." + table + ", user_sdo_geom_metadata m " +
     "WHERE " + sdo_geom_metadata + "' AND lower(" + searchField + ") LIKE lower('" + condition + "%')" + " " +
-    "ORDER BY " + searchField + "";
+    "ORDER BY " + searchField +
+    limit;
 
   return searchString;
 }
