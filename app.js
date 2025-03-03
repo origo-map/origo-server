@@ -50,7 +50,7 @@ app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 if (conf['trustProxy']) {
-  app.set('trust proxy', true);
+  app.set('trust proxy', conf['trustProxy']);
 }
 
 // uncomment after placing your favicon in /public

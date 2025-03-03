@@ -153,5 +153,5 @@ module.exports = {
   attachment: {
     filepath: "C:\\attachment\\"
   },
-  trustProxy: false
+  trustProxy: false // Configure express for use behind proxy. If true, the client’s IP address is understood as the left-most entry in the X-Forwarded-For header. For other options, see https://expressjs.com/en/guide/behind-proxies.html.
 }
