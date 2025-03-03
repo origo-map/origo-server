@@ -18,22 +18,7 @@ const limiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   keyGenerator: (req, res) => {
-    // Client ip without port
-    if (!req.ip) {
-      console.error('Warning: req.ip is missing!');
-      return req.socket.remoteAddress;
-    }
-    // Find all instances of IPv4 and IPv6 addresses in a string (which can be a comma separated list)
-    // and exclude port numbers, if present.
-    //
-    // \[?                          Matches an optional opening square bracket [
-    // ((\d{1,3}\.){3}\d{1,3})      Matches an IPv4 address
-    // (([a-f0-9:]+:+)+[a-f0-9]*)   Matches an IPv6 address
-    // (\]?[:]{1}\d+)?              Matches an optional closing square bracket ], followed by a colon : and one or more digits (port number)
-    return req.ip.matchAll(/\[?(((\d{1,3}\.){3}\d{1,3})|(([a-f0-9:]+:+)+[a-f0-9]*))(\]?[:]{1}\d+)?/gi)
-      .toArray() // Get all matches as an array
-      .map(e => e[1]) // Extract the first capture group of each match
-      .join(','); // Reassemble all matching IPs to a comma separated list without port numbers
+    return req.ip.match(/\[?((\d+\.?){4}|((:?[a-z0-9]{0,8}){2,8}))\]?/i, "$1")[1]; // Client ip without port
   }
 })
 
