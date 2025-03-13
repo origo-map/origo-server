@@ -1,6 +1,7 @@
 var pgDefault = function pgDefault(queryString, queryOptions) {
   var schema = queryOptions.schema;
   var table = queryOptions.table;
+  var customType = queryOptions.customType;
   var searchField = queryOptions.searchField;
   var gid = queryOptions.gid || 'gid';
   var sqlSearchField = searchField ? 'CAST("' + table + '"."' + searchField + '" AS TEXT) AS "NAMN",' : "";
@@ -10,7 +11,7 @@ var pgDefault = function pgDefault(queryString, queryOptions) {
   var wkt = useCentroid ? 'ST_AsText(ST_PointOnSurface(' + table + '."' + geometryField + '")) AS "GEOM" ' :
     'ST_AsText("' + table + '"."' + geometryField + '") AS "GEOM" ';
   var sqlFields = fields ? fields.join(',') + "," : "";
-  var type = " '" + table + "'" + ' AS "TYPE", ';
+  var type = " '" + (customType ?? table) + "'" + ' AS "TYPE", ';
   var title = queryOptions.title ? " '" + queryOptions.title + "'" + ' AS "TITLE", ' : '';
   var condition = queryString;
   var searchString;
