@@ -19,7 +19,7 @@ var search = function(req, res) {
     tables.forEach((table) => {
       var options = Object.assign({}, connectors[db], multiSearchModel, table);
       options.limit = options.limit || dbConfig.limit;
-      if (req.query.limit) {
+      if (req.query.limit && req.query.c !== 'true') {
         options.limit = options.limit ? Math.min(options.limit, req.query.limit) : req.query.limit;
       } else {
         options.limit = options.limit || 100;
