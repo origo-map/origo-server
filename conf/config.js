@@ -77,11 +77,11 @@ module.exports = {
     scope: 'fastighetochsamfallighet_direkt_v31_read'
   },
   lmcommunityassociation: {
-    url: "https://api-ver.lantmateriet.se/distribution/produkter/samfallighetsforening/v2.2",
-    url_ga: "https://api-ver.lantmateriet.se/distribution/produkter/gemensamhetsanlaggning/v2.1",
-    url_fs: "https://api-ver.lantmateriet.se/distribution/produkter/fastighetsamfallighet/v3.1",
-    url_token: "https://apimanager-ver.lantmateriet.se/oauth2/token",
-    url_revoke: "https://apimanager-ver.lantmateriet.se/oauth2/revoke",
+    url: "https://api.lantmateriet.se/distribution/produkter/samfallighetsforening/v2.2",
+    url_ga: "https://api.lantmateriet.se/distribution/produkter/gemensamhetsanlaggning/v2.1",
+    url_fs: "https://api.lantmateriet.se/distribution/produkter/fastighetsamfallighet/v3.1",
+    url_token: "https://apimanager.lantmateriet.se/oauth2/token",
+    url_revoke: "https://apimanager.lantmateriet.se/oauth2/revoke",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
     grant_type: 'client_credentials',
