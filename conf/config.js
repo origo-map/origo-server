@@ -152,5 +152,9 @@ module.exports = {
   },
   attachment: {
     filepath: "C:\\attachment\\"
+  },
+  behindProxy: {
+    trustProxy: false, // Configure express for use behind proxy. If true, the client’s IP address is understood as the left-most entry in the X-Forwarded-For header (should generally be avoided in production). For other options, see https://expressjs.com/en/guide/behind-proxies.html.
+    trimForwardedPorts: false // When trusting a source IP forwarded by a proxy, remove port numbers. Otherwise a client may bypass the rate-limiter by changing its port number.
   }
 }
