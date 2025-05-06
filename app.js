@@ -44,7 +44,8 @@ var handlebars = require('express-handlebars')
       lte: function (v1, v2) { return v1 <= v2; },
       gte: function (v1, v2) { return v1 >= v2; },
       and: function () { return Array.prototype.every.call(arguments, Boolean); },
-      or: function () { return Array.prototype.slice.call(arguments, 0, -1).some(Boolean); }
+      or: function () { return Array.prototype.slice.call(arguments, 0, -1).some(Boolean); },
+      dateFormat: require('handlebars-dateformat')
     }});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
