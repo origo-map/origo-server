@@ -13,10 +13,13 @@ var conf = require('./conf/config');
 var app = express();
 
 const limiter = rateLimit({
-	windowMs: 5 * 60 * 1000, // 5 minutes
-	max: 10000, // Limit each IP to 10000 requests per `window` (here, per 15 minutes)
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10000, // Limit each IP to 10000 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  ...(conf['behindProxy']?.trimForwardedPorts && { keyGenerator: (req, res) => {
+    return req.ip.match(/\[?((\d+\.?){4}|((:?[a-z0-9]{0,8}){2,8}))\]?/i, "$1")[1]; // Client ip without port
+  }})
 })
 
 // apply rate limiter to all requests
@@ -41,11 +44,15 @@ var handlebars = require('express-handlebars')
       lte: function (v1, v2) { return v1 <= v2; },
       gte: function (v1, v2) { return v1 >= v2; },
       and: function () { return Array.prototype.every.call(arguments, Boolean); },
-      or: function () { return Array.prototype.slice.call(arguments, 0, -1).some(Boolean); }
+      or: function () { return Array.prototype.slice.call(arguments, 0, -1).some(Boolean); },
+      dateFormat: require('handlebars-dateformat')
     }});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
+if (conf['behindProxy']?.trustProxy) {
+  app.set('trust proxy', conf['behindProxy'].trustProxy);
+}
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));

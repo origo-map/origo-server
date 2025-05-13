@@ -83,6 +83,12 @@ Configured services at:
 
       /origoserver/lm/elevation/{EPSG code}/{longitude}/{latitude}
 
+      Get ground height for coordinate
+
+      /origoserver/lm/elevation/{EPSG code}
+
+      POST a GeoJSON to get all coordinates set to elevation in response
+
 - Ortnamn Direkt - set consumer_key and consumer_secret in conf/config.js
 
       /origoserver/lm/placenames/?q={searchstring}&kommunkod={4-digit number for the municipality}&limit={number}&nametype={placename type}&lang={language name}&srid={EPSG code}
@@ -150,3 +156,69 @@ Configured services at:
       /origoserver/attachments/ngp/dpdocuments/something-like-the-layername/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/attachments
 
       /origoserver/attachments/ngp/dpdocuments/something-like-the-layername/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/attachments/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+- Attachment - list, get, add and delete files to features
+
+      Configure attachment in conf/config.js
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/attachments
+
+      A GET request to list all attachments for a specific object.
+
+      /origoserver/attachment/{something-like-the-layername}/attachments
+
+      A GET request to list all attachments for a specific layer/collection.
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/attachments/{uuid}
+
+      A GET request to get the url for the attachment with a specific uuid.
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/addAttachment
+
+      POST a file to store it in the configured folder under the sub-folder {something-like-the-layername}/{a unique identifier}/{group}. Requires "Content-Type: multipart/form-data" with the multipart fields "attachment" and "group".
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments
+
+      POST a string of comma-separated attachment IDs as a JSON body, e g { attachmentIds: "id1,id2,etc" } to delete the specified attachments.
+
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments/
+
+      A GET request to delete all attachments for a specific object.
+
+- Samfällighetsförening Direkt - Show information from Samfällighetsförening Direkt API from Lantmäteriet.
+
+      Configure attachment in conf/config.js
+
+      /origoserver/lm/communityassociation/{objektidentitet of the community association}
+
+      A GET request to show the information on the community association.
+
+      /origoserver/lm/communityassociation/beror/{objektidentitet of the object the association maintains}
+
+      A GET request to show the information on the community association associated with this object.
+
+      /origoserver/lm/communityassociation/filter?lanskod={two digit code}&sate={municipality name}&sateMatch={search method}&kommunkodForvaltningsobjekt={four digit code}&namn={association name}&namnMatch={search method}&foreningstyp={type of association}&andamal={purpose of maintaince object}&maxHits={number}&srid={EPSG code}
+
+       A GET request to list community association based on search parameters. To get the response as a GeoJSON add header "Accept: application/geo+json" in the request, can be used to integrate as Origo layer although the response may take several seconds so shouldn't be used directly. Download the GeoJSON beforehand and publish on webserver or use a geospatial data server to serve the data.
+
+       Filters parameters:
+
+      - lanskod - the code of the county (two digit code)
+
+      - sate - the name of the seat of municipalty the the association resides.
+
+      - sateMatch - the way the search for seat is to be done. Valid values "equals", "startsWith", "contains", "endsWith".
+
+      - kommunkodForvaltningsobjekt - the code of the municipality (four digit code)
+
+      - namn - the name of the association.
+
+      - namnMatch - the way the search for name is to be done. Valid values "equals", "startsWith", "contains", "endsWith".
+
+      - foreningstyp - the type of the association. Valid values "LGA-samfällighet", "Vägsamfällighet", "Vägförening", "Samfällighetsförening".
+
+      - andamal - the purpose of maintaince object. Valid values "Anläggning enligt vattenlagen", "Avloppsanläggning", "Bad och/eller båtanläggning", "Elledning och/eller belysning", "Garage och/eller parkering", "Grönområden", "Kvartersanläggning", "Radio- TV och/eller tele", "Skiftessamfälligheter", "Vattenförsörjning", "Vägar", "Värmeanläggning", "Övrigt".
+
+      - maxHits - the maximum numbeers of hits returned. Default 100. Set a value of 0 or less to get unlimited hits.
+
+      - srid - the EPSG code of the coordinate referens system. Limited to Sweref 99 codes.

@@ -1,0 +1,329 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h2>{{{features.[0].properties.samfallighetsforeningsattribut.foreningensForetagsnamn}}}</h2>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Föreningsinformation</h3>
+        </div>
+      </div>
+                {{#each features}}
+            <table class="table table-light">
+              <tbody>
+                  <tr class="table-active">
+                    <td>
+                        {{#if properties.samfallighetsforeningsattribut.foreningensForetagsnamn}}
+                          Föreningens företagsnamn: {{properties.samfallighetsforeningsattribut.foreningensForetagsnamn}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.organisationsnummer}}
+                          Organisationsnummer: {{properties.samfallighetsforeningsattribut.organisationsnummer}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.foreningstyp}}
+                          Föreningstyp: {{properties.samfallighetsforeningsattribut.foreningstyp}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.status}}
+                          Status: {{properties.samfallighetsforeningsattribut.status}}<br>
+                        {{/if}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                          Adress:<br>
+                          {{#if properties.samfallighetsforeningsattribut.utdelningsadress1}}
+                            {{properties.samfallighetsforeningsattribut.utdelningsadress1}}<br>
+                          {{/if}}
+                          {{#if properties.samfallighetsforeningsattribut.coAdress}}
+                            c/o {{properties.samfallighetsforeningsattribut.coAdress}}<br>
+                          {{/if}}
+                          {{#if properties.samfallighetsforeningsattribut.postnummer}}
+                            {{properties.samfallighetsforeningsattribut.postnummer}} 
+                          {{/if}}
+                          {{#if properties.samfallighetsforeningsattribut.postort}}
+                            {{properties.samfallighetsforeningsattribut.postort}}<br>
+                          {{/if}}
+                    </td>
+                  </tr>
+                  <tr class="table-active">
+                    <td>
+                        {{#if properties.samfallighetsforeningsattribut.sate}}
+                          Säte: {{properties.samfallighetsforeningsattribut.sate}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.foreningsstamma}}
+                          Föreningsstämma: {{properties.samfallighetsforeningsattribut.foreningsstamma}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.statsbidragsnummer}}
+                          Statsbidragsnummer: {{properties.samfallighetsforeningsattribut.statsbidragsnummer}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.status}}
+                          Status: {{properties.samfallighetsforeningsattribut.status}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.firmatecknareTillaggsinformation}}
+                          Firmatecknare tilläggsinformation: {{properties.samfallighetsforeningsattribut.firmatecknareTillaggsinformation}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.registreringsdatum}}
+                          Registreringsdatum: {{properties.samfallighetsforeningsattribut.registreringsdatum}}<br>
+                        {{/if}}
+                        Räkenskapsår: 
+                        {{#if properties.samfallighetsforeningsattribut.rakenskapsarFran}}
+                          från {{properties.samfallighetsforeningsattribut.rakenskapsarFran}}
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.rakenskapsarTill}}
+                           till {{properties.samfallighetsforeningsattribut.rakenskapsarTill}}<br>
+                        {{/if}}
+                         {{#if properties.objektidentitet}}
+                          Objektidentitet:  {{properties.objektidentitet}}<br>
+                        {{/if}}
+                        {{#if properties.samfallighetsforeningsattribut.senasteAndringSFR}}
+                          Senaste ändring: {{dateFormat properties.samfallighetsforeningsattribut.senasteAndringSFR "YYYY-MM-DD hh:mm:ss"}}<br>
+                        {{/if}}
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+             <table class="table">
+              <div class="card">
+                <div class="card-header">
+                  <h3>Styrelsemedlemmar</h3>
+                </div>
+              </div>
+              <tbody>
+                       {{#each properties.styrelsemedlem}}
+                        <tr>
+                          <td>
+                          {{#if namn}}
+                            Namn: {{namn}}<br>
+                          {{/if}}
+                          {{#if medlemstyp}}
+                            Medlemstyp: {{medlemstyp}}<br>
+                          {{/if}}
+                          {{#if styrelsefunktion}}
+                            Styrelsefunktion: <b>{{styrelsefunktion}}</b><br>
+                          {{/if}}
+                          {{#if utdelningsadress1}}
+                            Adress: {{utdelningsadress1}}<br>
+                          {{/if}}
+                          {{#if postnummer}}
+                            Postnummer: {{postnummer}}<br>
+                          {{/if}}
+                          {{#if postort}}
+                            Postort: {{postort}}<br>
+                          {{/if}}
+                          {{#if firmatecknare}}
+                            Firmatecknare: Ja<br>
+                          {{/if}}
+                          {{#if anmarkning}}
+                            Anmärkning: <em>{{anmarkning}}</em><br>
+                          {{/if}}
+                          </td>
+                        </tr>
+                        {{/each}}
+              </tbody>
+            </table>
+            <table class="table">
+              <tbody>
+              <div class="card">
+                <div class="card-header">
+                  <h3>Styrelseinformation</h3>
+                </div>
+              </div>
+                <tr>
+                  <td>
+                  {{#if properties.styrelseinformation.versionGiltigFran}}
+                    Version giltig från: {{dateFormat properties.styrelseinformation.versionGiltigFran "YYYY-MM-DD hh:mm:ss"}}<br>
+                  {{/if}}
+                  {{#if properties.styrelseinformation.minAntalLedamoter}}
+                    Min antal ledamoter: {{properties.styrelseinformation.minAntalLedamoter}}<br>
+                  {{/if}}
+                  {{#if properties.styrelseinformation.maxAntalLedamoter}}
+                    Max antal ledamoter: {{properties.styrelseinformation.maxAntalLedamoter}}<br>
+                  {{/if}}
+                  {{#if properties.styrelseinformation.minAntalSuppleanter}}
+                    Min antal suppleanter: {{properties.styrelseinformation.minAntalSuppleanter}}<br>
+                  {{/if}}
+                  {{#if properties.styrelseinformation.maxAntalSuppleanter}}
+                    Max antal suppleanter: {{properties.styrelseinformation.maxAntalSuppleanter}}<br>
+                  {{/if}}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table">
+              <tbody>
+              <div class="card">
+                <div class="card-header">
+                  <h3>Förvaltningsobjekt</h3>
+                </div>
+              </div>
+                       {{#each properties.forvaltningsobjekt}}
+                        <tr>
+                          <td>
+                          {{#if andamal}}
+                            Ändamål:{{andamal}}<br>
+                          {{/if}}
+                          {{#if gemensamhetsanlaggning.beteckning}}
+                            Gemensamhetsanläggning: <a href="/origoserver/lm/communityassociation/ga_geometry/{{gemensamhetsanlaggning.objektidentitet}}">{{gemensamhetsanlaggning.beteckning}}</a><br>
+                          {{/if}}
+                          {{#if gemensamhetsanlaggning.objektidentitet}}
+                            Objektidentitet: {{gemensamhetsanlaggning.objektidentitet}}<br>
+                          {{/if}}
+                          </td>
+                        </tr>
+                        {{/each}}
+  {{#if properties.forvaltningsobjekt.[0].gemensamhetsanlaggning.objektidentitet}}
+                        <tr>
+                        <td>
+                        <div id="app-wrapper" style="height: 300px;">
+                        </div>
+                        <script type="text/javascript">
+                        //Init origo
+                        var origo = Origo({
+                            "configName": "CommunityAssociation",
+                            "projectionExtent": [
+                              -20026376.39,
+                              -20048966.10,
+                              20026376.39,
+                              20048966.10
+                            ],
+                            "extent": [
+                              -20026376.39,
+                              -20048966.10,
+                              20026376.39,
+                              20048966.10
+                            ],
+                            "center": [
+                              1810000,
+                              8390000
+                            ],
+                            "resolutions": [
+                              156543.03,
+                              78271.52,
+                              39135.76,
+                              19567.88,
+                              9783.94,
+                              4891.97,
+                              2445.98,
+                              1222.99,
+                              611.50,
+                              305.75,
+                              152.87,
+                              76.437,
+                              38.219,
+                              19.109,
+                              9.5546,
+                              4.7773,
+                              2.3887,
+                              1.1943,
+                              0.5972
+                            ],
+                            "zoom": 16,
+                            "projectionCode": "EPSG:3857",
+                            "proj4Defs": [
+                                {
+                                    "code": "EPSG:3006",
+                                    "alias": "urn:ogc:def:crs:EPSG::3006",
+                                    "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+                                }
+                            ],
+                            "layers": [
+                              {{#each properties.forvaltningsobjekt}}
+                                 	{
+                                    "name": "{{gemensamhetsanlaggning.objektidentitet}}",
+                                    "format": "image/png",
+                                    "title": "{{gemensamhetsanlaggning.beteckning}}",
+                                    "group": "root",
+                                    "queryable": true,
+                                    "source": "/origoserver/lm/communityassociation/ga_geometry/{{gemensamhetsanlaggning.objektidentitet}}",
+                                    "projection": "EPSG:3006",
+                                    "type": "GEOJSON",
+                                    "visible": true,
+                                    "style": "default"
+                                  },
+                                {{/each}}
+                                {
+                                  "name": "osm",
+                                  "title": "OpenStreetMap",
+                                  "group": "background",
+                                  "queryable": false,
+                                  "style": "karta_osm",
+                                  "type": "OSM",
+                                  "visible": true
+                                }
+                            ],
+                            "groups": [
+                                {
+                                    "name": "background",
+                                    "title": "Bakgrundskartor",
+                                    "expanded": true
+                                }
+                            ],
+                            "styles": {
+                              "default": [
+                              [
+                                {
+                                  "stroke": {
+                                    "color": "rgba(0,0,255,1.0)",
+                                    "width": 2
+                                  },
+                                  "fill": {
+                                    "color": "rgba(0,0,255,0.1)"
+                                  }
+                                }
+                              ]
+                            ]
+                          }
+                        }, {svgSpritePath: 'https://cdn.jsdelivr.net/gh/origo-map/origo@latest/build/css/svg/'});
+                         </script>
+                        </td>
+                        </tr>
+  {{/if}}
+              </tbody>
+            </table>
+            <table class="table">
+              <tbody>
+              <div class="card">
+                <div class="card-header">
+                  <h3>Arkivakt</h3>
+                </div>
+              </div>
+                       {{#each properties.arkivakt}}
+                        <tr>
+                          <td>
+                          {{#if aktbeteckning}}
+                            Aktbeteckning:{{aktbeteckning}}<br>
+                          {{/if}}
+                          {{#each atgardsinformation}}
+                            <b>Åtgärdsinformation</b><br>
+                              {{#if beslut}}
+                                Beslut: {{beslut}}<br>
+                              {{/if}}
+                              {{#if registreringsdatum}}
+                                Registreringsdatum: {{registreringsdatum}}<br>
+                              {{/if}}
+                              {{#if atgardstyp}}
+                                Åtgardstyp: {{atgardstyp}}<br>
+                              {{/if}}
+                            {{/each}}
+                         </td>
+                        </tr>
+                        {{/each}}
+              </tbody>
+            </table>
+                {{/each}}
+        </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+function function2() {
+  {{#if features.[0].properties.forvaltningsobjekt.[0].gemensamhetsanlaggning.objektidentitet}}
+    origo.api().getMap().getView().fit(origo.api().getLayer("{{features.[0].properties.forvaltningsobjekt.[0].gemensamhetsanlaggning.objektidentitet}}").getSource().getExtent(), { maxZoom: 6 }); 
+  {{/if}}
+}
+
+setTimeout(function2, 200);
+
+</script>
