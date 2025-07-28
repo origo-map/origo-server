@@ -222,3 +222,22 @@ Configured services at:
       - maxHits - the maximum numbeers of hits returned. Default 100. Set a value of 0 or less to get unlimited hits.
 
       - srid - the EPSG code of the coordinate referens system. Limited to Sweref 99 codes.
+
+- lmservices - Helper to get information from Lantmäteriet services. Can be used like this:
+
+          const lmservices = require('./lmservices.js');
+          const getStuff = async (req, res) => {
+            const typ = req.query.typ;
+            const fastighet = req.query.fastighet;
+            const id = req.query.id || [];
+            const hasAccess = await checkAccess();
+            if(hasAccess){
+              console.log("Has access");
+              const response = await lmservices({ typ, fastighet, id, includeData: 'total' })
+              res.json(response);
+            } else {
+              console.log("No access");
+              res.send();
+            }
+          }
+          module.exports = getStuff;
