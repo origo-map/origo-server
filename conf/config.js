@@ -76,6 +76,52 @@ module.exports = {
     consumer_secret: 'xxxxx',
     scope: 'fastighetochsamfallighet_direkt_v31_read'
   },
+  lmservices: {
+    apps: {
+      defaultApp: {
+        url: 'https://api.lantmateriet.se/',
+        url_token: "https://apimanager.lantmateriet.se/oauth2/token",
+        url_revoke: "https://apimanager.lantmateriet.se/oauth2/revoke",
+        consumer_key: 'XXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        consumer_secret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        scope: 'belagenhetsadress_direkt_v42_read byggnad_direkt_v3_read fastighetochsamfallighet_direkt_v31_read gemensamhetsanlaggning_direkt_v21_read inskrivning_direkt_v3_read markreglerande_bestammelse_direkt_v2_read rattighet_direkt_v21_read taxering_direkt'
+      }
+    },
+    services: {
+      belagenhetsadress: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/belagenhetsadress/v4.2'
+      },
+      byggnad: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/byggnad/v3'
+      },
+      fastighetsamfallighet: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/fastighetsamfallighet/v3.1'
+      },
+      gemensamhetsanlaggning: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/gemensamhetsanlaggning/v2.1'
+      },
+      inskrivning: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/inskrivning/v3'
+      },
+      markreglerandebestammelse: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/markreglerandebestammelse/v2'
+      },
+      rattighet: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/rattighet/v2.1'
+      },
+      taxering: {
+        app: 'defaultApp',
+        url: 'https://api.lantmateriet.se/distribution/produkter/taxering/v3'
+      }
+    }
+  },
   lmcommunityassociation: {
     url: "https://api.lantmateriet.se/distribution/produkter/samfallighetsforening/v2.2",
     url_ga: "https://api.lantmateriet.se/distribution/produkter/gemensamhetsanlaggning/v2.1",
