@@ -47,6 +47,7 @@ router.all('/lm/elevation*splat', lmElevation);
 router.all('/lm/placenames', lmSearchPlacename);
 router.all('/lm/enhetsomraden', lmEstate['lmGetEstateFromPoint']);
 router.all('/lm/registerenheter', lmEstate['lmSearchEstate']);
+router.all('/lm/registerenheter/*splat', lmEstate['lmSearchEstate']);
 router.all('/lm/addresses', lmSearchAddress);
 router.all('/lm/getestate', lmGetEstate);
 router.all('/lm/building', lmBuilding);
