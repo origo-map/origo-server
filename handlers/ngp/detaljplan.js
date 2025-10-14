@@ -88,7 +88,6 @@ async function listAssets(planid, res, next) {
     const myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/json');
     myHeaders.append('Authorization', `Bearer ${token}`);
-  
     let response = await fetch(url, { method: 'POST', body: JSON.stringify(postdata), headers: myHeaders });
     const fileinfos = [];
     if (!response.ok) {
@@ -178,8 +177,149 @@ async function getDocument(uuid, res, next) {
     }
 }
 
+async function getItems(collid, limit, crs, bbox, bboxCrs, datetime, afterId, res, next) {
+    await ensureToken(next);
+    const url = new URL(`distribution/geodatakatalog/sokning/v1/detaljplan/v2/collections/${collid}/items`, configOptions.url_base);
+    // Validate parameters before setting on url.
+    const limitRegEx = /^(?:[1-9][0-9]{0,3}|10000)$/;
+    if (limitRegEx.test(limit)) {
+        url.searchParams.set('limit', limit);
+    }
+    const crsRegEx = /\b(?:http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/\d{4,6}|urn:ogc:def:crs:EPSG::\d{4,6})\b/;
+    if (crsRegEx.test(crs)) {
+        url.searchParams.set('crs', crs);
+    }
+    const bboxRegEx = /^-?\d+(\.\d+)?(?:,-?\d+(\.\d+)?){3}$|^-?\d+(\.\d+)?(?:,-?\d+(\.\d+)?){5}$/;
+    if (bboxRegEx.test(bbox)) {
+        url.searchParams.set('bbox', bbox);
+    }
+    // Timestamp according to RFC 3339
+    const rfc3339TimePattern = /([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)([01][0-9]|2[0-3]):([0-5][0-9]))/;
+    // Complete pattern for all formats
+    const rfc3339CompletePattern = new RegExp(
+        `^(${rfc3339TimePattern.source}|` +              // Individual timestamp
+        `${rfc3339TimePattern.source}\\/\\.\\.|` +       // start/..
+        `\\.\\.\\/${rfc3339TimePattern.source}|` +       // ../end
+        `${rfc3339TimePattern.source}\\/${rfc3339TimePattern.source})$` // start/end
+    );
+    if (datetime) {
+        if (rfc3339CompletePattern.test(datetime.replace(" ", "+"))) {  // Put back + which somehow disappered an replaced by space
+            url.searchParams.set('datetime', datetime.replace(" ", "+"));
+        }
+    }
+    if (crsRegEx.test(bboxCrs)) {
+        url.searchParams.set('bbox-crs', bboxCrs);
+    }
+    const checkUuidRegEx = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/i;
+    if (checkUuidRegEx.test(afterId)) {
+        url.searchParams.set('afterId', afterId);
+    }
+    // Add token to request
+    const myHeaders = new Headers();
+    myHeaders.append('Authorization', `Bearer ${token}`);
 
-  
+    let response = await fetch(url, { method: 'GET', headers: myHeaders });
+    if (!response.ok) {
+        if (response.status === 401) {
+            // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
+            await createToken(next);
+            myHeaders.set('Authorization', `Bearer ${token}`);
+            response = await fetch(url, { method: 'GET', headers: myHeaders });
+            // Check if still some error and throw otherwise continue with response
+            if (!response.ok) {
+                next(new Error(`Error: ${response.status}`));
+            }
+        } else {
+            next(new Error(`Error: ${response.status}`));
+        }
+    }
+    if (response.ok) {
+        const responsebody = await response.json();
+        res.json(responsebody);
+    } else {
+        next(new Error(`Error: ${response.status}`));
+    }
+}
+async function searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId, res, next) {
+    await ensureToken(next);
+    const url = new URL('distribution/geodatakatalog/sokning/v1/detaljplan/v2/search', configOptions.url_base);
+    const predefinedSearches = configOptions.search;
+    // Leta efter objektet med namnet "dpVnrl"
+    const foundObject = predefinedSearches.find(item => item.name === queryId);
+
+    if (foundObject) {
+        const postdata = {
+            "query": JSON.parse(foundObject.query)
+        };
+
+        // Validate parameters before setting on url.
+        const limitRegEx = /^(?:[1-9][0-9]{0,3}|10000)$/;
+        if (limitRegEx.test(limit)) {
+            //postdata.limit = limit;
+        }
+        const crsRegEx = /\b(?:http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/\d{4,6}|urn:ogc:def:crs:EPSG::\d{4,6})\b/;
+        if (crsRegEx.test(crs)) {
+            //postdata.crs = crs;
+        }
+        const bboxRegEx = /^-?\d+(\.\d+)?(?:,-?\d+(\.\d+)?){3}$|^-?\d+(\.\d+)?(?:,-?\d+(\.\d+)?){5}$/;
+        if (bboxRegEx.test(bbox)) {
+            postdata.bbox = bbox;
+        }
+        // Timestamp according to RFC 3339
+        const rfc3339TimePattern = /([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?(Z|(\+|-)([01][0-9]|2[0-3]):([0-5][0-9]))/;
+        // Complete pattern for all formats
+        const rfc3339CompletePattern = new RegExp(
+            `^(${rfc3339TimePattern.source}|` +              // Individual timestamp
+            `${rfc3339TimePattern.source}\\/\\.\\.|` +       // start/..
+            `\\.\\.\\/${rfc3339TimePattern.source}|` +       // ../end
+            `${rfc3339TimePattern.source}\\/${rfc3339TimePattern.source})$` // start/end
+        );
+        if (datetime) {
+            if (rfc3339CompletePattern.test(datetime.replace(" ", "+"))) {  // Put back + which somehow disappered an replaced by space
+                postdata.datetime = datetime.replace(" ", "+");
+            }
+        }
+        if (crsRegEx.test(bboxCrs)) {
+            postdata['bbox-crs'] = bboxCrs;
+        }
+        const checkUuidRegEx = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/i;
+        if (checkUuidRegEx.test(afterId)) {
+            postdata.afterId = afterId;
+        }
+        if (typeof foundObject.collections !== 'undefined' && Array.isArray(foundObject.collections)) {
+            postdata.collections = foundObject.collections;
+        }
+        // Add token to request
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'application/json');
+        myHeaders.append('Authorization', `Bearer ${token}`);
+
+        let response = await fetch(url, { method: 'POST', body: JSON.stringify(postdata), headers: myHeaders });
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Retry once in case the token as been invalid f.e. when same consumer key been used to create token on another server
+                await createToken(next);
+                myHeaders.set('Authorization', `Bearer ${token}`);
+                response = await fetch(url, { method: 'POST', body: JSON.stringify(postdata), headers: myHeaders });
+                // Check if still some error and throw otherwise continue with response
+                if (!response.ok) {
+                    next(new Error(`Error: ${response.status}`));
+                }
+            } else {
+                next(new Error(`Error: ${response.status}`));
+            }
+        }
+        if (response.ok) {
+            const responsebody = await response.json();
+            res.json(responsebody);
+        } else {
+            next(new Error(`Error: ${response.status}`));
+        }
+    } else {
+        next(new Error(`Not valid search: ${queryId}`));
+    }
+}
+
 /**
  * Express handler that handles list attachments. Sends back attachments according to origo's spec
  * @param {*} req 
@@ -211,4 +351,60 @@ const fetchDoc = async (req, res, next) => {
     }
 }
 
-module.exports = { listAll, fetchDoc };
+/**
+ * Get items from a collection as a GeoJSON.
+ *
+ * @async
+ * @function
+ * @name getCollectionItems
+ * @kind variable
+ * @param {any} req
+ * @param {any} res
+ * @param {any} next
+ * @returns {Promise<void>}
+ */
+const getCollectionItems = async (req, res, next) => {
+    const collectionId = req.params.collectionId;
+    const limit = req.query.limit ? req.query.limit : 100;
+    const crs = req.query.crs ? req.query.crs : 'urn:ogc:def:crs:EPSG::3006';
+    const bbox = req.query.bbox;
+    const bboxCrs = req.query['bbox-crs'];
+    const datetime = req.query.datetime;
+    const afterId = req.query.afterId;
+
+    if (typeof collectionId !== 'undefined') {
+        const checkCollectionIdRegEx = /[0-9]{4}/i;
+        let found = collectionId.match(checkCollectionIdRegEx);
+        if (found !== null) {
+            await getItems(collectionId, limit, crs, bbox, bboxCrs, datetime, afterId, res, next);
+        } else {
+            next(new Error(`Not valid collectionId: ${collectionId}`));
+        }
+    } else {
+        next(new Error('No collectionId found!'));
+    }
+}
+
+const doSearch = async (req, res, next) => {
+    const queryId = req.params.queryId;
+    const limit = req.query.limit ? req.query.limit : 100;
+    const crs = req.query.crs ? req.query.crs : 'urn:ogc:def:crs:EPSG::3006';
+    const bbox = req.query.bbox;
+    const bboxCrs = req.query['bbox-crs'];
+    const datetime = req.query.datetime;
+    const afterId = req.query.afterId;
+
+    if (typeof queryId !== 'undefined') {
+        const checkQueryIdRegEx = /^[a-zA-Z0-9]*$/;
+        let found = queryId.match(checkQueryIdRegEx);
+        if (found !== null) {
+            await searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId, res, next);
+        } else {
+            next(new Error(`Not valid queryId: ${queryId}`));
+        }
+    } else {
+        next(new Error('No queryId found!'));
+    }
+}
+
+module.exports = { listAll, fetchDoc, getCollectionItems, doSearch };
