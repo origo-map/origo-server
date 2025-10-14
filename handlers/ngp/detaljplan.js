@@ -255,7 +255,7 @@ async function searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId
         // Validate parameters before setting on url.
         const limitRegEx = /^(?:[1-9][0-9]{0,3}|10000)$/;
         if (limitRegEx.test(limit)) {
-            //postdata.limit = limit;
+            postdata.limit = Number(limit);
         }
         const crsRegEx = /\b(?:http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/\d{4,6}|urn:ogc:def:crs:EPSG::\d{4,6})\b/;
         if (crsRegEx.test(crs)) {
