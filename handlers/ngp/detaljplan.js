@@ -17,7 +17,7 @@ let tokenExpires;
 
 if (conf['ngpDetaljplan']) {
     configOptions = Object.assign({}, conf['ngpDetaljplan']);
- }
+}
 
 /**
  * Logs in against LM and fills the global variable "token" with a new token
@@ -228,9 +228,11 @@ async function getItems(collid, limit, crs, bbox, bboxCrs, datetime, afterId, re
             // Check if still some error and throw otherwise continue with response
             if (!response.ok) {
                 next(new Error(`Error: ${response.status}`));
+                res.status(500).send({error: `Error: ${response.status}`});
             }
         } else {
             next(new Error(`Error: ${response.status}`));
+            res.status(500).send({error: `Error: ${response.status}`});
         }
     }
     if (response.ok) {
@@ -238,13 +240,15 @@ async function getItems(collid, limit, crs, bbox, bboxCrs, datetime, afterId, re
         res.json(responsebody);
     } else {
         next(new Error(`Error: ${response.status}`));
+        res.status(500).send({error: `Error: ${response.status}`});
     }
 }
 async function searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId, res, next) {
     await ensureToken(next);
     const url = new URL('distribution/geodatakatalog/sokning/v1/detaljplan/v2/search', configOptions.url_base);
     const predefinedSearches = configOptions.search;
-    // Leta efter objektet med namnet "dpVnrl"
+
+    // Find a predefined search that matches the one that is requested
     const foundObject = predefinedSearches.find(item => item.name === queryId);
 
     if (foundObject) {
@@ -259,7 +263,7 @@ async function searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId
         }
         const crsRegEx = /\b(?:http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/\d{4,6}|urn:ogc:def:crs:EPSG::\d{4,6})\b/;
         if (crsRegEx.test(crs)) {
-            //postdata.crs = crs;
+            url.searchParams.set('crs', crs);
         }
         const bboxRegEx = /^-?\d+(\.\d+)?(?:,-?\d+(\.\d+)?){3}$|^-?\d+(\.\d+)?(?:,-?\d+(\.\d+)?){5}$/;
         if (bboxRegEx.test(bbox)) {
@@ -280,11 +284,11 @@ async function searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId
             }
         }
         if (crsRegEx.test(bboxCrs)) {
-            postdata['bbox-crs'] = bboxCrs;
+            url.searchParams.set('bbox-crs', bboxCrs);
         }
         const checkUuidRegEx = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/i;
         if (checkUuidRegEx.test(afterId)) {
-            postdata.afterId = afterId;
+            url.searchParams.set('afterId', afterId);
         }
         if (typeof foundObject.collections !== 'undefined' && Array.isArray(foundObject.collections)) {
             postdata.collections = foundObject.collections;
@@ -304,9 +308,11 @@ async function searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId
                 // Check if still some error and throw otherwise continue with response
                 if (!response.ok) {
                     next(new Error(`Error: ${response.status}`));
+                    res.status(500).send({error: `Error: ${response.status}`});
                 }
             } else {
                 next(new Error(`Error: ${response.status}`));
+                res.status(500).send({error: `Error: ${response.status}`});
             }
         }
         if (response.ok) {
@@ -314,9 +320,11 @@ async function searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId
             res.json(responsebody);
         } else {
             next(new Error(`Error: ${response.status}`));
+            res.status(500).send({error: `Error: ${response.status}`});
         }
     } else {
         next(new Error(`Not valid search: ${queryId}`));
+        res.status(500).send({error: `Not valid search: ${queryId}`});
     }
 }
 
@@ -401,6 +409,7 @@ const doSearch = async (req, res, next) => {
             await searchItems(queryId, limit, crs, bbox, bboxCrs, datetime, afterId, res, next);
         } else {
             next(new Error(`Not valid queryId: ${queryId}`));
+            res.status(500).send({error: `Not valid queryId: ${queryId}`});
         }
     } else {
         next(new Error('No queryId found!'));
