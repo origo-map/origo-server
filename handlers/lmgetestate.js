@@ -125,15 +125,21 @@ function concatResult(feature) {
 
   if ('features' in feature) {
     feature.features.forEach((element) => {
-      const registeromrade = element.properties.registerbeteckning[0].registeromrade ? element.properties.registerbeteckning[0].registeromrade : '';
-      const beteckning = element.properties.registerbeteckning[0].trakt ? element.properties.registerbeteckning[0].trakt : '';
-      const block = element.properties.registerbeteckning[0].block ? element.properties.registerbeteckning[0].block : '';
-      const enhet = element.properties.registerbeteckning[0].enhet ? element.properties.registerbeteckning[0].enhet : '';
+      // Get the current assignation incase there are more than one
+      const gallandBeteckning = element.properties.registerbeteckning.find(beteckning => beteckning.beteckningsstatus === "gällande");
+      const registeromrade = gallandBeteckning.registeromrade ? gallandBeteckning.registeromrade : '';
+      const beteckning = gallandBeteckning.trakt ? gallandBeteckning.trakt : '';
+      const block = gallandBeteckning.block ? gallandBeteckning.block : '';
+      const enhet = gallandBeteckning.enhet ? gallandBeteckning.enhet : '';
       const objektidentitet = element.properties.objektidentitet;
       const typ = element.properties.typ;
       let samfallighetsattribut = {};
+      let delagare = [];
       if ('samfallighetsattribut' in element.properties) {
         samfallighetsattribut = element.properties.samfallighetsattribut;
+      }
+      if ('delagare' in element.properties) {
+        delagare = element.properties.delagare;
       }
       let fastighetsattribut = {};
       if ('fastighetsattribut' in element.properties) {
@@ -169,7 +175,8 @@ function concatResult(feature) {
               objektidentitet: objektidentitet,
                typ,
               fastighetsattribut,
-              samfallighetsattribut
+              samfallighetsattribut,
+              delagare
             };
             oneFeature['type'] = 'Feature';
             geometryEnhetsomrade.push(oneFeature);
@@ -199,7 +206,8 @@ function concatResult(feature) {
                       objektidentitet: objektidentitet,
                       typ,
                       fastighetsattribut,
-                      samfallighetsattribut
+                      samfallighetsattribut,
+                      delagare
                     };
                     registerenhetsomradeYta['type'] = 'Feature';
                     registerenhetsomradeGeometry.push(registerenhetsomradeYta);
@@ -211,7 +219,8 @@ function concatResult(feature) {
                     objektidentitet: objektidentitet,
                     typ,
                     fastighetsattribut,
-                    samfallighetsattribut
+                    samfallighetsattribut,
+                    delagare
                   };
                   registerenhetsomradePunkt['type'] = 'Feature';
                   registerenhetsomradeGeometry.push(registerenhetsomradePunkt);
