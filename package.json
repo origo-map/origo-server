@@ -37,7 +37,6 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "serve-favicon": "^2.5.0",
-    "sqlite3": "^5.1.7",
     "utf8": "^3.0.0",
     "uuid-by-string": "^4.0.0",
     "wkt": "^0.1.1",
