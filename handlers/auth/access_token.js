@@ -23,7 +23,12 @@ module.exports = async function access_token(req, res) {
     } else {
       res.status(400).send('Bad Request: Neither code nor refresh token found.');
     }
-    const user_info = await client.userinfo(token_set.access_token);
+    let user_info = {}
+    if (conf.auth.user_info_source == 'id_token') {
+      user_info = JSON.parse(Buffer.from(token_set.id_token.split('.')[1], 'base64').toString());
+    } else {
+      user_info = await client.userinfo(token_set.access_token);
+    }
     res.json({
       authenticated: true,
       access_token: token_set.access_token,
