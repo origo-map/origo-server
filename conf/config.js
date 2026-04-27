@@ -49,11 +49,11 @@ module.exports = {
     scope: 'am_application_scope default'
   },
   lmsearchplacename: {
-    url: "https://api.lantmateriet.se/distribution/produkter/ortnamn/v2.1",
+    url: "https://api.lantmateriet.se/distribution/produkter/ortnamn/v2.2",
     url_token: "https://api.lantmateriet.se/token",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
-    scope: 'am_application_scope default'
+    scope: 'ortnamn_direkt_read'
   },
   lmsearchestate: {
     url: "https://api.lantmateriet.se/distribution/produkter/registerbeteckning/v5/",
