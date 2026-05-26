@@ -160,7 +160,7 @@ async function doGetAsyncCall(req, res, configOptions, token) {
 
       // Setup the search call and wait for result
       const url = new URL(configOptions.url + '/hojd');
-      url.searchParams.set('srid', srid);
+      url.searchParams.set('srid', '3006');
       url.searchParams.set('e', xcoord);
       url.searchParams.set('n', ycoord);
 
