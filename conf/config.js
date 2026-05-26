@@ -41,12 +41,12 @@ module.exports = {
     scope: 'byggnad_direkt_v3_read'
   },
   lmelevation: {
-    url: "https://api.lantmateriet.se/distribution/produkter/hojd/v1/rest/api",
+    url: "https://api.lantmateriet.se/distribution/produkter/markhojd/v1",
     url_token: "https://apimanager.lantmateriet.se/oauth2/token",
     url_revoke: "https://apimanager.lantmateriet.se/oauth2/revoke",
     consumer_key: 'xxxxx',
     consumer_secret: 'xxxxx',
-    scope: 'am_application_scope default'
+    scope: 'markhojd_direkt_v1_read'
   },
   lmsearchplacename: {
     url: "https://api.lantmateriet.se/distribution/produkter/ortnamn/v2.2",

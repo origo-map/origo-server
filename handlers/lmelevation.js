@@ -159,15 +159,19 @@ async function doGetAsyncCall(req, res, configOptions, token) {
       }
 
       // Setup the search call and wait for result
+      const url = new URL(configOptions.url + '/hojd');
+      url.searchParams.set('srid', srid);
+      url.searchParams.set('e', xcoord);
+      url.searchParams.set('n', ycoord);
+
       const options = {
-          url: encodeURI(configOptions.url + '/hojd/3006/' + xcoord + '/' + ycoord),
-          method: 'GET',
-          headers: {
-            'content-type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            'scope': `${configOptions.scope}`
-          }
-      }
+        url: url.toString(),
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      };
       // Await the simple elevation request
       await doGetWait(req, res, options);
     }
