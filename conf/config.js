@@ -193,6 +193,7 @@ module.exports = {
     client_id: 'xxxxx',
     client_secret: 'xxxxx',
     display_name: 'samaccountname',
+    user_info_source: 'userinfo_endpoint', // Options: 'id_token' or 'userinfo_endpoint'. If 'id_token', display name will be extracted from the id token. If 'userinfo_endpoint', display name will be extracted from the user info response.
     clients: {
       my_client: 'https://www.myclient.se',
       my_other_client: 'https://www.myotherclient.com'
