@@ -141,6 +141,8 @@ async function listAssets(planid, res, next) {
 
     if (fileinfos.length > 0) {
         res.json({ "attachmentInfos": fileinfos });        
+    } else {
+        res.json({ "attachmentInfos": [] });
     }
 }
 
