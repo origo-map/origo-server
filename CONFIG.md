@@ -92,6 +92,24 @@ An openID connect provider is required for this to work.
 
     	display_name - attribute from user-information displayed in the user menu (Origo with oidc-plugin).
 
+    	The settings below are used where login is limited to members of an AD group (report-issues, matomoDashboard, dialogkarta and attachment). Members of nested groups count.
+
+    	ad_url - url to the AD server, f.e. 'ldaps://ad.example.se'.
+
+    	ad_base_dn - base DN for the lookups, f.e. 'dc=example,dc=se'.
+
+    	ad_username - the AD account used for the lookups.
+
+    	ad_password - the password for the AD account. Preferably set it with an environment variable.
+
+    	ad_ca_file - the CA certificate for the AD server, if Node doesn't trust it. A relative path is from the server's root folder.
+
+    	ad_cache_minutes - how long the members of a group are cached. Default 15.
+
+    	ad_group - the AD group, or a list of groups, used where no group of its own is set. Optional.
+
+    	username_claim - the claim in userinfo with the user's AD username (sAMAccountName). Default 'sub'.
+
 - NGP Detaljplan - get documents from detailed plans
 
 Acts as a attachment server for files from Nationella geodataplattformen (NGP). First setup the Oauth2 keys in [Lantmäteriet APImanager](https://apimanager.lantmateriet.se/devportal/apis) and add GeodatakatalogSökning and GeodatakatalogNedladdning as subscribtions.
@@ -107,3 +125,19 @@ Acts as a attachment server for files from Nationella geodataplattformen (NGP). 
     	scope - the scope used to get the token from Lantmäteriet API, f.e. 'am_application_scope default'.
 
     	query - A string with JSON to specify the query on which a detailed plan is searched for and specify where to inject identifier in the query between two $ characters, f.e. '{"feature.typ": {"eq": "detaljplan"}, "detaljplan.beteckning": {"eq": "$planid$"}, "detaljplan.status": {"in": ["laga kraft"]}}'.
+
+- Attachment - stores attachments for features in layers as files, at /origoserver/attachment/. Only enabled when attachment exists in config.js.
+
+    	filepath - the directory for the files. They are stored as <filepath>/<layer>/<object>/<group>/<file name>.
+
+    	maxFileSize - the largest file in bytes. Default 26214400 (25 MB). A larger file gets 413.
+
+    	allowedExtensions - the file extensions (without dot) that may be uploaded. Other files get 415. Default jpg, jpeg, png, gif, webp, heic, bmp, tif, tiff, pdf, txt, csv, rtf, doc, docx, xls, xlsx, ppt, pptx, odt, ods, odp, msg, eml, dwg, dxf, zip.
+
+    	require_login - true to require login for uploading and deleting attachments; reading is always open. Default false, for sites without AD. The user is taken from the session cookie set when the map logs in through /origoserver/auth (the OIDC plugin), so this requires that auth, session and reportIssues are configured (the AD account for the group lookup is taken from reportIssues) and that the map is on the same address as origoserver.
+
+    	ad_group - the AD group, or a list of groups, whose members may upload and delete. Default the group in reportIssues.
+
+    	allowed_origins - with require_login: the addresses (Origin) that may upload and delete, e.g. ['https://karta.sundsvall.se']. The session cookie is sent with requests from other sites too, so other origins are refused. Default the same address as the server (Host or X-Forwarded-Host).
+
+    	inlineExtensions - the file extensions that open in the browser. Everything else is sent as a download, and all files are sent with nosniff and a sandbox Content-Security-Policy. Default jpg, jpeg, png, gif, webp, bmp. Don't add svg or html, since they can run scripts.

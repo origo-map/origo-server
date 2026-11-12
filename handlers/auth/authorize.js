@@ -13,6 +13,6 @@ module.exports = async function authorize(req, res) {
     res.redirect(authorizationUrl);
   } catch (e) {
     console.error(e.toString());
-    res.status(500).send('authorize error');
+    res.status(500).send(e.toString());
   }
 };

@@ -15,6 +15,7 @@ module.exports = async function access_token(req, res) {
         code: code,
         redirect_uri: conf.auth.redirect_uri
       });
+      req.session.tokenSet = token_set;
     } else if (refresh_token && refresh_token.length) {
       token_set = await client.grant({
         grant_type: 'refresh_token',
@@ -23,17 +24,26 @@ module.exports = async function access_token(req, res) {
     } else {
       res.status(400).send('Bad Request: Neither code nor refresh token found.');
     }
-    const user_info = await client.userinfo(token_set.access_token);
-    res.json({
-      authenticated: true,
-      access_token: token_set.access_token,
-      refresh_token: token_set.refresh_token,
-      id_token: token_set.id_token,
-      expires_at: token_set.expires_at,
-      displayname: user_info[conf.auth.display_name]
-    });
+    if (token_set !== null) {
+      const user_info = await client.userinfo(token_set.access_token);
+      req.session.userinfo = user_info;
+      req.session.loggedInUser = user_info.sub;
+      res.json({
+        authenticated: true,
+        access_token: token_set.access_token,
+        refresh_token: token_set.refresh_token,
+        id_token: token_set.id_token,
+        expires_at: token_set.expires_at,
+        displayname: user_info[conf.auth.display_name]
+      });
+    }
   } catch (e) {
-    console.error(e.toString());
+    console.error('access_token error', e);
+    const rawBodyForLog = JSON.stringify(req.body) || String(req.body);
+    const safeBodyForLog = rawBodyForLog
+      .replace(/[\x00-\x1F\x7F]/g, ' ')
+      .slice(0, 2000);
+    console.error('body', safeBodyForLog);
     res.status(500).send('access_token error');
   }
 };
