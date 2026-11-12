@@ -12,6 +12,7 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "activedirectory2": "^2.2.0",
     "axios": "^1.16.1",
     "bluebird": "^3.7.2",
     "cookie-parser": "~1.4.7",
