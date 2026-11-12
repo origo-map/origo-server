@@ -18,13 +18,13 @@ var singleSearch = function(req, res) {
 
   var db = dbType(connector);
   var dbModel = model[db];
-  var searchString = dbModel(query, searchModel);
+  var searchQuery = dbModel(query, searchModel);
 
   var queries = [];
 
-  queries.push({
-    queryString: searchString
-  });
+  queries.push(typeof searchQuery === 'string' ? {
+    queryString: searchQuery
+  } : searchQuery);
 
   dbConnectors[db](res, queries, connector[db])
     .then(function(result) {

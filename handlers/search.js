@@ -24,10 +24,10 @@ var search = function(req, res) {
       } else {
         options.limit = options.limit || 100;
       }
-      var searchString = model[db](query, options);
-      queries.push({
-        queryString: searchString
-      });
+      var searchQuery = model[db](query, options);
+      queries.push(typeof searchQuery === 'string' ? {
+        queryString: searchQuery
+      } : searchQuery);
     });
 
     var connector = Object.assign({}, connectors[db], multiSearchModel);
