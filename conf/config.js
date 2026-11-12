@@ -16,7 +16,10 @@ module.exports = {
     scope: 'am_application_scope default'
   },
   proxy: {
-    proxyUrl: 'proxy?url='
+    // Whitelist for /proxy?url=. Protocol and host must match exactly, and the path must
+    // start with the given path. An empty list denies all requests.
+    // Example: 'https://karta.example.se/geoserver/'
+    allowedUrls: []
   },
   'lmproxy-ver': {
     url: "http://maps-ver.lantmateriet.se/",
