@@ -5,7 +5,7 @@
 The minimum requirements are:
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (version 4 or higher is recommended)
+- [Node.js](https://nodejs.org/) (version 22 with latest version or higher is recommended)
 
 1.  To get your own local copy of Origo server use git to clone the repository with the command below:
 
