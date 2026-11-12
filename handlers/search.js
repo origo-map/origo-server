@@ -15,7 +15,7 @@ var search = function(req, res) {
   multiSearchModels.forEach((multiSearchModel) => {
     var db = multiSearchModel.connector || dbType(connectors) || 'pg';
     var queries = [];
-    var tables = req.query.layers || multiSearchModel.tables;
+    var tables = multiSearchModel.tables;
     tables.forEach((table) => {
       var options = Object.assign({}, connectors[db], multiSearchModel, table);
       options.limit = options.limit || dbConfig.limit;
@@ -24,10 +24,10 @@ var search = function(req, res) {
       } else {
         options.limit = options.limit || 100;
       }
-      var searchString = model[db](query, options);
-      queries.push({
-        queryString: searchString
-      });
+      var searchQuery = model[db](query, options);
+      queries.push(typeof searchQuery === 'string' ? {
+        queryString: searchQuery
+      } : searchQuery);
     });
 
     var connector = Object.assign({}, connectors[db], multiSearchModel);

@@ -22,19 +22,19 @@ var searchAddressEstate = function(req, res) {
   }
 
   var db = dbType(connector);
-  var addressString = model[db](query, addressModel);
-  var estatesString = model[db](query, estatesModel);
+  var addressQuery = model[db](query, addressModel);
+  var estatesQuery = model[db](query, estatesModel);
 
   var queries = [];
 
-  queries.push({
-    queryString: addressString,
-    cb: addressCb
-  });
-  queries.push({
-    queryString: estatesString,
-    cb: estateCb
-  });
+  queries.push(Object.assign(
+    typeof addressQuery === 'string' ? { queryString: addressQuery } : addressQuery,
+    { cb: addressCb }
+  ));
+  queries.push(Object.assign(
+    typeof estatesQuery === 'string' ? { queryString: estatesQuery } : estatesQuery,
+    { cb: estateCb }
+  ));
 
   dbConnectors[db](res, queries, connector[db])
     .then(function(result) {
