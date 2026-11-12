@@ -13,7 +13,6 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions) {
   var sqlFields = fields ? fields.join(',') + "," : "";
   var type = " '" + (customType ?? table) + "'" + " AS TYPE, ";
   var title = queryOptions.title ? " '" + queryOptions.title + "'" + ' AS "TITLE", ' : '';
-  var condition = queryString;
   var searchString;
   var limit = queryOptions.limit ? "TOP " + queryOptions.limit.toString() + " " : "";
 
@@ -25,10 +24,15 @@ var mssqlDefault = function mssqlDefault(queryString, queryOptions) {
     title +
     wkt +
     " FROM " + database + "." + schema + "." + table +
-    " WHERE LOWER(" + searchField + ") LIKE LOWER('" + condition + "%')" + " " +
+    " WHERE LOWER(" + searchField + ") LIKE LOWER(@search)" + " " +
     " ORDER BY " + searchField + "";
 
-  return searchString;
+  return {
+    queryString: searchString,
+    parameters: {
+      search: queryString + '%'
+    }
+  };
 };
 
 module.exports = mssqlDefault;
