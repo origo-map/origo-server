@@ -63,7 +63,7 @@ Configured services at:
 
       /origoserver/document/page_{vers}_{subdoc}_{page}_{archive}_{id}.djvu
 
-- Search
+- Search (_consider using a db acct with minimal permissions_)
 
       /origoserver/addressestatesearch?q={defined in dbconfig.js}
 

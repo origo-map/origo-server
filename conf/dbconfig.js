@@ -1,6 +1,7 @@
 module.exports = {
   limit: 10,
   connectors: {
+    // Consider using database users with minimal permissions
       addressEstate: {
           mssql: {
             user: 'xxxxx',
