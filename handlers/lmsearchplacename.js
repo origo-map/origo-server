@@ -4,6 +4,7 @@ var rp = require('request-promise');
 var Bluebird = require('bluebird');
 const url = require('url');
 var getMunicipality = require('../lib/utils/municipality');
+const { compareRelevance, compareNamesNaturally } = require('../utils/compare');
 
 var objectIds;
 var username;
@@ -129,7 +130,7 @@ async function doSearchAsyncCall(req, res, municipalityArray, urlParams) {
   var promiseArray = [];
   // Split all the separate municipality given to individual searches
   municipalityArray.forEach(function(municipality) {
-    var searchUrl = encodeURI(configOptions.url + urlParams + '&kommunkod=' + municipality)
+    const searchUrl = municipality ? encodeURI(configOptions.url + urlParams + '&kommunkod=' + municipality) : encodeURI(configOptions.url + urlParams);
     // Setup the search call and wait for result
     const options = {
         url: searchUrl,
@@ -145,7 +146,7 @@ async function doSearchAsyncCall(req, res, municipalityArray, urlParams) {
       .then(function (result) {
         var parameters = JSON.parse(result);
         var newRes = [];
-        newRes = concatResult(parameters.features, municipality);
+        newRes = concatResult(parameters.features, municipality, req.query.q);
         return newRes;
       })
       .catch(function (err) {
@@ -175,7 +176,7 @@ async function doSearchAsyncCall(req, res, municipalityArray, urlParams) {
     });
 }
 
-function concatResult(placenames, municipality) {
+function concatResult(placenames, municipality, searchString) {
   const result = [];
 
   // Check to see if there are multiple hits or a single
@@ -190,6 +191,7 @@ function concatResult(placenames, municipality) {
       result.push(getOrtnamn(placenames, municipality));
     }
   }
+  result.sort((a, b) => compareRelevance(a.properties.name, b.properties.name, searchString) || compareNamesNaturally(a.properties.name, b.properties.name));
   return result;
 }
 

@@ -4,9 +4,11 @@ var request = require('request');
 var rp = require('request-promise');
 var Bluebird = require('bluebird');
 const url = require('url');
+const { compareRelevance, compareNamesNaturally } = require('../utils/compare');
 
 var objectIds;
 var fnrObjektidentitet;
+var fnrObjektidentitetGA;
 var username;
 var password;
 var srid;
@@ -21,6 +23,7 @@ var proxyUrl = 'lmsearchestate';
 var configOptions;
 objectIds = [];
 fnrObjektidentitet = '';
+fnrObjektidentitetGA = '';
 
 // Do the request in proper order
 const lmSearchEstate = async (req, res) => {
@@ -93,7 +96,7 @@ const lmSearchEstate = async (req, res) => {
       objectIds.length = objectIds.length > 250 ? 250 : objectIds.length;
 
       // Do a POST with all the IDs from free search to get the complete objects with geometry
-      await getEstateAsyncCall(req, res);
+      await getEstateAsyncCall(req, res, municipalityArray);
       // Reset the array of found objects.
       objectIds = [];
     } else {
@@ -131,10 +134,15 @@ const lmGetEstateFromPoint = async (req, res) => {
 
       if (typeof fnrObjektidentitet === 'undefined') {
         // fnr is undefined do nothing
-      } else {
-        if (typeof fnrObjektidentitet !== '') {
+    } else {
+        if (fnrObjektidentitet !== '') {
           req.url = req.url + '&fnr=' + fnrObjektidentitet;
           lmGetEstate(req, res, type);
+        } else if (fnrObjektidentitetGA !== '') {
+          req.url = req.url + '&fnr=' + fnrObjektidentitetGA;
+          lmGetEstate(req, res, type);
+        } else {
+          res.send({error: 'Hittar ingen fastighet'});
         }
       }
     } else {
@@ -144,6 +152,7 @@ const lmGetEstateFromPoint = async (req, res) => {
     res.send({});
   }
   fnrObjektidentitet = '';
+  fnrObjektidentitetGA = '';
 }
 
 // Export the module
@@ -203,7 +212,6 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
           'scope': `${scope}`
         }
     }
-
     promiseArray.push(rp.get(options)
       .then(function(result) {
         var parameters = JSON.parse(result);
@@ -237,11 +245,11 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
     });
 }
 
-function getEstateWait(options, res) {
+function getEstateWait(options, res, municipalityArray) {
   rp(options)
   .then(function (parsedBody) {
     // Send the resulting object as json and end response
-    res.send(concatResult(parsedBody.features));
+    res.send(concatResult(parsedBody.features, municipalityArray, options.searchString));
   })
   .catch(function (err) {
     console.log(err);
@@ -250,7 +258,7 @@ function getEstateWait(options, res) {
   });
 }
 
-async function getEstateAsyncCall(req, res) {
+async function getEstateAsyncCall(req, res, municipalityArray) {
   if (objectIds.length > 0) {
     // Setup the call for getting the objects found in search and wait for result
     var options = {
@@ -264,7 +272,7 @@ async function getEstateAsyncCall(req, res) {
       },
       json: true
     };
-    getEstateWait(options, res);
+    getEstateWait(options, res, municipalityArray);
   } else {
     console.log('No objects!');
     res.send({});
@@ -284,16 +292,18 @@ function makeRequest(req, res, options) {
   })
 }
 
-function concatResult(features) {
+function concatResult(features, municipalityArray, searchString) {
   const result = [];
 
   features.forEach((feature) => {
     let objektidentitet = '';
-    const registeromrade = feature.properties.registerbeteckning[0].registeromrade ? feature.properties.registerbeteckning[0].registeromrade : '';
-    const beteckningsid = feature.properties.registerbeteckning[0].objektidentitet;
-    const beteckning = feature.properties.registerbeteckning[0].trakt ? feature.properties.registerbeteckning[0].trakt : '';
-    const block = feature.properties.registerbeteckning[0].block ? feature.properties.registerbeteckning[0].block : '';
-    const enhet = feature.properties.registerbeteckning[0].enhet ? feature.properties.registerbeteckning[0].enhet : '';
+    // Get the current assignation incase there are more than one
+    const gallandBeteckning = feature.properties.registerbeteckning.find(beteckning => beteckning.beteckningsstatus === "gällande");
+    const registeromrade = gallandBeteckning.registeromrade ? gallandBeteckning.registeromrade : '';
+    const beteckningsid = gallandBeteckning.objektidentitet;
+    const beteckning = gallandBeteckning.trakt ? gallandBeteckning.trakt : '';
+    const block = gallandBeteckning.block ? gallandBeteckning.block : '';
+    const enhet = gallandBeteckning.enhet ? gallandBeteckning.enhet : '';
     let coordinates = [];
     // Check to see if feature has none or multiple coordinates
     if ('registerenhetsreferens' in feature.properties) {
@@ -352,9 +362,15 @@ function concatResult(features) {
 
     // Only show those that has coordinates
     if (coordinates.length !== 0) {
-      result.push(object);
+      // Only show those municipalities that has been searched in
+      var municipalityArrayLower = municipalityArray.map(v => v.toLowerCase());
+      if (municipalityArrayLower.includes(registeromrade.toLowerCase())) {
+        result.push(object);
+      }
     }
   })
+
+  result.sort((a, b) => compareRelevance(a.properties.name, b.properties.name, searchString) || compareNamesNaturally(a.properties.name, b.properties.name));
 
   return result;
 }
@@ -362,6 +378,7 @@ function concatResult(features) {
 function doGetFromPointWait(req, res, options) {
   rp(options)
   .then(function (parsedBody) {
+    console.log('doGetFromPointWait result: ' + JSON.stringify(parsedBody));
     res.send(concatEstateNameResult(parsedBody));
   })
   .catch(function (err) {
@@ -383,7 +400,6 @@ async function doGetFromPointAsyncCall(req, res, configOptions, easting, northin
       },
       json: true // Automatically parses the JSON string in the response
   }
-
   await doGetFromPointWait(req, res, options);
 }
 
@@ -432,7 +448,6 @@ async function doGetEstateNumberAsyncCall(configOptions, easting, northing) {
       },
       json: true // Automatically parses the JSON string in the response
   }
-
   promiseArray.push(rp(options)
     .then(function (parsedBody) {
       concatEstateNumberResult(parsedBody);
@@ -446,10 +461,11 @@ async function doGetEstateNumberAsyncCall(configOptions, easting, northing) {
   await Promise.all(promiseArray)
     .then(function (returnValue) {
         // The result has been handled in concatEstateNumberResult()
-    })
+      })
     .catch(function (err) {
         // If fail return empty array
         fnrObjektidentitet = '';
+        fnrObjektidentitetGA = '';
     })
     .finally(function () {
         // The result has been handled in concatEstateNumberResult()
@@ -464,7 +480,7 @@ function concatEstateNumberResult(feature) {
       if ('registerenhetsreferens' in element.properties) {
         fnrObjektidentitet = element.properties.registerenhetsreferens.objektidentitet;
       } else if ('gemensamhetsanlaggningsreferens' in element.properties) {
-        fnrObjektidentitet = element.properties.gemensamhetsanlaggningsreferens.objektidentitet;
+        fnrObjektidentitetGA = element.properties.gemensamhetsanlaggningsreferens.objektidentitet;
       }
     })
   }
