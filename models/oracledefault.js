@@ -12,7 +12,6 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
   var sqlFields = fields ? fields.join(',') + "," : "";
   var type = "'" + (customType ?? table) + "' AS type,";
   var title = queryOptions.title ? " '" + queryOptions.title + "'" + ' AS TITLE, ' : '';
-  var condition = queryString;
   var searchString;
   var sdo_geom_metadata;
   if (queryOptions.hasOwnProperty('metadata')) {
@@ -31,11 +30,16 @@ var oracleDefault = function oracleDefault(queryString, queryOptions) {
     title +
     wkt + " " +
     "FROM " + schema + "." + table + ", user_sdo_geom_metadata m " +
-    "WHERE " + sdo_geom_metadata + "' AND lower(" + searchField + ") LIKE lower('" + condition + "%')" + " " +
+    "WHERE " + sdo_geom_metadata + "' AND lower(" + searchField + ") LIKE lower(:search)" + " " +
     "ORDER BY " + searchField +
     limit;
 
-  return searchString;
+  return {
+    queryString: searchString,
+    binds: {
+      search: queryString + '%'
+    }
+  };
 }
 
 module.exports = oracleDefault;
