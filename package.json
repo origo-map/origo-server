@@ -33,7 +33,9 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "uuid-by-string": "^4.0.0",
-    "wkt": "^0.1.1"
+    "wkt": "^0.1.1",
+    "uuid":"^14.0.3",
+    "mime-types":"^3.0.2"
   },
   "optionalDependencies": {
     "mssql": "^12.7.14",
