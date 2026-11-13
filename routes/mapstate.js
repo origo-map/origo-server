@@ -1,5 +1,6 @@
 const fs = require("fs");
-const { v4: uuidV4 } = require('uuid');
+const path = require("path");
+const { v4: uuidV4, validate: uuidValidate, version: uuidVersion } = require('uuid');
 const origoConfig = require('../conf/config');
 const express = require('express');
 const mapstateRouter = express.Router();
@@ -44,7 +45,7 @@ mapstateRouter.post('/', function (req, res) {
     fs.writeFile(getFileName(mapstateId), JSON.stringify(req.body), function (err) {
         if (err) {
             console.log(err.message);
-            res.set(500).send(err.message);
+            res.set(500).send('Could not save mapstate');
         } else {
             console.log('mapstate file : ' + mapstateId + ' was written successfully.');
             res.send(JSON.stringify({ "mapStateId": mapstateId }));
@@ -55,10 +56,14 @@ mapstateRouter.post('/', function (req, res) {
 mapstateRouter.get('/:mapstateId', function (req, res) {
     //TODO: SANITY CHECK AND ALL THAT STUFF
     const mapstateId = req.params["mapstateId"];
+    // Only accept UUIDv4 ids, prevents path traversal and log injection
+    if (!uuidValidate(mapstateId) || uuidVersion(mapstateId) !== 4) {
+        return res.status(400).send('Invalid mapstateId');
+    }
     fs.readFile(getFileName(mapstateId), function (err, data) {
         if (err) {
             console.log(err.message);
-            res.set(500).send(err.message);
+            res.set(500).send('Could not read mapstate');
         } else {
             console.log('mapstate file : ' + mapstateId + ' was read successfully.');
             res.send(data);
@@ -76,11 +81,14 @@ function getFileName (mapstateId) {
     if (!origoConfig.mapState || !origoConfig.mapState.storagePath || origoConfig.mapState.storagePath.length == 0) {
         throw "No path for storing mapState found in configuration";
     }
-    const storageDir = origoConfig.mapState.storagePath;
+    const storageDir = path.resolve(origoConfig.mapState.storagePath);
     if (!fs.existsSync(storageDir)) {
         fs.mkdirSync(storageDir);
     }
-    const fileName = storageDir + "/" + "mapstate-" + mapstateId + ".json";
+    const fileName = path.resolve(storageDir, "mapstate-" + mapstateId + ".json");
+    if (!fileName.startsWith(storageDir + path.sep)) {
+        throw new Error("Invalid mapstateId");
+    }
     return fileName;
 }
 
