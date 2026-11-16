@@ -1,28 +1,22 @@
 var conf = require('../conf/config');
-var request = require('request');
 var rp = require('request-promise');
 var transformCoordinates = require('../lib/utils/transformcoordinates');
 const url = require('url');
+const lmtokenhandler = require('./lmtokenhandler');
 //var Promise = require('bluebird');
 
-var objectIds;
-var username;
-var password;
-var srid;
 var validProjs = ["3006", "3007", "3008", "3009", "3010", "3011", "3012", "3013", "3014", "3015", "3016", "3017", "3018", "3857", "4326"];
 
-// Token holder
-let token;
-let scope;
 var proxyUrl = 'lmgetestate';
 
 // Do the request in proper order
 const lmGetEstate = async (req, res, type = 'merged') => {
 
   if (conf[proxyUrl]) {
-    configOptions = Object.assign({}, conf[proxyUrl]);
-    scope = configOptions.scope;
+    const configOptions = Object.assign({}, conf[proxyUrl]);
+    const scope = configOptions.scope;
     const parsedUrl = url.parse(decodeURI(req.url), true);
+    var srid;
     if ('srid' in parsedUrl.query) {
       srid = parsedUrl.query.srid;
     } else {
@@ -36,10 +30,18 @@ const lmGetEstate = async (req, res, type = 'merged') => {
       // Check to see if the fnr are a valid UUID and only proceed if it is
       if (found !== null) {
         // Get a token from LM
-        await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
+        const tokenObject = await lmtokenhandler({
+          id: proxyUrl,
+          url_token: configOptions.url_token,
+          url_revoke: configOptions.url_revoke,
+          consumer_key: configOptions.consumer_key,
+          consumer_secret: configOptions.consumer_secret,
+          scope: configOptions.scope
+        });
+        const token = tokenObject.token;
 
         // Do a POST with all the IDs from free search to get the complete objects with geometry
-        await doGetAsyncCall(req, res, configOptions, fnr, type);
+        await doGetAsyncCall(req, res, configOptions, fnr, type, token, scope, srid);
       } else {
         res.send({});
       }
@@ -52,42 +54,7 @@ const lmGetEstate = async (req, res, type = 'merged') => {
 // Export the module
 module.exports = lmGetEstate;
 
-function getTokenWait(options) {
-  // Return promise to be invoked for authenticating on service requests
-  return new Promise((resolve, reject) => {
-      // Requesting the token service object
-      request(options, (error, response, body) => {
-          if (error) {
-            console.log('Error token:' + error);
-            reject('An error occured collecting token: ', error);
-          } else {
-            token = body.access_token;
-            // console.log('Got token ' + token);
-            resolve(body.access_token);
-          }
-      })
-  })
-}
-
-async function getTokenAsyncCall(consumer_key, consumer_secret, scope) {
-  // Request a token from Lantmateriet API
-  const options = {
-      url: configOptions.url_token,
-      method: 'POST',
-      headers: {
-         'Authorization': 'Basic ' + Buffer.from(consumer_key + ':' + consumer_secret).toString('base64')
-      },
-      form: {
-          'scope': scope,
-          'grant_type': 'client_credentials'
-      },
-      json: true
-  }
-  var result = await getTokenWait(options);
-  return result;
-}
-
-function doGetWait(req, res, options, type) {
+function doGetWait(req, res, options, type, srid) {
   rp(options)
   .then(function (parsedBody) {
     if (type === 'full') {
@@ -103,7 +70,7 @@ function doGetWait(req, res, options, type) {
   });
 }
 
-async function doGetAsyncCall(req, res, configOptions, fnr, type) {
+async function doGetAsyncCall(req, res, configOptions, fnr, type, token, scope, srid) {
   // Setup the search call and wait for result
   const options = {
       url: encodeURI(configOptions.url + '/' + fnr + '?includeData=total' + '&srid=' + srid),
@@ -116,7 +83,7 @@ async function doGetAsyncCall(req, res, configOptions, fnr, type) {
       json: true // Automatically parses the JSON string in the response
   }
 
-  await doGetWait(req, res, options, type);
+  await doGetWait(req, res, options, type, srid);
 }
 
 function concatResult(feature) {

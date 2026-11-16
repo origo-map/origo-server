@@ -1,32 +1,28 @@
 var conf = require('../conf/config');
-var request = require('request');
 var rp = require('request-promise');
 const url = require('url');
 const { compareRelevance, compareNamesNaturally } = require('../utils/compare');
-
-var objectIds;
-var srid;
-var maxHits;
-var statusAddress;
-var format;
-
-// Token holder
-let token;
-let scope;
+const lmtokenhandler = require('./lmtokenhandler');
 
 var proxyUrl = 'lmsearchaddress';
-var configOptions;
-objectIds = [];
 
 // Do the request in proper order
 const lmSearchAddress = async (req, res) => {
 
   if (conf[proxyUrl]) {
-    configOptions = Object.assign({}, conf[proxyUrl]);
-    scope = configOptions.scope;
+    const configOptions = Object.assign({}, conf[proxyUrl]);
+    const scope = configOptions.scope;
 
     // Get a token from LM
-    await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
+    const tokenObject = await lmtokenhandler({
+      id: proxyUrl,
+      url_token: configOptions.url_token,
+      url_revoke: configOptions.url_revoke,
+      consumer_key: configOptions.consumer_key,
+      consumer_secret: configOptions.consumer_secret,
+      scope: configOptions.scope
+    });
+    const token = tokenObject.token;
 
     // Get the query parameters from the url
     const parsedUrl = url.parse(decodeURI(req.url), true);
@@ -45,6 +41,11 @@ const lmSearchAddress = async (req, res) => {
         searchValue = searchValue + ' ' + searchArray[index];
       }
     }
+    var srid;
+    var maxHits;
+    var format;
+    var statusAddress;
+    var municipalityCodes;
     if ('srid' in parsedUrl.query) {
       srid = parsedUrl.query.srid;
     } else {
@@ -71,23 +72,22 @@ const lmSearchAddress = async (req, res) => {
       municipalityCodes = [];
     }
     if (northing !== undefined && easting !== undefined) {
-      getAddressPointAsyncCall(northing, easting, req, res);
+      getAddressPointAsyncCall(northing, easting, req, res, configOptions, token, scope, srid, format);
     } else {
+      var objectIds;
       if (municipalityCodes.length > 0) {
         // Do a free text search with municipality codes to get the IDs of all that matches
-        await doSearchWithCodesAsyncCall(municipalityCodes, searchString);
+        objectIds = await doSearchWithCodesAsyncCall(municipalityCodes, searchString, configOptions, token, scope, statusAddress, maxHits);
       } else {
         // Do a free text search to get the IDs of all that matches
-        await doSearchAsyncCall(municipalityArray, searchValue);
+        objectIds = await doSearchAsyncCall(municipalityArray, searchValue, configOptions, token, scope, statusAddress, maxHits);
       }
 
       // Allow a maximum of 250 objects
       objectIds.length = objectIds.length > 250 ? 250 : objectIds.length;
 
       // Do a POST with all the IDs from free search to get the complete objects with geometry
-      await getAddressAsyncCall(req, res);
-      // Reset the array of found objects.
-      objectIds = [];
+      await getAddressAsyncCall(req, res, objectIds, configOptions, token, scope, srid);
     }
   }
 }
@@ -95,57 +95,10 @@ const lmSearchAddress = async (req, res) => {
 // Export the module
 module.exports = lmSearchAddress;
 
-function getTokenWait(options) {
-  // Return promise to be invoked for authenticating on service requests
-  return new Promise((resolve, reject) => {
-      // Requesting the token service object
-      request(options, (error, response, body) => {
-          if (error) {
-            console.log('Error token:' + error);
-            reject('An error occured collecting token: ', error);
-          } else {
-            token = body.access_token;
-            // console.log('Got token ' + token);
-            resolve(body.access_token);
-          }
-      })
-  })
-}
-
-async function getTokenAsyncCall(consumer_key, consumer_secret, scope) {
-  // Request a token from Lantmateriet API
-  const options = {
-      url: configOptions.url_token,
-      method: 'POST',
-      headers: {
-         'Authorization': 'Basic ' + Buffer.from(consumer_key + ':' + consumer_secret).toString('base64')
-      },
-      form: {
-          'scope': scope,
-          'grant_type': 'client_credentials'
-      },
-      json: true
-  }
-  var result = await getTokenWait(options);
-  return result;
-}
-
-function doSearchWait(options) {
-  return rp.get(options)
-  .then(function(result) {
-    var parameters = JSON.parse(result);
-
-    parameters.forEach(function(parameter) {
-      if (parameter.objektidentitet) {
-        objectIds.push(parameter.objektidentitet);
-      }
-    });
-  })
-}
-
-async function doSearchWithCodesAsyncCall(municipalityCodes, searchValue) {
+async function doSearchWithCodesAsyncCall(municipalityCodes, searchValue, configOptions, token, scope, statusAddress, maxHits) {
   var returnValue = [];
   var promiseArray = [];
+  var objectIds = [];
   // Split all the separate municipality given to individual searches
   municipalityCodes.forEach(function(municipality) {
     var searchUrl = encodeURI(configOptions.url + '/referens/fritext?adress=' + searchValue.replaceAll(',','') + ' &kommunkod=' + municipality + '&status=' + statusAddress + '&maxHits=' + maxHits)
@@ -191,11 +144,13 @@ async function doSearchWithCodesAsyncCall(municipalityCodes, searchValue) {
         });
         objectIds = newArray;
     });
+  return objectIds;
 }
 
-async function doSearchAsyncCall(municipalityArray, searchValue) {
+async function doSearchAsyncCall(municipalityArray, searchValue, configOptions, token, scope, statusAddress, maxHits) {
   var returnValue = [];
   var promiseArray = [];
+  var objectIds = [];
   // Split all the separate municipality given to individual searches
   municipalityArray.forEach(function(municipality) {
     var searchUrl = encodeURI(configOptions.url + '/referens/fritext?adress=' + searchValue.replaceAll(',','') + ' ' + municipality + '&status=' + statusAddress + '&maxHits=' + maxHits)
@@ -241,6 +196,7 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
         });
         objectIds = newArray;
     });
+  return objectIds;
 }
 
 function getAddressWait(options, res) {
@@ -256,7 +212,7 @@ function getAddressWait(options, res) {
   });
 }
 
-function getAddressPointWait(options, res) {
+function getAddressPointWait(options, res, configOptions, token, scope, srid, format) {
   rp(options)
   .then(function (result) {
     var parameters = JSON.parse(result);
@@ -294,7 +250,7 @@ function getAddressPointWait(options, res) {
   });
 }
 
-async function getAddressAsyncCall(req, res) {
+async function getAddressAsyncCall(req, res, objectIds, configOptions, token, scope, srid) {
   // Setup the call for getting the objects found in search and wait for result
   var options = {
     method: 'POST',
@@ -315,7 +271,7 @@ async function getAddressAsyncCall(req, res) {
   }
 }
 
-async function getAddressPointAsyncCall(northing, easting, req, res) {
+async function getAddressPointAsyncCall(northing, easting, req, res, configOptions, token, scope, srid, format) {
   // Setup the call for getting the objects found in search and wait for result
   var options = {
     method: 'GET',
@@ -326,7 +282,7 @@ async function getAddressPointAsyncCall(northing, easting, req, res) {
       'scope': `${scope}`
     }
   };
-  await getAddressPointWait(options, res);
+  await getAddressPointWait(options, res, configOptions, token, scope, srid, format);
 }
 
 function concatResult(features, searchString) {
