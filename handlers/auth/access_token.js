@@ -2,6 +2,8 @@ const openidIssuer = require('./openidIssuer');
 const conf = require('../../conf/config');
 
 module.exports = async function access_token(req, res) {
+  // Which endpoint the current call goes to, for the log if it fails.
+  let endpoint = 'token_endpoint';
   try {
     const client = await openidIssuer.getOpenidClient();
     const code = req.body.code;
@@ -25,6 +27,7 @@ module.exports = async function access_token(req, res) {
       res.status(400).send('Bad Request: Neither code nor refresh token found.');
     }
     if (token_set !== null) {
+      endpoint = 'userinfo_endpoint';
       const user_info = await client.userinfo(token_set.access_token);
       req.session.userinfo = user_info;
       req.session.loggedInUser = user_info.sub;
@@ -39,6 +42,7 @@ module.exports = async function access_token(req, res) {
     }
   } catch (e) {
     console.error('access_token error', e);
+    openidIssuer.resetOnNetworkError(e, endpoint);
     const rawBodyForLog = JSON.stringify(req.body) || String(req.body);
     const safeBodyForLog = rawBodyForLog
       .replace(/[\x00-\x1F\x7F]/g, ' ')

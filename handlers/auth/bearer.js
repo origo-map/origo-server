@@ -34,6 +34,7 @@ async function userFromRequest(req) {
       cache.delete(key);
       return null;
     }
+    openidIssuer.resetOnNetworkError(err, 'userinfo_endpoint');
     throw err;
   }
 
