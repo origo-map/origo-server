@@ -88,10 +88,21 @@ function doGet(req, res, configOptions, srid, output) {
     }
   })
   .catch(function (err) {
-    console.log(err);
-    console.log('ERROR doGet!');
+    // Not the whole err: err.options.body is the query with the authenticationkey.
+    console.error(`ERROR doGet! tvapi ${configOptions.name}:`, describeRequestError(err));
     res.send({});
   });
+}
+
+// A request-promise error as a short string without the request: the status and the start of the
+// response body, or the network error code.
+function describeRequestError(err) {
+  if (err.statusCode) {
+    const body = typeof err.error === 'string' ? err.error : JSON.stringify(err.error);
+    return `HTTP ${err.statusCode} ${String(body).slice(0, 500)}`;
+  }
+  const cause = err.cause || err.error;
+  return (cause && (cause.code || cause.message)) || err.message;
 }
 
 function createGeojson(entities, configOptions, srid) {

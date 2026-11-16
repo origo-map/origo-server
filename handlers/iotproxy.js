@@ -50,10 +50,21 @@ function doGet(req, res, configOptions, srid) {
     res.send(createGeojson(parsedBody, configOptions, srid));
   })
   .catch(function (err) {
-    console.log(err);
-    console.log('ERROR doGetFromPointWait!');
+    // Not the whole err: err.options and err.response hold the url, which can contain an API key.
+    console.error(`ERROR doGetFromPointWait! iotproxy ${configOptions.name}:`, describeRequestError(err));
     res.send({});
   });
+}
+
+// A request-promise error as a short string without the url: the status and the start of the
+// response body, or the network error code.
+function describeRequestError(err) {
+  if (err.statusCode) {
+    const body = typeof err.error === 'string' ? err.error : JSON.stringify(err.error);
+    return `HTTP ${err.statusCode} ${String(body).slice(0, 500)}`;
+  }
+  const cause = err.cause || err.error;
+  return (cause && (cause.code || cause.message)) || err.message;
 }
 
 

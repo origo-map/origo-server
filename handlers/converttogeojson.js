@@ -38,7 +38,7 @@ const convertToGeojson = async (req, res) => {
     } else {
       q = '';
       console.log('No converting specified!');
-      res.send({});
+      res.status(501).send({ error: 'No converting specified!'});
     }
 
     if (conf[proxyUrl]) {
@@ -54,9 +54,20 @@ const convertToGeojson = async (req, res) => {
       });
     } else {
       console.log('ERROR config!');
-      res.send({});
+      res.status(501).send({ error: 'ERROR config!'});
     }
   }
+}
+
+// A request-promise error as a short string without url or headers: the status and the start of
+// the response body, or the network error code.
+function describeRequestError(err) {
+  if (err.statusCode) {
+    const body = typeof err.error === 'string' ? err.error : JSON.stringify(err.error);
+    return `HTTP ${err.statusCode} ${String(body).slice(0, 500)}`;
+  }
+  const cause = err.cause || err.error;
+  return (cause && (cause.code || cause.message)) || err.message;
 }
 
 // Export the module
@@ -83,9 +94,9 @@ function doGet(req, res, configOptions, srid, filterOn, filterValue) {
     res.send(createGeojson(body[configOptions.arrayOfObjects], configOptions, srid, filterOn, filterValue));
   })
   .catch(function (err) {
-    console.log(err);
-    console.log('ERROR doGet!');
-    res.send({});
+    // Not the whole err: err.options and err.response hold the url and headers, i.e. API keys.
+	  console.error(`ERROR doGet! converttogeojson ${configOptions.name}:`, describeRequestError(err));
+	  res.status(500).send({error: 'ERROR doGet!'});
   });
 }
 
