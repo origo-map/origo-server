@@ -152,6 +152,50 @@ async function addGeometryAndMakeGeojson(arrSamfallPromises, configOptions, toke
 }
 
 /**
+ * Makes a array with the contact information for the associations
+ * 
+ * @async
+ * @function
+ * @name makeContactsArray
+ * @kind function
+ * @param {any} arrSamfallPromises
+ * @param {any} configOptions
+ * @param {any} token
+ * @param {any} srid
+ * @returns {Promise<any[]>}
+ */
+async function makeContactsArray(arrSamfallPromises, configOptions, token, srid) {
+    const arrContacts = [];
+    await Promise.all(arrSamfallPromises).then((samfallResults) => {
+        samfallResults.forEach(function(reqPost) {
+            if (reqPost.data) {
+                if (reqPost.data.features.length > 0) {
+                    reqPost.data.features.forEach(function(feature) {
+                        if (feature.properties.samfallighetsforeningsattribut) {
+                            // For each association get the contact info
+                            arrContacts.push({
+                                "objektidentitet": feature.properties.objektidentitet,
+                                "foreningensForetagsnamn": feature.properties.samfallighetsforeningsattribut.foreningensForetagsnamn,
+                                "coAdress": feature.properties.samfallighetsforeningsattribut.coAdress,
+                                "utdelningsadress1": feature.properties.samfallighetsforeningsattribut.utdelningsadress1,
+                                "utdelningsadress2": feature.properties.samfallighetsforeningsattribut.utdelningsadress2,
+                                "postnummer": feature.properties.samfallighetsforeningsattribut.postnummer,
+                                "postort": feature.properties.samfallighetsforeningsattribut.postort,
+                                "organisationsnummer": feature.properties.samfallighetsforeningsattribut.organisationsnummer
+                            });
+                        }
+                    });
+                }
+            } else {
+                res.render('lmCommunityAssociationListError', { error: 'No associations!' });
+            }
+        });
+    });
+
+    return arrContacts;
+}
+
+/**
  * Main function to process requests.
  * Handles token retrieval and directing request handling based on method (GET/POST).
  *
@@ -246,6 +290,7 @@ async function doProcessRequests(req, res, configOptions, token) {
             case 'filter':
                 // Get the query parameters from the url and check that only valid parameters are sent to the API
                 let srid = '3006';
+                let showType = 'lista';
                 const fullUrl = req.protocol + '://' + req.get('host') + req.url;
                 const accessHeader = req.header('Accept');
                 let geojson = false;
@@ -258,7 +303,7 @@ async function doProcessRequests(req, res, configOptions, token) {
                 const params = new URLSearchParams();
                 const parametersToCheck = [
                 'lanskod', 'sate', 'sateMatch', 'kommunkodForvaltningsobjekt',
-                'namn', 'namnMatch', 'foreningstyp', 'andamal', 'maxHits', 'srid'
+                'namn', 'namnMatch', 'foreningstyp', 'andamal', 'maxHits', 'srid', 'showType'
                 ];
                 
                 parametersToCheck.forEach(param => {
@@ -274,6 +319,10 @@ async function doProcessRequests(req, res, configOptions, token) {
                 if (params.has('srid')) {
                     srid = parsedUrl.searchParams.get('srid');
                 }
+                // If srid is set specifically, use that otherwise continue using deafult 3006.
+                if (params.has('showType')) {
+                    showType = parsedUrl.searchParams.get('showType');
+                }
                 const newQueryString = params.toString();
                 const response = await axios({
                     method: 'GET',
@@ -286,7 +335,7 @@ async function doProcessRequests(req, res, configOptions, token) {
                 });
                 const assArray = response.data;
                 if (assArray.length > 0) {
-                    if (geojson) {
+                    if (geojson || showType === 'kontakt') {
                         // If the result should be sent back as a GeoJSON first do a POST and retrieve the objects that is maintain by the association.
                         const objektList = [];
                         assArray.forEach(function(parameter) {
@@ -318,8 +367,14 @@ async function doProcessRequests(req, res, configOptions, token) {
 
                             arrSamfallPromises.push(promise);
                         }
-                        const resultingGeojson = await addGeometryAndMakeGeojson(arrSamfallPromises, configOptions, token, srid);
-                        res.send(resultingGeojson);
+                        let result = {};
+                        if (geojson) {
+                            result = await addGeometryAndMakeGeojson(arrSamfallPromises, configOptions, token, srid);
+                            res.send(result);
+                        } else if (showType === 'kontakt') {
+                            const arrContacts = await makeContactsArray(arrSamfallPromises, configOptions, token, srid);
+                            res.render('lmCommunityAssociationContact', { associations: arrContacts, numberAssociations: arrContacts.length });
+                        }
                     } else {
                         // Sorting the array by the 'foreningensForetagsnamn' key
                         assArray.sort((a, b) => {
@@ -331,7 +386,7 @@ async function doProcessRequests(req, res, configOptions, token) {
                             }
                             return 0;
                         });
-                        res.render('lmCommunityAssociationList', { associations: assArray, numberAssociations: assArray.length });
+                        res.render('lmCommunityAssociationList', { associations: assArray, numberAssociations: assArray.length });   
                     }
                 } else {
                     res.render('lmCommunityAssociationListError', { error: 'No matches!' });
