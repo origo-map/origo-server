@@ -21,6 +21,10 @@ module.exports = {
     // Example: 'https://karta.example.se/geoserver/'
     allowedUrls: []
   },
+  session: {
+    // Secret used to sign the session ID cookie. Change this to a random string in production.
+    secret: "xxxxx",
+  },
   'lmproxy-ver': {
     url: "http://maps-ver.lantmateriet.se/",
     auth: {

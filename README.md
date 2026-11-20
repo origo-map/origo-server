@@ -39,6 +39,19 @@ To uninstall run the following command:
 
 node uninstall_windowsservice.js
 
+### Run the tests
+
+The tests use Node's built-in test runner (`node --test`), so no extra test packages are needed. Run them from the `kod` folder after `npm install`:
+
+      npm run test:attachment
+      npm run test:auth
+
+- test:attachment - the optional login for changing attachments (`handlers/attachment/requireWrite.js`): off by default, the Origin check, `allowed_origins` and the user from the session.
+
+- test:auth - `requireAdGroupMember` (`handlers/auth`) with one or more AD groups, the cached group list when AD fails, and where the user comes from. Also that `openidIssuer` drops the cached OpenID client after network errors, so the next request does discovery again.
+
+Config, tokens and AD are replaced in the tests, so they need neither a login service, AD nor a `conf/config.js`. New tests go in a `test` folder next to the handler, named `*.test.js`, with a matching `test:<name>` script in package.json.
+
 ### Current services provided
 
 Basic configuration needed in conf/config.js and/or conf/dbconfig.js. More information about configuration can be found in the [CONFIG.md](https://github.com/origo-map/origo-server/blob/master/CONFIG.md) file.
