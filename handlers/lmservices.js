@@ -31,6 +31,18 @@ const lmservices = async function lmservices(params = {}) {
     includeData = 'total'
   } = params;
   let returnObj = {};
+  // Parameter checking
+  const checkUuidRegEx = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/i;
+  let foundUuid = fastighet.match(checkUuidRegEx);
+  if (foundUuid === null) {
+    return { error: 'Error: fastighet parameter not valid' }
+  }
+  const checkIncludeDataRegEx = /^[A-Za-z]+$/i;
+  let foundIncludeData = includeData.match(checkIncludeDataRegEx);
+  if (foundIncludeData === null) {
+    return { error: 'Error: includeData parameter not valid' }
+  }
+
   if (conf && conf.lmservices && conf.lmservices.services && conf.lmservices.services[typ]) {
     const serviceConf = conf.lmservices.services[typ];
     if (conf.lmservices.apps && conf.lmservices.apps[serviceConf.app]) {
@@ -222,7 +234,7 @@ const lmservices = async function lmservices(params = {}) {
         }
       } else { returnObj = { error: 'No token' } }
     } else { returnObj = { error: 'Error in configuration' } }
-  } else { returnObj = { error: 'Error in configuration' } }
+  } else { returnObj = { error: 'Error in configuration. Typ missing' } }
   return returnObj;
 }
 module.exports = lmservices;

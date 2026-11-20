@@ -1,38 +1,34 @@
 var conf = require('../conf/config');
-var request = require('request');
 var rp = require('request-promise');
-var Bluebird = require('bluebird');
 const url = require('url');
 var getMunicipality = require('../lib/utils/municipality');
 const { compareRelevance, compareNamesNaturally } = require('../utils/compare');
-
-var objectIds;
-var username;
-var password;
-
-// Token holder
-let token;
-let scope;
+const lmtokenhandler = require('./lmtokenhandler');
 
 var proxyUrl = 'lmsearchplacename';
-var configOptions;
-var srid = '3006';
-objectIds = [];
 
 // Doesn't need the async for now
 const lmSearchPlacename = async (req, res) => {
 
   if (conf[proxyUrl]) {
-    configOptions = Object.assign({}, conf[proxyUrl]);
+    const configOptions = Object.assign({}, conf[proxyUrl]);
+    const scope = configOptions.scope;
 
     // Get a token from LM
-    await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
+    const tokenObject = await lmtokenhandler({
+      id: proxyUrl,
+      url_token: configOptions.url_token,
+      url_revoke: configOptions.url_revoke,
+      consumer_key: configOptions.consumer_key,
+      consumer_secret: configOptions.consumer_secret,
+      scope: configOptions.scope
+    });
+    const token = tokenObject.token;
 
     const parsedUrl = url.parse(decodeURI(req.url), true);
     var kommunkod = '';
     if ('kommunkod' in parsedUrl.query) {
       kommunkod = parsedUrl.query.kommunkod;
-      var kommunkod = parsedUrl.query.kommunkod;
       var municipalityArray = kommunkod.split(',');
       if (municipalityArray.length > 0) {
         var lmuser = parsedUrl.query.lmuser;
@@ -42,6 +38,8 @@ const lmSearchPlacename = async (req, res) => {
         var limit = parsedUrl.query.limit;
         var lang = parsedUrl.query.lang;
         var nametype = parsedUrl.query.nametype;
+        var srid;
+        var matchtype;
         if ('srid' in parsedUrl.query) {
           srid = parsedUrl.query.srid;
         } else {
@@ -71,7 +69,7 @@ const lmSearchPlacename = async (req, res) => {
         }
         searchUrl = searchUrl + '&srid=' + srid;
         if ( q.length > 0 ) {
-          doSearchAsyncCall(req, res, municipalityArray, searchUrl);
+          doSearchAsyncCall(req, res, municipalityArray, searchUrl, configOptions, token, scope);
         } else {
           console.log('No searchstring, skip!');
           res.send({});
@@ -90,42 +88,7 @@ const lmSearchPlacename = async (req, res) => {
 // Export the module
 module.exports = lmSearchPlacename;
 
-function getTokenWait(options) {
-  // Return promise to be invoked for authenticating on service requests
-  return new Promise((resolve, reject) => {
-      // Requesting the token service object
-      request(options, (error, response, body) => {
-          if (error) {
-            console.log('Error token:' + error);
-            reject('An error occured collecting token: ', error);
-          } else {
-            token = body.access_token;
-            // console.log('Got token ' + token);
-            resolve(body.access_token);
-          }
-      })
-  })
-}
-
-async function getTokenAsyncCall(consumer_key, consumer_secret, scope) {
-  // Request a token from Lantmateriet API
-  const options = {
-      url: configOptions.url_token,
-      method: 'POST',
-      headers: {
-         'Authorization': 'Basic ' + Buffer.from(consumer_key + ':' + consumer_secret).toString('base64')
-      },
-      form: {
-          'scope': scope,
-          'grant_type': 'client_credentials'
-      },
-      json: true
-  }
-  var result = await getTokenWait(options);
-  return result;
-}
-
-async function doSearchAsyncCall(req, res, municipalityArray, urlParams) {
+async function doSearchAsyncCall(req, res, municipalityArray, urlParams, configOptions, token, scope) {
   var returnValue = [];
   var promiseArray = [];
   // Split all the separate municipality given to individual searches

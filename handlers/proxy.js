@@ -11,7 +11,7 @@ module.exports = function proxy(req, res) {
   }
   url = toAllowedUrl(buildUrl(req.query));
   if (!url) {
-    console.warn('Proxy: url not allowed', req.query.url);
+    console.warn('Proxy: url not allowed', sanitizeForLog(req.query.url));
     return sendError(res, 403, 'Url not allowed');
   }
   proxyRequest(req, res, {
@@ -37,6 +37,10 @@ function sendError(res, status, body) {
     'Content-Type': 'text/plain'
   });
   res.end(body);
+}
+
+function sanitizeForLog(value) {
+  return String(value).replace(/[\r\n]/g, '');
 }
 
 function parseAllowedUrls(urls) {

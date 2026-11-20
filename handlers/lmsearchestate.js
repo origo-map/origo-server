@@ -1,42 +1,33 @@
 var conf = require('../conf/config');
 var lmGetEstate = require('../handlers/lmgetestate');
-var request = require('request');
 var rp = require('request-promise');
-var Bluebird = require('bluebird');
 const url = require('url');
 const { compareRelevance, compareNamesNaturally } = require('../utils/compare');
-
-var objectIds;
-var fnrObjektidentitet;
-var fnrObjektidentitetGA;
-var username;
-var password;
-var srid;
-var status;
-var maxHits;
-
-// Token holder
-let token;
-let scope;
+const lmtokenhandler = require('./lmtokenhandler');
 
 var proxyUrl = 'lmsearchestate';
-var configOptions;
-objectIds = [];
-fnrObjektidentitet = '';
-fnrObjektidentitetGA = '';
 
 // Do the request in proper order
 const lmSearchEstate = async (req, res) => {
 
   if (conf[proxyUrl]) {
-    configOptions = Object.assign({}, conf[proxyUrl]);
-    scope = configOptions.scope;
+    const configOptions = Object.assign({}, conf[proxyUrl]);
+    const scope = configOptions.scope;
 
     // Get a token from LM
-    await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
+    const tokenObject = await lmtokenhandler({
+      id: proxyUrl,
+      url_token: configOptions.url_token,
+      url_revoke: configOptions.url_revoke,
+      consumer_key: configOptions.consumer_key,
+      consumer_secret: configOptions.consumer_secret,
+      scope: configOptions.scope
+    });
+    const token = tokenObject.token;
 
     // Get the query parameters from the url
     const parsedUrl = url.parse(decodeURI(req.url), true);
+    var srid;
     if ('srid' in parsedUrl.query) {
       srid = parsedUrl.query.srid;
     } else {
@@ -59,11 +50,8 @@ const lmSearchEstate = async (req, res) => {
       const x = parsedUrl.query.x;
       const y = parsedUrl.query.y;
 
-      // Get a token from LM
-      await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
-
       // Do a POST with all the IDs from free search to get the complete objects with geometry
-      await doGetFromPointAsyncCall(req, res, configOptions, x, y);
+      await doGetFromPointAsyncCall(req, res, configOptions, x, y, token, scope, srid);
     } else if ('q' in parsedUrl.query) {
       const searchString = parsedUrl.query.q;
       var searchArray = searchString.split(' ');
@@ -78,6 +66,8 @@ const lmSearchEstate = async (req, res) => {
           searchValue = searchValue + ' ' + searchArray[index];
         }
       }
+      var status;
+      var maxHits;
       if ('status' in parsedUrl.query) {
         status = parsedUrl.query.status;
       } else {
@@ -90,15 +80,13 @@ const lmSearchEstate = async (req, res) => {
       }
       
       // Do a free text search to get the IDs of all that matches
-      await doSearchAsyncCall(municipalityArray, searchValue);
+      var objectIds = await doSearchAsyncCall(municipalityArray, searchValue, configOptions, token, scope, status, maxHits);
 
       // Allow a maximum of 250 objects
       objectIds.length = objectIds.length > 250 ? 250 : objectIds.length;
 
       // Do a POST with all the IDs from free search to get the complete objects with geometry
-      await getEstateAsyncCall(req, res, municipalityArray);
-      // Reset the array of found objects.
-      objectIds = [];
+      await getEstateAsyncCall(req, res, municipalityArray, objectIds, configOptions, token, scope, srid);
     } else {
       res.send([]);
     }
@@ -110,9 +98,10 @@ const lmGetEstateFromPoint = async (req, res) => {
   let type = 'merged';
 
   if (conf[proxyUrl]) {
-    configOptions = Object.assign({}, conf[proxyUrl]);
-    scope = configOptions.scope;
+    const configOptions = Object.assign({}, conf[proxyUrl]);
+    const scope = configOptions.scope;
     const parsedUrl = url.parse(decodeURI(req.url), true);
+    var srid;
     if ('srid' in parsedUrl.query) {
       srid = parsedUrl.query.srid;
     } else {
@@ -127,10 +116,20 @@ const lmGetEstateFromPoint = async (req, res) => {
       const x = parsedUrl.query.x;
       const y = parsedUrl.query.y;
       // Get a token from LM
-      await getTokenAsyncCall(configOptions.consumer_key, configOptions.consumer_secret, configOptions.scope);
+      const tokenObject = await lmtokenhandler({
+        id: proxyUrl,
+        url_token: configOptions.url_token,
+        url_revoke: configOptions.url_revoke,
+        consumer_key: configOptions.consumer_key,
+        consumer_secret: configOptions.consumer_secret,
+        scope: configOptions.scope
+      });
+      const token = tokenObject.token;
 
       // Do a POST with all the IDs from free search to get the complete objects with geometry
-      await doGetEstateNumberAsyncCall(configOptions, x, y);
+      const estateNumbers = await doGetEstateNumberAsyncCall(configOptions, x, y, token, scope, srid);
+      const fnrObjektidentitet = estateNumbers.fnrObjektidentitet;
+      const fnrObjektidentitetGA = estateNumbers.fnrObjektidentitetGA;
 
       if (typeof fnrObjektidentitet === 'undefined') {
         // fnr is undefined do nothing
@@ -151,8 +150,6 @@ const lmGetEstateFromPoint = async (req, res) => {
   } else {
     res.send({});
   }
-  fnrObjektidentitet = '';
-  fnrObjektidentitetGA = '';
 }
 
 // Export the module
@@ -161,44 +158,10 @@ module.exports = {
   lmGetEstateFromPoint
 };
 
-function getTokenWait(options) {
-  // Return promise to be invoked for authenticating on service requests
-  return new Promise((resolve, reject) => {
-      // Requesting the token service object
-      request(options, (error, response, body) => {
-          if (error) {
-            console.log('Error token:' + error);
-            reject('An error occured collecting token: ', error);
-          } else {
-            token = body.access_token;
-            // console.log('Got token ' + token);
-            resolve(body.access_token);
-          }
-      })
-  })
-}
-
-async function getTokenAsyncCall(consumer_key, consumer_secret, scope) {
-  // Request a token from Lantmateriet API
-  const options = {
-      url: configOptions.url_token,
-      method: 'POST',
-      headers: {
-         'Authorization': 'Basic ' + Buffer.from(consumer_key + ':' + consumer_secret).toString('base64')
-      },
-      form: {
-          'scope': scope,
-          'grant_type': 'client_credentials'
-      },
-      json: true
-  }
-  var result = await getTokenWait(options);
-  return result;
-}
-
-async function doSearchAsyncCall(municipalityArray, searchValue) {
+async function doSearchAsyncCall(municipalityArray, searchValue, configOptions, token, scope, status, maxHits) {
   var returnValue = [];
   var promiseArray = [];
+  var objectIds = [];
   // Split all the separate municipality given to individual searches
   municipalityArray.forEach(function(municipality) {
     var searchUrl = encodeURI(configOptions.url + 'referens/fritext?beteckning=' + municipality + ' ' + searchValue + '&status=' + status + '&maxHits=' + maxHits)
@@ -243,6 +206,7 @@ async function doSearchAsyncCall(municipalityArray, searchValue) {
         });
         objectIds = newArray;
     });
+  return objectIds;
 }
 
 function getEstateWait(options, res, municipalityArray) {
@@ -258,7 +222,7 @@ function getEstateWait(options, res, municipalityArray) {
   });
 }
 
-async function getEstateAsyncCall(req, res, municipalityArray) {
+async function getEstateAsyncCall(req, res, municipalityArray, objectIds, configOptions, token, scope, srid) {
   if (objectIds.length > 0) {
     // Setup the call for getting the objects found in search and wait for result
     var options = {
@@ -277,19 +241,6 @@ async function getEstateAsyncCall(req, res, municipalityArray) {
     console.log('No objects!');
     res.send({});
   }
-}
-
-function makeRequest(req, res, options) {
-  return rp.get(options)
-  .then(function(result) {
-    var parameters = JSON.parse(result);
-
-    parameters.forEach(function(parameter) {
-      if (parameter.beteckningsid) {
-        objectIds.push(parameter.beteckningsid);
-      }
-    });
-  })
 }
 
 function concatResult(features, municipalityArray, searchString) {
@@ -388,7 +339,7 @@ function doGetFromPointWait(req, res, options) {
   });
 }
 
-async function doGetFromPointAsyncCall(req, res, configOptions, easting, northing) {
+async function doGetFromPointAsyncCall(req, res, configOptions, easting, northing, token, scope, srid) {
   // Setup the search call and wait for result
   const options = {
       url: encodeURI(configOptions.url + 'punkt?punktSrid=' + srid + '&koordinater=' + northing + ',' + easting + '&srid=' + srid),
@@ -433,9 +384,10 @@ function concatEstateNameResult(feature) {
   return result;
 }
 
-async function doGetEstateNumberAsyncCall(configOptions, easting, northing) {
-  var returnValue = [];
+async function doGetEstateNumberAsyncCall(configOptions, easting, northing, token, scope, srid) {
   var promiseArray = [];
+  var fnrObjektidentitet = '';
+  var fnrObjektidentitetGA = '';
 
   // Setup the search call and wait for result
   const options = {
@@ -450,7 +402,9 @@ async function doGetEstateNumberAsyncCall(configOptions, easting, northing) {
   }
   promiseArray.push(rp(options)
     .then(function (parsedBody) {
-      concatEstateNumberResult(parsedBody);
+      const numbers = concatEstateNumberResult(parsedBody);
+      fnrObjektidentitet = numbers.fnrObjektidentitet;
+      fnrObjektidentitetGA = numbers.fnrObjektidentitetGA;
     })
     .catch(function (err) {
       console.log(err);
@@ -470,10 +424,16 @@ async function doGetEstateNumberAsyncCall(configOptions, easting, northing) {
     .finally(function () {
         // The result has been handled in concatEstateNumberResult()
     });
+
+  return {
+    fnrObjektidentitet,
+    fnrObjektidentitetGA
+  };
 }
 
 function concatEstateNumberResult(feature) {
-  const result = {};
+  let fnrObjektidentitet = '';
+  let fnrObjektidentitetGA = '';
 
   if ('features' in feature) {
     feature.features.forEach((element) => {
@@ -484,4 +444,9 @@ function concatEstateNumberResult(feature) {
       }
     })
   }
+
+  return {
+    fnrObjektidentitet,
+    fnrObjektidentitetGA
+  };
 }

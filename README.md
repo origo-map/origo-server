@@ -181,9 +181,9 @@ Configured services at:
 
       POST a string of comma-separated attachment IDs as a JSON body, e g { attachmentIds: "id1,id2,etc" } to delete the specified attachments.
 
-      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAttachments/
+      /origoserver/attachment/{something-like-the-layername}/{a unique identifier}/deleteAllAttachments
 
-      A GET request to delete all attachments for a specific object.
+      A POST request (no body needed) to delete all attachments for a specific object. Deleting with GET is not allowed and gives 405.
 
 - Samfällighetsförening Direkt - Show information from Samfällighetsförening Direkt API from Lantmäteriet.
 

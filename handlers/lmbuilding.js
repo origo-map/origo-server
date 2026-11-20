@@ -74,7 +74,7 @@ async function handleSearchRequest(req, res, config, token, isRegisterEnhet) {
         res.render('lmbuildingerror', { error: 'No buildings object!' });
       }
     } else {
-      registerEnhetId = response.data.features[0].properties.liggerPa.registerenhetsreferens.objektidentitet; // Get registerEnhetId from returned data
+      const registerEnhetId = response.data.features[0].properties.liggerPa.registerenhetsreferens.objektidentitet; // Get registerEnhetId from returned data
 
       await getBuildingInformation(req, res, config, token, [id], registerEnhetId, isRegisterEnhet);
     }

@@ -3,7 +3,6 @@ var axios = require('axios');
 const lmtokenhandler = require('./lmtokenhandler');
 var transformCoordinates = require('../lib/utils/transformcoordinates');
 
-var srid = '3006';
 var validProjs = ["3006", "3007", "3008", "3009", "3010", "3011", "3012", "3013", "3014", "3015", "3016", "3017", "3018", "3857", "4326"];
 
 var confObj = 'lmelevation';
@@ -49,7 +48,7 @@ const lmElevation = async (req, res) => {
  * @param {any} options - The config otions for the axios request.
  * @returns {void}
  */
-function doGetWait(req, res, options) {
+function doGetWait(req, res, options, srid) {
   axios(options)
   .then(response => {
     const parsedBody = response.data;
@@ -76,7 +75,7 @@ function doGetWait(req, res, options) {
  * @param {any} options - The config otions for the axios request.
  * @returns {void}
  */
-function doGetGeoemtryWait(req, res, options) {
+function doGetGeoemtryWait(req, res, options, srid) {
   axios(options)
   .then(response => {
     const parsedBody = response.data;
@@ -104,6 +103,7 @@ async function doGetAsyncCall(req, res, configOptions, token) {
   var xcoord;
   var ycoord;
   var urlArr;
+  var srid = '3006';
 
   // Extracting coordinates and srid from the URL
   urlArr = req.url.split('/');
@@ -141,7 +141,7 @@ async function doGetAsyncCall(req, res, configOptions, token) {
         data: bodyContent
     }
     // Await the geometry processing request
-    await doGetGeoemtryWait(req, res, options);
+    await doGetGeoemtryWait(req, res, options, srid);
   } else if (isNaN(srid) || isNaN(xcoord) || isNaN(ycoord) ) {  // Check that request url has numbers
     console.log('ERROR Request parameters not numbers!');
     res.send({});
@@ -173,7 +173,7 @@ async function doGetAsyncCall(req, res, configOptions, token) {
         }
       };
       // Await the simple elevation request
-      await doGetWait(req, res, options);
+      await doGetWait(req, res, options, srid);
     }
   }
 }
